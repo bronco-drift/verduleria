@@ -2,14 +2,13 @@ import { config } from "dotenv";
 config({ path: ".env.local" });
 
 import { createClient } from "@supabase/supabase-js";
+import { DEMO_USER_ID, DEMO_USER_NAME, DEMO_STORE_SLUG } from "../lib/demo";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!,
   { auth: { autoRefreshToken: false, persistSession: false } }
 );
-
-const STORE_SLUG = "don-jose";
 
 type SeedProduct = {
   name: string;
@@ -82,15 +81,25 @@ const PRODUCTS: SeedProduct[] = [
 const CATEGORIES = ["Frutas", "Verduras", "Hongos", "Hierbas", "Almacén"];
 
 async function main() {
-  console.log("🌱 Seeding Verdulería Don José...\n");
+  console.log("🌱 Seeding...\n");
 
-  // 1) Upsert store
+  // Demo customer profile (no auth user required after _disable_auth_for_demo.sql)
+  console.log("→ Demo customer profile...");
+  await supabase
+    .from("profiles")
+    .upsert(
+      { id: DEMO_USER_ID, full_name: DEMO_USER_NAME, phone: null },
+      { onConflict: "id" }
+    );
+  console.log(`  ✓ ${DEMO_USER_NAME} (${DEMO_USER_ID})`);
+
+  // Demo store
   console.log("→ Store...");
   const { data: store, error: storeErr } = await supabase
     .from("stores")
     .upsert(
       {
-        slug: STORE_SLUG,
+        slug: DEMO_STORE_SLUG,
         name: "Verdulería Don José",
         address: "Av. Cabildo 1234, CABA",
         phone: "+54 9 11 5555-1234",
@@ -106,14 +115,13 @@ async function main() {
     console.error("Store error:", storeErr);
     process.exit(1);
   }
-  console.log(`  ✓ ${store.name} (id: ${store.id})`);
+  console.log(`  ✓ ${store.name}`);
 
-  // 2) Wipe existing categories+products for this store (cascade)
+  // Wipe and reload categories+products for this store
   console.log("→ Limpiando categorías y productos previos...");
   await supabase.from("products").delete().eq("store_id", store.id);
   await supabase.from("categories").delete().eq("store_id", store.id);
 
-  // 3) Insert categories
   console.log("→ Categorías...");
   const { data: cats, error: catErr } = await supabase
     .from("categories")
@@ -134,7 +142,6 @@ async function main() {
 
   const catByName = new Map(cats.map((c) => [c.name, c.id]));
 
-  // 4) Insert products
   console.log("→ Productos...");
   const productRows = PRODUCTS.map((p) => ({
     store_id: store.id,
@@ -159,8 +166,6 @@ async function main() {
   console.log(`  ✓ ${prods.length} productos\n`);
 
   console.log("✅ Seed completo.");
-  console.log(`   Storefront: /don-jose`);
-  console.log(`   Store ID:   ${store.id}\n`);
 }
 
 main().catch((err) => {

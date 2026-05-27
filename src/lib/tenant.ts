@@ -1,65 +1,44 @@
-import { createSupabaseServerClient } from "./supabase/server";
 import { cache } from "react";
+import { createSupabaseAdminClient } from "./supabase/admin";
+import { DEMO_STORE_SLUG } from "./demo";
 
 /**
  * Get store by URL slug. Cached per-request via React cache().
- * Returns null if not found. Use for /[storeSlug]/... routes.
+ * Returns null if not found.
  */
 export const getStoreBySlug = cache(async (slug: string) => {
-  const supabase = await createSupabaseServerClient();
-  const { data, error } = await supabase
+  const supabase = createSupabaseAdminClient();
+  const { data } = await supabase
     .from("stores")
     .select("*")
     .eq("slug", slug)
-    .eq("is_active", true)
     .maybeSingle();
-
-  if (error) {
-    console.error("getStoreBySlug error:", error);
-    return null;
-  }
   return data;
 });
 
 /**
- * Get the store the current user is a member of (owner/admin/driver).
- * Used in /admin routes. Returns null if user is not a member of any store.
+ * Get the active demo store. In a no-auth phase, "Mi verdulería" always
+ * manages this store. When auth comes back, this is resolved from the
+ * logged-in user's store_members entry.
  */
-export const getCurrentUserStore = cache(async () => {
-  const supabase = await createSupabaseServerClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) return null;
-
-  const { data } = await supabase
-    .from("store_members")
-    .select("role, stores(*)")
-    .eq("user_id", user.id)
-    .limit(1)
-    .maybeSingle();
-
-  if (!data || !data.stores) return null;
-
-  return {
-    store: data.stores as unknown as {
-      id: string;
-      slug: string;
-      name: string;
-      delivery_fee: string;
-    },
-    role: data.role as "owner" | "admin" | "driver",
-    user,
-  };
+export const getDemoStore = cache(async () => {
+  const store = await getStoreBySlug(DEMO_STORE_SLUG);
+  if (!store) {
+    throw new Error(
+      `Demo store "${DEMO_STORE_SLUG}" not found. Run \`npm run db:seed\`.`
+    );
+  }
+  return store;
 });
 
 /**
- * Get the active store from the user's session (must be logged in).
- * Returns null if not logged in or not a member.
+ * List all active stores (for the Tienda landing when multiple stores exist).
  */
-export const requireUserStore = async () => {
-  const result = await getCurrentUserStore();
-  if (!result) throw new Error("Unauthorized: no store membership");
-  return result;
-};
+export const listActiveStores = cache(async () => {
+  const supabase = createSupabaseAdminClient();
+  const { data } = await supabase
+    .from("stores")
+    .select("id, slug, name, address, phone, delivery_fee, is_active")
+    .order("name");
+  return data ?? [];
+});

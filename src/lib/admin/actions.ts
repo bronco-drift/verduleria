@@ -2,13 +2,25 @@
 
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
-import { requireAdminContext } from "./auth";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { nextStatuses } from "./order-flow";
+import { DEMO_USER_ID, DEMO_STORE_SLUG } from "@/lib/demo";
 import type { OrderStatus, ProductUnit } from "@/db/schema";
 
 export type ActionResult =
   | { ok: true }
   | { ok: false; error: string };
+
+async function getActiveStore() {
+  const supabase = createSupabaseAdminClient();
+  const { data: store } = await supabase
+    .from("stores")
+    .select("id, slug")
+    .eq("slug", DEMO_STORE_SLUG)
+    .single();
+  if (!store) throw new Error("Demo store not found");
+  return store;
+}
 
 // ============================================================================
 // ORDERS
@@ -21,41 +33,41 @@ export async function updateOrderStatusAction({
   orderId: string;
   newStatus: OrderStatus;
 }): Promise<ActionResult> {
-  const ctx = await requireAdminContext();
+  const supabase = createSupabaseAdminClient();
+  const store = await getActiveStore();
 
-  // Fetch order, verify it belongs to admin's store
-  const { data: order } = await ctx.admin
+  const { data: order } = await supabase
     .from("orders")
     .select("status, store_id")
     .eq("id", orderId)
     .single();
-
   if (!order) return { ok: false, error: "Pedido no encontrado" };
-  if (order.store_id !== ctx.store.id) {
-    return { ok: false, error: "Sin permisos sobre este pedido" };
+  if (order.store_id !== store.id) {
+    return { ok: false, error: "Pedido de otra verdulería" };
   }
 
   const allowed = nextStatuses(order.status as OrderStatus);
   if (!allowed.includes(newStatus)) {
-    return { ok: false, error: `No se puede pasar de ${order.status} a ${newStatus}` };
+    return {
+      ok: false,
+      error: `No se puede pasar de ${order.status} a ${newStatus}`,
+    };
   }
 
-  const { error } = await ctx.admin
+  const { error } = await supabase
     .from("orders")
     .update({ status: newStatus, updated_at: new Date().toISOString() })
     .eq("id", orderId);
-
   if (error) return { ok: false, error: error.message };
 
-  await ctx.admin.from("order_status_history").insert({
+  await supabase.from("order_status_history").insert({
     order_id: orderId,
     status: newStatus,
-    changed_by: ctx.user.id,
+    changed_by: DEMO_USER_ID,
   });
 
-  // Side effects on delivery
   if (newStatus === "in_delivery") {
-    await ctx.admin
+    await supabase
       .from("deliveries")
       .update({
         status: "picked_up",
@@ -63,7 +75,7 @@ export async function updateOrderStatusAction({
       })
       .eq("order_id", orderId);
   } else if (newStatus === "delivered") {
-    await ctx.admin
+    await supabase
       .from("deliveries")
       .update({
         status: "delivered",
@@ -72,7 +84,8 @@ export async function updateOrderStatusAction({
       .eq("order_id", orderId);
   }
 
-  revalidatePath("/admin", "layout");
+  revalidatePath("/verduleria", "layout");
+  revalidatePath("/tienda", "layout");
   return { ok: true };
 }
 
@@ -83,29 +96,29 @@ export async function assignDriverAction({
   orderId: string;
   driverId: string;
 }): Promise<ActionResult> {
-  const ctx = await requireAdminContext();
+  const supabase = createSupabaseAdminClient();
+  const store = await getActiveStore();
 
-  // Verify order belongs to store
-  const { data: order } = await ctx.admin
+  const { data: order } = await supabase
     .from("orders")
     .select("store_id")
     .eq("id", orderId)
     .single();
-  if (!order || order.store_id !== ctx.store.id) {
-    return { ok: false, error: "Sin permisos" };
+  if (!order || order.store_id !== store.id) {
+    return { ok: false, error: "Pedido de otra verdulería" };
   }
 
-  // Verify driver is a member of this store
-  const { data: member } = await ctx.admin
+  const { data: member } = await supabase
     .from("store_members")
     .select("user_id")
-    .eq("store_id", ctx.store.id)
+    .eq("store_id", store.id)
     .eq("user_id", driverId)
     .eq("role", "driver")
     .maybeSingle();
-  if (!member) return { ok: false, error: "Repartidor no encontrado en tu store" };
+  if (!member)
+    return { ok: false, error: "Repartidor no encontrado en tu verdulería" };
 
-  const { error } = await ctx.admin
+  const { error } = await supabase
     .from("deliveries")
     .update({
       driver_id: driverId,
@@ -113,10 +126,9 @@ export async function assignDriverAction({
       assigned_at: new Date().toISOString(),
     })
     .eq("order_id", orderId);
-
   if (error) return { ok: false, error: error.message };
 
-  revalidatePath("/admin", "layout");
+  revalidatePath("/verduleria", "layout");
   return { ok: true };
 }
 
@@ -148,7 +160,8 @@ export async function createProductAction(
   _prev: ActionResult | null,
   formData: FormData
 ): Promise<ActionResult> {
-  const ctx = await requireAdminContext();
+  const supabase = createSupabaseAdminClient();
+  const store = await getActiveStore();
 
   const parsed = productSchema.safeParse({
     name: formData.get("name"),
@@ -164,8 +177,8 @@ export async function createProductAction(
     return { ok: false, error: parsed.error.issues[0].message };
   }
 
-  const { error } = await ctx.admin.from("products").insert({
-    store_id: ctx.store.id,
+  const { error } = await supabase.from("products").insert({
+    store_id: store.id,
     name: parsed.data.name,
     description: parsed.data.description ?? null,
     price: parsed.data.price.toFixed(2),
@@ -175,11 +188,10 @@ export async function createProductAction(
     is_featured: parsed.data.is_featured ?? false,
     is_active: true,
   });
-
   if (error) return { ok: false, error: error.message };
 
-  revalidatePath("/admin/productos");
-  revalidatePath(`/${ctx.store.slug}`);
+  revalidatePath("/verduleria/productos");
+  revalidatePath("/tienda");
   return { ok: true };
 }
 
@@ -197,7 +209,8 @@ export async function updateProductAction({
     stock: number | null;
   }>;
 }): Promise<ActionResult> {
-  const ctx = await requireAdminContext();
+  const supabase = createSupabaseAdminClient();
+  const store = await getActiveStore();
 
   const update: Record<string, unknown> = {
     updated_at: new Date().toISOString(),
@@ -209,93 +222,92 @@ export async function updateProductAction({
   if (patch.is_featured !== undefined) update.is_featured = patch.is_featured;
   if (patch.stock !== undefined) update.stock = patch.stock;
 
-  const { error } = await ctx.admin
+  const { error } = await supabase
     .from("products")
     .update(update)
     .eq("id", id)
-    .eq("store_id", ctx.store.id);
-
+    .eq("store_id", store.id);
   if (error) return { ok: false, error: error.message };
 
-  revalidatePath("/admin/productos");
-  revalidatePath(`/${ctx.store.slug}`);
+  revalidatePath("/verduleria/productos");
+  revalidatePath("/tienda");
   return { ok: true };
 }
 
 export async function deleteProductAction(id: string): Promise<ActionResult> {
-  const ctx = await requireAdminContext();
-  const { error } = await ctx.admin
+  const supabase = createSupabaseAdminClient();
+  const store = await getActiveStore();
+  const { error } = await supabase
     .from("products")
     .delete()
     .eq("id", id)
-    .eq("store_id", ctx.store.id);
+    .eq("store_id", store.id);
   if (error) return { ok: false, error: error.message };
-  revalidatePath("/admin/productos");
-  revalidatePath(`/${ctx.store.slug}`);
+  revalidatePath("/verduleria/productos");
+  revalidatePath("/tienda");
   return { ok: true };
 }
 
 // ============================================================================
-// DRIVERS (store members con role='driver')
+// DRIVERS (store_members con role='driver')
 // ============================================================================
 
 const addDriverSchema = z.object({
-  email: z.string().email("Email inválido"),
+  fullName: z.string().min(2, "Ingresá un nombre"),
+  phone: z.string().optional(),
 });
 
 export async function addDriverAction(
   _prev: ActionResult | null,
   formData: FormData
 ): Promise<ActionResult> {
-  const ctx = await requireAdminContext();
+  const supabase = createSupabaseAdminClient();
+  const store = await getActiveStore();
 
   const parsed = addDriverSchema.safeParse({
-    email: formData.get("email"),
+    fullName: formData.get("fullName"),
+    phone: formData.get("phone") || undefined,
   });
   if (!parsed.success) {
     return { ok: false, error: parsed.error.issues[0].message };
   }
 
-  // Find user by email
-  const { data: usersData, error: usersErr } =
-    await ctx.admin.auth.admin.listUsers();
-  if (usersErr) return { ok: false, error: usersErr.message };
+  // Create a synthetic profile for the driver (no auth in this phase)
+  const driverId = crypto.randomUUID();
+  const { error: profErr } = await supabase.from("profiles").insert({
+    id: driverId,
+    full_name: parsed.data.fullName,
+    phone: parsed.data.phone ?? null,
+  });
+  if (profErr) return { ok: false, error: profErr.message };
 
-  const target = usersData.users.find((u) => u.email === parsed.data.email);
-  if (!target) {
-    return {
-      ok: false,
-      error: "No existe un usuario con ese email. Que se registre primero.",
-    };
+  const { error: memberErr } = await supabase.from("store_members").insert({
+    store_id: store.id,
+    user_id: driverId,
+    role: "driver",
+  });
+  if (memberErr) {
+    // Roll back the profile
+    await supabase.from("profiles").delete().eq("id", driverId);
+    return { ok: false, error: memberErr.message };
   }
 
-  // Upsert membership
-  const { error: memberErr } = await ctx.admin.from("store_members").upsert(
-    {
-      store_id: ctx.store.id,
-      user_id: target.id,
-      role: "driver",
-    },
-    { onConflict: "store_id,user_id" }
-  );
-
-  if (memberErr) return { ok: false, error: memberErr.message };
-
-  revalidatePath("/admin/repartidores");
+  revalidatePath("/verduleria/repartidores");
   return { ok: true };
 }
 
-export async function removeDriverAction(
-  userId: string
-): Promise<ActionResult> {
-  const ctx = await requireAdminContext();
-  const { error } = await ctx.admin
+export async function removeDriverAction(userId: string): Promise<ActionResult> {
+  const supabase = createSupabaseAdminClient();
+  const store = await getActiveStore();
+  const { error } = await supabase
     .from("store_members")
     .delete()
-    .eq("store_id", ctx.store.id)
+    .eq("store_id", store.id)
     .eq("user_id", userId)
     .eq("role", "driver");
   if (error) return { ok: false, error: error.message };
-  revalidatePath("/admin/repartidores");
+  // Also delete the synthetic profile
+  await supabase.from("profiles").delete().eq("id", userId);
+  revalidatePath("/verduleria/repartidores");
   return { ok: true };
 }
