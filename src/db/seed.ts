@@ -29,53 +29,75 @@ type SeedProduct = {
 };
 
 const PRODUCTS: SeedProduct[] = [
-  // Verduras
-  { name: "Acelga fresca", price: "1900", unit: "atado", unit_amount: "1 atado", category: "Verduras" },
-  { name: "Espinaca", price: "1900", unit: "atado", unit_amount: "1 atado", category: "Verduras" },
-  { name: "Lechuga manteca", price: "1400", unit: "unidad", unit_amount: "1 planta", category: "Verduras" },
-  { name: "Rúcula", price: "2200", unit: "paquete", unit_amount: "1 paquete", category: "Verduras", is_featured: true },
-  { name: "Tomate perita", price: "3000", unit: "kg", unit_amount: "1 kg", category: "Verduras" },
-  { name: "Tomate cherry", price: "1900", unit: "bandeja", unit_amount: "500 g", category: "Verduras", is_featured: true },
+  // ─── VERDURAS ──────────────────────────────────────────────────────
+  { name: "Acelga fresca", price: "1900", unit: "atado", unit_amount: "1 atado (500g)", category: "Verduras" },
+  { name: "Apio", price: "2000", unit: "unidad", unit_amount: "1 u", category: "Verduras" },
+  { name: "Batata", price: "2500", unit: "kg", unit_amount: "1 kg", category: "Verduras" },
+  { name: "Berenjena", price: "3900", unit: "kg", unit_amount: "1 kg", category: "Verduras" },
+  { name: "Brócoli", price: "2500", unit: "unidad", unit_amount: "1 u", category: "Verduras" },
   { name: "Cebolla", price: "1600", unit: "kg", unit_amount: "1 kg", category: "Verduras" },
   { name: "Cebolla morada", price: "2200", unit: "kg", unit_amount: "1 kg", category: "Verduras" },
-  { name: "Papa cepillada", price: "2300", unit: "paquete", unit_amount: "2 kg", category: "Verduras" },
-  { name: "Batata", price: "2500", unit: "kg", unit_amount: "1 kg", category: "Verduras" },
-  { name: "Zanahoria", price: "2500", unit: "kg", unit_amount: "1 kg", category: "Verduras" },
+  { name: "Choclo", price: "4100", unit: "bandeja", unit_amount: "2 u", category: "Verduras" },
+  { name: "Espinaca", price: "1900", unit: "atado", unit_amount: "1 atado", category: "Verduras" },
+  { name: "Espárragos", price: "14000", unit: "atado", unit_amount: "1 atado", category: "Verduras", is_featured: true },
+  { name: "Kale", price: "3400", unit: "atado", unit_amount: "1 atado", category: "Verduras" },
+  { name: "Lechuga manteca", price: "1400", unit: "unidad", unit_amount: "1 planta", category: "Verduras" },
   { name: "Morrón rojo", price: "1300", unit: "unidad", unit_amount: "1 u", category: "Verduras" },
   { name: "Morrón verde", price: "900", unit: "unidad", unit_amount: "1 u", category: "Verduras" },
-  { name: "Brócoli", price: "2500", unit: "unidad", unit_amount: "1 u", category: "Verduras" },
-  { name: "Apio", price: "2000", unit: "unidad", unit_amount: "1 u", category: "Verduras" },
-  { name: "Zapallo anco", price: "1900", unit: "unidad", unit_amount: "1 u", category: "Verduras" },
+  { name: "Papa cepillada", price: "2300", unit: "paquete", unit_amount: "2 kg", category: "Verduras" },
+  { name: "Papines", price: "5000", unit: "paquete", unit_amount: "500 g", category: "Verduras" },
+  { name: "Perejil", price: "1500", unit: "paquete", unit_amount: "1 paquete", category: "Verduras" },
+  { name: "Puerro", price: "1700", unit: "paquete", unit_amount: "500 g", category: "Verduras" },
+  { name: "Remolacha", price: "3900", unit: "kg", unit_amount: "1 kg", category: "Verduras" },
+  { name: "Repollo blanco", price: "2300", unit: "kg", unit_amount: "1 kg", category: "Verduras" },
+  { name: "Repollitos de Bruselas", price: "3400", unit: "bandeja", unit_amount: "500 g", category: "Verduras" },
+  { name: "Rúcula", price: "2200", unit: "paquete", unit_amount: "1 paquete", category: "Verduras", is_featured: true },
+  { name: "Tomate cherry", price: "1900", unit: "bandeja", unit_amount: "500 g", category: "Verduras", is_featured: true },
+  { name: "Tomate perita", price: "3000", unit: "kg", unit_amount: "1 kg", category: "Verduras" },
+  { name: "Zanahoria", price: "2500", unit: "kg", unit_amount: "1 kg", category: "Verduras" },
+  { name: "Zapallo anco", price: "1900", unit: "unidad", unit_amount: "1 u (~2 kg)", category: "Verduras" },
+  { name: "Zapallo kabutia", price: "2600", unit: "unidad", unit_amount: "1 u", category: "Verduras" },
+  { name: "Zapallito", price: "4900", unit: "kg", unit_amount: "1 kg", category: "Verduras" },
   { name: "Zucchini", price: "4000", unit: "kg", unit_amount: "1 kg", category: "Verduras" },
-  { name: "Berenjena", price: "3900", unit: "kg", unit_amount: "1 kg", category: "Verduras" },
-  { name: "Choclo", price: "4100", unit: "bandeja", unit_amount: "2 u", category: "Verduras" },
 
-  // Frutas
+  // ─── FRUTAS ────────────────────────────────────────────────────────
+  { name: "Ananá", price: "6500", unit: "unidad", unit_amount: "1 u", category: "Frutas" },
   { name: "Banana", price: "2900", unit: "kg", unit_amount: "1 kg", category: "Frutas", is_featured: true },
+  { name: "Frutilla", price: "4900", unit: "bandeja", unit_amount: "500 g", category: "Frutas" },
+  { name: "Granada", price: "8000", unit: "unidad", unit_amount: "1 u", category: "Frutas" },
+  { name: "Kiwi", price: "5000", unit: "bandeja", unit_amount: "500 g", category: "Frutas" },
+  { name: "Lima", price: "3000", unit: "kg", unit_amount: "1 kg", category: "Frutas" },
+  { name: "Limón", price: "2200", unit: "kg", unit_amount: "1 kg", category: "Frutas" },
+  { name: "Mandarina", price: "1800", unit: "kg", unit_amount: "1 kg", category: "Frutas" },
+  { name: "Mango", price: "2800", unit: "unidad", unit_amount: "1 u", category: "Frutas" },
   { name: "Manzana roja", price: "4500", unit: "kg", unit_amount: "1 kg", category: "Frutas" },
   { name: "Manzana verde", price: "4500", unit: "kg", unit_amount: "1 kg", category: "Frutas" },
-  { name: "Pera Williams", price: "4500", unit: "kg", unit_amount: "1 kg", category: "Frutas" },
+  { name: "Melón", price: "6200", unit: "unidad", unit_amount: "1 u", category: "Frutas" },
   { name: "Naranja para jugo", price: "2000", unit: "kg", unit_amount: "1 kg", category: "Frutas" },
-  { name: "Mandarina", price: "1800", unit: "kg", unit_amount: "1 kg", category: "Frutas" },
-  { name: "Limón", price: "2200", unit: "kg", unit_amount: "1 kg", category: "Frutas" },
-  { name: "Kiwi", price: "5000", unit: "bandeja", unit_amount: "500 g", category: "Frutas" },
+  { name: "Naranja ombligo", price: "3500", unit: "kg", unit_amount: "1 kg", category: "Frutas" },
   { name: "Palta Hass", price: "2600", unit: "unidad", unit_amount: "1 u grande", category: "Frutas", is_featured: true },
-  { name: "Frutilla", price: "4900", unit: "bandeja", unit_amount: "500 g", category: "Frutas" },
-  { name: "Ananá", price: "6500", unit: "unidad", unit_amount: "1 u", category: "Frutas" },
+  { name: "Pera Williams", price: "4500", unit: "kg", unit_amount: "1 kg", category: "Frutas" },
+  { name: "Sandía", price: "5000", unit: "unidad", unit_amount: "1 u (~5 kg)", category: "Frutas" },
+  { name: "Uva blanca", price: "9000", unit: "bandeja", unit_amount: "500 g", category: "Frutas" },
+  { name: "Uva negra", price: "5500", unit: "kg", unit_amount: "1 kg", category: "Frutas" },
 
-  // Hongos
+  // ─── HONGOS ────────────────────────────────────────────────────────
   { name: "Champiñones frescos", price: "6800", unit: "bandeja", unit_amount: "200 g", category: "Hongos" },
   { name: "Portobellos frescos", price: "8700", unit: "bandeja", unit_amount: "200 g", category: "Hongos" },
+  { name: "Girgolas frescas", price: "6800", unit: "bandeja", unit_amount: "200 g", category: "Hongos" },
 
-  // Hierbas
-  { name: "Perejil", price: "1500", unit: "paquete", unit_amount: "1 paquete", category: "Hierbas" },
-  { name: "Albahaca", price: "2000", unit: "unidad", unit_amount: "1 atado", category: "Hierbas" },
+  // ─── HIERBAS ───────────────────────────────────────────────────────
+  { name: "Albahaca", price: "2000", unit: "atado", unit_amount: "1 atado", category: "Hierbas" },
   { name: "Ciboulette", price: "3000", unit: "atado", unit_amount: "1 atado", category: "Hierbas" },
 
-  // Almacén
-  { name: "Huevos blancos", price: "4000", unit: "docena", unit_amount: "12 u", category: "Almacén" },
+  // ─── ALMACÉN ───────────────────────────────────────────────────────
+  { name: "Aceite de oliva", price: "18700", unit: "paquete", unit_amount: "500 ml", category: "Almacén" },
   { name: "Ajo", price: "2500", unit: "unidad", unit_amount: "2 cabezas", category: "Almacén" },
+  { name: "Garbanzos", price: "4200", unit: "paquete", unit_amount: "500 g", category: "Almacén" },
+  { name: "Huevos blancos", price: "4000", unit: "docena", unit_amount: "12 u", category: "Almacén" },
   { name: "Jengibre", price: "5500", unit: "kg", unit_amount: "250 g", category: "Almacén" },
+  { name: "Lentejas", price: "4900", unit: "paquete", unit_amount: "450 g", category: "Almacén" },
+  { name: "Quinoa", price: "8900", unit: "paquete", unit_amount: "250 g", category: "Almacén" },
 ];
 
 const CATEGORIES = ["Frutas", "Verduras", "Hongos", "Hierbas", "Almacén"];
