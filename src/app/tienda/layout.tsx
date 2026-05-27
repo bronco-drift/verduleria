@@ -1,6 +1,7 @@
 import { headers } from "next/headers";
 import { SubTabs } from "@/components/layout/sub-tabs";
-import { getDemoStore } from "@/lib/tenant";
+import { StoreSelector } from "@/components/layout/store-selector";
+import { getActiveStore, listActiveStores } from "@/lib/active-store";
 import { CartToggle } from "./cart-toggle";
 import { CartDrawer } from "./cart-drawer";
 
@@ -12,14 +13,13 @@ export default async function TiendaLayout({
   const h = await headers();
   const pathname = h.get("x-next-pathname") ?? "/tienda";
 
-  const store = await getDemoStore();
+  const [store, allStores] = await Promise.all([
+    getActiveStore(),
+    listActiveStores(),
+  ]);
 
   const tabs = [
-    {
-      href: "/tienda",
-      label: "Catálogo",
-      match: (p: string) => p === "/tienda",
-    },
+    { href: "/tienda", label: "Catálogo", match: (p: string) => p === "/tienda" },
     {
       href: "/tienda/recetas",
       label: "👨‍🍳 Recetas",
@@ -44,13 +44,14 @@ export default async function TiendaLayout({
           <p className="text-[11px] text-muted-foreground">Comprando en</p>
           <h2 className="text-[15px] font-bold">{store.name}</h2>
         </div>
-        <CartToggle />
+        <div className="flex items-center gap-4">
+          <StoreSelector stores={allStores} currentSlug={store.slug} />
+          <CartToggle />
+        </div>
       </div>
       <SubTabs tabs={tabs} pathname={pathname} />
       {children}
-      <CartDrawer
-        storeDeliveryFee={Number(store.delivery_fee)}
-      />
+      <CartDrawer storeDeliveryFee={Number(store.delivery_fee)} />
     </main>
   );
 }

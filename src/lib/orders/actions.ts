@@ -4,7 +4,8 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
-import { DEMO_USER_ID, DEMO_STORE_SLUG } from "@/lib/demo";
+import { DEMO_USER_ID } from "@/lib/demo";
+import { getActiveStore } from "@/lib/active-store";
 
 const checkoutSchema = z.object({
   deliveryAddress: z.string().min(5, "Indicá una dirección"),
@@ -31,13 +32,7 @@ export async function createOrderFromCartAction(
   }
 
   const supabase = createSupabaseAdminClient();
-
-  const { data: store } = await supabase
-    .from("stores")
-    .select("id, delivery_fee")
-    .eq("slug", DEMO_STORE_SLUG)
-    .single();
-  if (!store) return { ok: false, error: "Verdulería no encontrada" };
+  const store = await getActiveStore();
 
   const { data: cart } = await supabase
     .from("carts")
@@ -134,5 +129,5 @@ export async function createOrderFromCartAction(
   await supabase.from("cart_items").delete().eq("cart_id", cart.id);
 
   revalidatePath("/", "layout");
-  redirect(`/tienda/mis-pedidos?just=${order.id}`);
+  redirect(`/tienda/mis-pedidos?just=${order.id}&store=${store.slug}`);
 }

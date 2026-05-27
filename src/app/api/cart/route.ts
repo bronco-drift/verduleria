@@ -1,5 +1,6 @@
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
-import { DEMO_USER_ID, DEMO_STORE_SLUG } from "@/lib/demo";
+import { DEMO_USER_ID } from "@/lib/demo";
+import { getActiveStore } from "@/lib/active-store";
 
 export type CartItemRow = {
   id: string;
@@ -19,12 +20,10 @@ export type CartResponse = {
 
 export async function GET() {
   const supabase = createSupabaseAdminClient();
-  const { data: store } = await supabase
-    .from("stores")
-    .select("id")
-    .eq("slug", DEMO_STORE_SLUG)
-    .maybeSingle();
-  if (!store) {
+  let store: { id: string };
+  try {
+    store = await getActiveStore();
+  } catch {
     return Response.json({ items: [], subtotal: 0, count: 0 } satisfies CartResponse);
   }
 

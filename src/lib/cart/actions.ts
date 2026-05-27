@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { DEMO_USER_ID } from "@/lib/demo";
+import { getActiveStore } from "@/lib/active-store";
 
 export type CartActionResult =
   | { ok: true }

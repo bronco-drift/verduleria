@@ -72,3 +72,41 @@ export async function toggleStoreActiveAction({
   revalidatePath("/", "layout");
   return { ok: true };
 }
+
+const updateStoreSchema = z.object({
+  storeId: z.string().uuid(),
+  name: z.string().min(2, "Nombre requerido"),
+  address: z.string().optional(),
+  phone: z.string().optional(),
+  delivery_fee: z.coerce.number().min(0),
+});
+
+export async function updateStoreAction(
+  _prev: ActionResult | null,
+  formData: FormData
+): Promise<ActionResult> {
+  const parsed = updateStoreSchema.safeParse({
+    storeId: formData.get("storeId"),
+    name: formData.get("name"),
+    address: formData.get("address") || undefined,
+    phone: formData.get("phone") || undefined,
+    delivery_fee: formData.get("delivery_fee") || 0,
+  });
+  if (!parsed.success) {
+    return { ok: false, error: parsed.error.issues[0].message };
+  }
+
+  const supabase = createSupabaseAdminClient();
+  const { error } = await supabase
+    .from("stores")
+    .update({
+      name: parsed.data.name,
+      address: parsed.data.address ?? null,
+      phone: parsed.data.phone ?? null,
+      delivery_fee: parsed.data.delivery_fee.toFixed(2),
+    })
+    .eq("id", parsed.data.storeId);
+  if (error) return { ok: false, error: error.message };
+  revalidatePath("/", "layout");
+  return { ok: true };
+}

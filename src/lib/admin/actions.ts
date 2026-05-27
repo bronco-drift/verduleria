@@ -4,7 +4,8 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { nextStatuses } from "./order-flow";
-import { DEMO_USER_ID, DEMO_STORE_SLUG } from "@/lib/demo";
+import { DEMO_USER_ID } from "@/lib/demo";
+import { getActiveStore as resolveActiveStore } from "@/lib/active-store";
 import type { OrderStatus, ProductUnit } from "@/db/schema";
 
 export type ActionResult =
@@ -12,14 +13,8 @@ export type ActionResult =
   | { ok: false; error: string };
 
 async function getActiveStore() {
-  const supabase = createSupabaseAdminClient();
-  const { data: store } = await supabase
-    .from("stores")
-    .select("id, slug")
-    .eq("slug", DEMO_STORE_SLUG)
-    .single();
-  if (!store) throw new Error("Demo store not found");
-  return store;
+  const store = await resolveActiveStore();
+  return { id: store.id, slug: store.slug };
 }
 
 // ============================================================================
