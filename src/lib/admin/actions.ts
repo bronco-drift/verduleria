@@ -203,10 +203,12 @@ export async function updateProductAction({
   patch: Partial<{
     name: string;
     price: number;
+    cost: number;
     unit_amount: string | null;
     is_active: boolean;
     is_featured: boolean;
-    stock: number | null;
+    stock: number;
+    stock_min: number;
   }>;
 }): Promise<ActionResult> {
   const supabase = createSupabaseAdminClient();
@@ -217,10 +219,12 @@ export async function updateProductAction({
   };
   if (patch.name !== undefined) update.name = patch.name;
   if (patch.price !== undefined) update.price = patch.price.toFixed(2);
+  if (patch.cost !== undefined) update.cost = patch.cost.toFixed(2);
   if (patch.unit_amount !== undefined) update.unit_amount = patch.unit_amount;
   if (patch.is_active !== undefined) update.is_active = patch.is_active;
   if (patch.is_featured !== undefined) update.is_featured = patch.is_featured;
   if (patch.stock !== undefined) update.stock = patch.stock;
+  if (patch.stock_min !== undefined) update.stock_min = patch.stock_min;
 
   const { error } = await supabase
     .from("products")

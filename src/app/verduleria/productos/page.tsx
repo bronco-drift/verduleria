@@ -12,7 +12,7 @@ export default async function VerduleriaProductosPage() {
     supabase
       .from("products")
       .select(
-        "id, name, price, unit, unit_amount, is_active, is_featured, category_id"
+        "id, name, price, cost, stock, stock_min, unit, unit_amount, is_active, is_featured, category_id"
       )
       .eq("store_id", store.id)
       .order("name"),
@@ -23,21 +23,32 @@ export default async function VerduleriaProductosPage() {
       .order("sort_order"),
   ]);
 
+  const list = (products ?? []).map((p) => ({
+    id: p.id,
+    name: p.name,
+    price: Number(p.price),
+    cost: Number(p.cost ?? 0),
+    stock: p.stock ?? 0,
+    stock_min: p.stock_min ?? 5,
+    unit: p.unit,
+    unit_amount: p.unit_amount,
+    is_active: p.is_active,
+    is_featured: p.is_featured,
+    category_id: p.category_id,
+  }));
+
   return (
-    <div className="space-y-6">
-      <p className="text-sm text-muted-foreground">
-        {products?.length ?? 0} productos cargados.
+    <div className="space-y-5">
+      <p className="text-xs text-muted-foreground">
+        {list.length} productos cargados.
       </p>
 
-      <div className="grid gap-8 lg:grid-cols-[1fr_360px]">
-        <ProductsTable
-          products={products ?? []}
-          categories={categories ?? []}
-        />
+      <div className="grid gap-5 lg:grid-cols-[1fr_320px]">
+        <ProductsTable products={list} categories={categories ?? []} />
 
         <aside>
-          <Card className="p-4 space-y-4 sticky top-4">
-            <h3 className="font-semibold">Nuevo producto</h3>
+          <Card className="p-4 space-y-3 sticky top-4">
+            <h3 className="text-[13px] font-bold">Nuevo producto</h3>
             <ProductForm categories={categories ?? []} />
           </Card>
         </aside>

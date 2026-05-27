@@ -143,16 +143,27 @@ async function main() {
   const catByName = new Map(cats.map((c) => [c.name, c.id]));
 
   console.log("→ Productos...");
-  const productRows = PRODUCTS.map((p) => ({
-    store_id: store.id,
-    category_id: catByName.get(p.category) ?? null,
-    name: p.name,
-    price: p.price,
-    unit: p.unit,
-    unit_amount: p.unit_amount,
-    is_featured: p.is_featured ?? false,
-    is_active: true,
-  }));
+  const productRows = PRODUCTS.map((p) => {
+    const priceNum = Number(p.price);
+    // Heuristic cost = ~55% of price
+    const cost = Math.round(priceNum * 0.55);
+    // Mock initial stock 5..40, some out
+    const r = Math.random();
+    const stock = r > 0.92 ? 0 : Math.floor(r * 35) + 5;
+    return {
+      store_id: store.id,
+      category_id: catByName.get(p.category) ?? null,
+      name: p.name,
+      price: p.price,
+      cost: cost.toFixed(2),
+      stock,
+      stock_min: 5,
+      unit: p.unit,
+      unit_amount: p.unit_amount,
+      is_featured: p.is_featured ?? false,
+      is_active: true,
+    };
+  });
 
   const { data: prods, error: prodErr } = await supabase
     .from("products")

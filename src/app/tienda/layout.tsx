@@ -1,8 +1,8 @@
 import { headers } from "next/headers";
 import { SubTabs } from "@/components/layout/sub-tabs";
 import { getDemoStore } from "@/lib/tenant";
-import { createSupabaseAdminClient } from "@/lib/supabase/admin";
-import { DEMO_USER_ID } from "@/lib/demo";
+import { CartToggle } from "./cart-toggle";
+import { CartDrawer } from "./cart-drawer";
 
 export default async function TiendaLayout({
   children,
@@ -14,40 +14,43 @@ export default async function TiendaLayout({
 
   const store = await getDemoStore();
 
-  // Cart count
-  const supabase = createSupabaseAdminClient();
-  const { data: cart } = await supabase
-    .from("carts")
-    .select("id")
-    .eq("user_id", DEMO_USER_ID)
-    .eq("store_id", store.id)
-    .maybeSingle();
-  let cartCount = 0;
-  if (cart) {
-    const { data: items } = await supabase
-      .from("cart_items")
-      .select("quantity")
-      .eq("cart_id", cart.id);
-    cartCount = items?.reduce((sum, it) => sum + it.quantity, 0) ?? 0;
-  }
-
   const tabs = [
-    { href: "/tienda", label: "Catálogo" },
     {
-      href: "/tienda/carrito",
-      label: cartCount > 0 ? `Carrito (${cartCount})` : "Carrito",
+      href: "/tienda",
+      label: "Catálogo",
+      match: (p: string) => p === "/tienda",
     },
-    { href: "/tienda/mis-pedidos", label: "Mis pedidos" },
+    {
+      href: "/tienda/recetas",
+      label: "👨‍🍳 Recetas",
+      match: (p: string) => p.startsWith("/tienda/recetas"),
+    },
+    {
+      href: "/tienda/cerca",
+      label: "📍 Cerca de mí",
+      match: (p: string) => p.startsWith("/tienda/cerca"),
+    },
+    {
+      href: "/tienda/mis-pedidos",
+      label: "Mis pedidos",
+      match: (p: string) => p.startsWith("/tienda/mis-pedidos"),
+    },
   ];
 
   return (
-    <main className="flex-1 mx-auto w-full max-w-5xl px-4 sm:px-6 py-6">
-      <div className="mb-2">
-        <p className="text-xs text-muted-foreground">Comprando en</p>
-        <h2 className="text-lg font-semibold">{store.name}</h2>
+    <main className="flex-1 mx-auto w-full max-w-6xl px-6 py-5">
+      <div className="flex items-center justify-between mb-3 flex-wrap gap-3">
+        <div>
+          <p className="text-[11px] text-muted-foreground">Comprando en</p>
+          <h2 className="text-[15px] font-bold">{store.name}</h2>
+        </div>
+        <CartToggle />
       </div>
       <SubTabs tabs={tabs} pathname={pathname} />
       {children}
+      <CartDrawer
+        storeDeliveryFee={Number(store.delivery_fee)}
+      />
     </main>
   );
 }

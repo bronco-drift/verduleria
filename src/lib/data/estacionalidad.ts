@@ -1,0 +1,48 @@
+export const MESES_NAMES = [
+  "Ene", "Feb", "Mar", "Abr", "May", "Jun",
+  "Jul", "Ago", "Sep", "Oct", "Nov", "Dic",
+] as const;
+
+export const MESES_ALL = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
+
+/** Months a product is in season (0=Ene). All-year products use MESES_ALL. */
+export const ESTACIONALIDAD_DEFAULT: Record<string, number[]> = {
+  "Acelga fresca": MESES_ALL,
+  Apio: MESES_ALL,
+  Batata: [2, 3, 4, 5, 6, 7, 8, 9, 10],
+  Berenjena: [0, 1, 2, 3, 10, 11],
+  "Brócoli": [3, 4, 5, 6, 7, 8, 9],
+  Cebolla: MESES_ALL,
+  "Cebolla morada": MESES_ALL,
+  Choclo: [0, 1, 2, 11],
+  Espinaca: [2, 3, 4, 5, 6, 7, 8, 9],
+  "Lechuga manteca": MESES_ALL,
+  "Morrón rojo": [0, 1, 2, 11],
+  "Morrón verde": [0, 1, 2, 11],
+  "Papa cepillada": MESES_ALL,
+  Perejil: MESES_ALL,
+  "Rúcula": MESES_ALL,
+  "Tomate cherry": [0, 1, 2, 11],
+  "Tomate perita": [0, 1, 2, 11],
+  Zanahoria: MESES_ALL,
+  "Zapallo anco": [2, 3, 4, 5, 6, 7, 8],
+  Zucchini: [0, 1, 2, 10, 11],
+  "Ananá": [0, 1, 2, 10, 11],
+  Banana: MESES_ALL,
+  Kiwi: [4, 5, 6, 7, 8, 9],
+  "Limón": MESES_ALL,
+  Mandarina: [4, 5, 6, 7, 8, 9],
+  "Manzana verde": MESES_ALL,
+  "Manzana roja": MESES_ALL,
+  "Naranja para jugo": [4, 5, 6, 7, 8, 9],
+  "Palta Hass": MESES_ALL,
+  "Pera Williams": [0, 1, 2, 11],
+  Frutilla: [7, 8, 9, 10, 11],
+  "Champiñones frescos": MESES_ALL,
+  "Portobellos frescos": MESES_ALL,
+  "Huevos blancos": MESES_ALL,
+  Ajo: MESES_ALL,
+  Jengibre: MESES_ALL,
+  Albahaca: [9, 10, 11, 0, 1, 2],
+  Ciboulette: MESES_ALL,
+};

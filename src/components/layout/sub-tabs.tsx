@@ -3,7 +3,6 @@ import Link from "next/link";
 export type SubTab = {
   href: string;
   label: string;
-  /** Optional custom match. Defaults to exact href match. */
   match?: (pathname: string) => boolean;
 };
 
@@ -15,16 +14,16 @@ export function SubTabs({
   pathname: string;
 }) {
   return (
-    <nav className="flex gap-1 border-b mb-6">
+    <nav className="flex gap-0 border-b-2 border-border mb-5 overflow-x-auto">
       {tabs.map((t) => {
         const active = t.match ? t.match(pathname) : pathname === t.href;
         return (
           <Link
             key={t.href}
             href={t.href}
-            className={`px-3 py-2 text-sm -mb-px border-b-2 transition-colors ${
+            className={`px-3 py-2 text-xs font-medium border-b-2 -mb-0.5 whitespace-nowrap transition-colors ${
               active
-                ? "border-foreground text-foreground font-medium"
+                ? "border-foreground text-foreground"
                 : "border-transparent text-muted-foreground hover:text-foreground"
             }`}
           >

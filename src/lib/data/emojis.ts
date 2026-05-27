@@ -1,0 +1,77 @@
+/**
+ * Best-effort emoji for a product name. Returns 🌿 if no match.
+ * Match is case-insensitive and matches by prefix or whole-word.
+ */
+const MAP: Record<string, string> = {
+  acelga: "🥬",
+  apio: "🌿",
+  batata: "🍠",
+  berenjena: "🍆",
+  brócoli: "🥦",
+  brocoli: "🥦",
+  cebolla: "🧅",
+  choclo: "🌽",
+  espinaca: "🥬",
+  espárragos: "🌱",
+  esparragos: "🌱",
+  kale: "🥬",
+  lechuga: "🥬",
+  morrón: "🫑",
+  morron: "🫑",
+  papa: "🥔",
+  papines: "🥔",
+  perejil: "🌿",
+  puerro: "🌿",
+  remolacha: "🫚",
+  repollo: "🥬",
+  repollitos: "🥦",
+  rúcula: "🌿",
+  rucula: "🌿",
+  tomate: "🍅",
+  zanahoria: "🥕",
+  zapallo: "🎃",
+  zapallito: "🥒",
+  zucchini: "🥒",
+  ananá: "🍍",
+  anana: "🍍",
+  banana: "🍌",
+  granada: "🍎",
+  kiwi: "🥝",
+  lima: "🍋",
+  limón: "🍋",
+  limon: "🍋",
+  mandarina: "🍊",
+  mango: "🥭",
+  manzana: "🍎",
+  melón: "🍈",
+  melon: "🍈",
+  naranja: "🍊",
+  palta: "🥑",
+  sandía: "🍉",
+  sandia: "🍉",
+  uva: "🍇",
+  champiñones: "🍄",
+  champinones: "🍄",
+  portobellos: "🍄",
+  girgolas: "🍄",
+  aceite: "🫒",
+  huevos: "🥚",
+  quinoa: "🌾",
+  lentejas: "🫘",
+  garbanzos: "🫘",
+  jengibre: "🫚",
+  albahaca: "🌿",
+  ciboulette: "🌿",
+  frutilla: "🍓",
+  hierbas: "🌿",
+  pera: "🍐",
+  ajo: "🧄",
+};
+
+export function emojiFor(name: string): string {
+  const n = name.toLowerCase();
+  for (const k of Object.keys(MAP)) {
+    if (n.includes(k)) return MAP[k];
+  }
+  return "🌿";
+}
