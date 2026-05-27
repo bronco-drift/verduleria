@@ -1,14 +1,9 @@
 import type { Metadata } from "next";
-import { Geist } from "next/font/google";
 import { headers } from "next/headers";
 import { Toaster } from "@/components/ui/sonner";
 import { TopTabs } from "@/components/layout/top-tabs";
+import { listActiveStores, getActiveStore } from "@/lib/active-store";
 import "./globals.css";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
 
 export const metadata: Metadata = {
   title: "Verdulería",
@@ -23,10 +18,28 @@ export default async function RootLayout({
   const h = await headers();
   const pathname = h.get("x-next-pathname") ?? "/";
 
+  // Try to resolve the active store. If none exist, fall back to empty UI.
+  let stores: { slug: string; name: string }[] = [];
+  let currentSlug = "";
+  try {
+    const all = await listActiveStores();
+    stores = all.map((s) => ({ slug: s.slug, name: s.name }));
+    if (stores.length) {
+      const active = await getActiveStore();
+      currentSlug = active.slug;
+    }
+  } catch {
+    // No stores — admin menu will show empty state
+  }
+
   return (
-    <html lang="es" className={`${geistSans.variable} h-full antialiased`}>
+    <html lang="es" className="h-full antialiased">
       <body className="min-h-full flex flex-col bg-background text-foreground">
-        <TopTabs pathname={pathname} />
+        <TopTabs
+          pathname={pathname}
+          stores={stores}
+          currentSlug={currentSlug}
+        />
         {children}
         <Toaster position="top-center" />
       </body>

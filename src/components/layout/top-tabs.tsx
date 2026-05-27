@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { AdminMenu } from "./admin-menu";
 
 const TABS = [
   {
@@ -13,24 +14,31 @@ const TABS = [
     emoji: "🥦",
     match: (p: string) => p === "/verduleria" || p.startsWith("/verduleria/"),
   },
-  {
-    href: "/admin",
-    label: "Admin",
-    emoji: "⚙️",
-    match: (p: string) => p === "/admin" || p.startsWith("/admin/"),
-  },
 ];
 
-export function TopTabs({ pathname }: { pathname: string }) {
+export function TopTabs({
+  pathname,
+  stores,
+  currentSlug,
+}: {
+  pathname: string;
+  stores: { slug: string; name: string }[];
+  currentSlug: string;
+}) {
   return (
     <header className="bg-background">
       <div className="mx-auto max-w-6xl px-6 pt-5 pb-0">
-        <h1 className="text-base font-bold mb-0.5">
-          🥦 Verdulería Online — Panel
-        </h1>
-        <p className="text-xs text-muted-foreground mb-4">
-          Gestión, análisis y tienda online
-        </p>
+        <div className="flex items-end justify-between gap-3 mb-4 flex-wrap">
+          <div>
+            <h1 className="text-base font-bold mb-0.5">
+              🥦 Verdulería Online — Panel
+            </h1>
+            <p className="text-xs text-muted-foreground">
+              Gestión, análisis y tienda online
+            </p>
+          </div>
+          <AdminMenu stores={stores} currentSlug={currentSlug} />
+        </div>
         <nav className="flex gap-0 border-b-2 border-border overflow-x-auto">
           {TABS.map((t) => {
             const active = t.match(pathname);

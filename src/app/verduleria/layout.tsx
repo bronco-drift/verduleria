@@ -1,7 +1,6 @@
 import { headers } from "next/headers";
 import { SubTabs } from "@/components/layout/sub-tabs";
-import { StoreSelector } from "@/components/layout/store-selector";
-import { getActiveStore, listActiveStores } from "@/lib/active-store";
+import { getActiveStore } from "@/lib/active-store";
 
 export default async function VerduleriaLayout({
   children,
@@ -11,10 +10,7 @@ export default async function VerduleriaLayout({
   const h = await headers();
   const pathname = h.get("x-next-pathname") ?? "/verduleria";
 
-  const [store, allStores] = await Promise.all([
-    getActiveStore(),
-    listActiveStores(),
-  ]);
+  const store = await getActiveStore();
 
   const tabs = [
     {
@@ -61,12 +57,9 @@ export default async function VerduleriaLayout({
 
   return (
     <main className="flex-1 mx-auto w-full max-w-6xl px-6 py-5">
-      <div className="flex items-center justify-between mb-3 flex-wrap gap-3">
-        <div>
-          <p className="text-[11px] text-muted-foreground">Gestionando</p>
-          <h2 className="text-[15px] font-bold">{store.name}</h2>
-        </div>
-        <StoreSelector stores={allStores} currentSlug={store.slug} />
+      <div className="mb-3">
+        <p className="text-[11px] text-muted-foreground">Gestionando</p>
+        <h2 className="text-[15px] font-bold">{store.name}</h2>
       </div>
       <SubTabs tabs={tabs} pathname={pathname} />
       {children}
