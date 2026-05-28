@@ -535,6 +535,43 @@ input.cell-input:focus{outline:none;border-color:var(--brand)}
 
 /* Proveedor */
 select.cell-sel{height:26px;padding:0 6px;font-size:11px;border:1px solid var(--border-strong);border-radius:5px;background:var(--surface);color:var(--ink)}
+
+/* Pedidos */
+.pedidos-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:1rem}
+.pedidos-list{display:flex;flex-direction:column;gap:10px;margin-top:.75rem}
+.pedido-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px;transition:border-color .15s}
+.pedido-card:hover{border-color:var(--border-strong)}
+.pedido-card.open{border-color:var(--brand)}
+.pedido-head{display:flex;justify-content:space-between;align-items:center;gap:12px;cursor:pointer;flex-wrap:wrap}
+.pedido-meta{flex:1;min-width:240px;display:flex;flex-direction:column;gap:3px}
+.pedido-id{font-size:13px;font-weight:700;color:var(--ink);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:-0.01em}
+.pedido-info{font-size:11px;color:var(--ink-soft);display:flex;gap:10px;flex-wrap:wrap}
+.pedido-total{font-size:16px;font-weight:700;color:var(--ink);white-space:nowrap;letter-spacing:-0.01em}
+.pedido-status{font-size:10px;font-weight:700;padding:3px 10px;border-radius:999px;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap}
+.pedido-status.pendiente{background:var(--warn-bg);color:var(--warn-fg)}
+.pedido-status.preparando{background:var(--info-bg);color:var(--info)}
+.pedido-status.entregado{background:var(--success-bg);color:var(--success-fg)}
+.pedido-status.cancelado{background:var(--surface-2);color:var(--ink-mute)}
+.pedido-body{margin-top:12px;padding-top:12px;border-top:1px solid var(--border);display:none}
+.pedido-card.open .pedido-body{display:block}
+.pedido-items{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
+.pedido-item-row{display:flex;align-items:center;gap:10px;padding:7px 10px;background:var(--bg);border-radius:6px;font-size:12px}
+.pedido-item-emoji{font-size:18px;flex-shrink:0}
+.pedido-item-name{flex:1;color:var(--ink);font-weight:500}
+.pedido-item-qty{color:var(--ink-soft);font-weight:600;white-space:nowrap}
+.pedido-item-price{color:var(--ink);font-weight:700;white-space:nowrap;min-width:80px;text-align:right}
+.pedido-totals{display:flex;flex-direction:column;gap:4px;padding:10px 12px;background:var(--bg);border-radius:7px;font-size:12px;margin-bottom:12px}
+.pedido-totals .ptr{display:flex;justify-content:space-between;color:var(--ink-soft)}
+.pedido-totals .ptr.total{font-weight:700;font-size:14px;color:var(--ink);padding-top:6px;margin-top:3px;border-top:1px solid var(--border)}
+.pedido-actions{display:flex;gap:6px;flex-wrap:wrap}
+.pedido-actions button{height:32px;padding:0 12px;font-size:11px;font-weight:600;border:1px solid var(--border-strong);background:var(--surface);color:var(--ink);border-radius:7px;cursor:pointer;transition:background .15s,border-color .15s}
+.pedido-actions button:hover{background:var(--surface-2)}
+.pedido-actions button.primary{background:var(--brand);color:#fff;border-color:var(--brand)}
+.pedido-actions button.primary:hover{background:var(--brand-hover)}
+.pedido-actions button.danger{color:var(--danger);border-color:oklch(85% 0.05 25)}
+.pedido-actions button.danger:hover{background:var(--danger-bg);border-color:var(--danger)}
+.pedido-empty{padding:2.5rem 1rem;text-align:center;color:var(--ink-faint);font-size:13px;background:var(--surface);border:1px dashed var(--border-strong);border-radius:9px;line-height:1.6}
+.pedido-empty strong{color:var(--ink-soft);display:block;margin-bottom:4px;font-size:14px}
 </style>
 </head>
 <body>
@@ -681,6 +718,11 @@ let zonas = [
 // Margen objetivo global
 let margenObj = 40;
 
+// Pedidos (generados desde checkout del carrito)
+let pedidos = [];
+let pedidosFilter = "todos";
+let pedidosOpen = new Set();
+
 // ─── HELPERS ─────────────────────────────────────────────
 function fmt(v){return v!=null?"$"+Math.round(v).toLocaleString("es-AR"):null}
 function pct(v){return v!=null?Math.round(v)+"%":null}
@@ -727,6 +769,7 @@ const TABS=[
   {id:"envio",label:"🚚 Costo de envío", group:"gestion"},
   {id:"estacional",label:"📅 Estacionalidad", group:"gestion"},
   {id:"proveedor",label:"📋 Proveedores", group:"gestion"},
+  {id:"pedidos",label:"🧾 Pedidos", group:"gestion"},
   // PÚBLICO (cara al cliente)
   {id:"tienda",label:"🛒 Tienda", group:"publico"},
   {id:"recetas",label:"👨‍🍳 Combos receta", group:"publico"},
@@ -1361,6 +1404,143 @@ function renderProveedorTable(){
   document.getElementById("tb-prov").innerHTML=h||`<tr><td colspan="6" style="text-align:center;padding:1.5rem;color:var(--ink-faint)">Sin resultados</td></tr>`;
 }
 
+// ── TAB: PEDIDOS ──
+function renderPedidos(){
+  const p=document.getElementById("panel-pedidos");
+  if(!p.dataset.init){
+    p.innerHTML=`
+      <div class="rec-header">
+        <h2>🧾 Pedidos</h2>
+        <p>Pedidos generados desde el carrito de la tienda. Cambiá el estado a medida que los preparás y entregás.</p>
+      </div>
+      <div class="pedidos-summary" id="pedidos-summary"></div>
+      <div class="top">
+        <input type="text" id="srch-ped" placeholder="Buscar por ID o producto..." oninput="renderPedidosList()">
+        <div class="fbts" id="ped-filter"></div>
+      </div>
+      <div class="pedidos-list" id="pedidos-list"></div>`;
+    p.dataset.init="1";
+    const fc=document.getElementById("ped-filter");
+    [["todos","Todos"],["pendiente","Pendientes"],["preparando","Preparando"],["entregado","Entregados"],["cancelado","Cancelados"]].forEach(([k,v])=>{
+      const b=document.createElement("button");
+      b.className="fb"+(k===pedidosFilter?" on":"");
+      b.textContent=v;
+      b.onclick=()=>{
+        pedidosFilter=k;
+        fc.querySelectorAll(".fb").forEach(x=>x.classList.remove("on"));
+        b.classList.add("on");
+        renderPedidosList();
+      };
+      fc.appendChild(b);
+    });
+  }
+  renderPedidosSummary();
+  renderPedidosList();
+}
+
+function renderPedidosSummary(){
+  const el=document.getElementById("pedidos-summary");
+  if(!el)return;
+  const total=pedidos.length;
+  const pend=pedidos.filter(p=>p.estado==="pendiente").length;
+  const prep=pedidos.filter(p=>p.estado==="preparando").length;
+  const ent=pedidos.filter(p=>p.estado==="entregado").length;
+  const revenue=pedidos.filter(p=>p.estado==="entregado").reduce((a,p)=>a+p.total,0);
+  el.innerHTML=`
+    <div class="summary-card"><div class="lbl">Total pedidos</div><div class="val">${total}</div></div>
+    <div class="summary-card warn"><div class="lbl">Pendientes</div><div class="val">${pend}</div></div>
+    <div class="summary-card"><div class="lbl">Preparando</div><div class="val">${prep}</div></div>
+    <div class="summary-card ok"><div class="lbl">Entregados</div><div class="val">${ent}</div></div>
+    <div class="summary-card"><div class="lbl">Ingresos cobrados</div><div class="val">${fmt(revenue)||"$0"}</div></div>`;
+}
+
+function renderPedidosList(){
+  const el=document.getElementById("pedidos-list");
+  if(!el)return;
+  const srch=(document.getElementById("srch-ped")?.value||"").toLowerCase();
+  let rows=[...pedidos].sort((a,b)=>new Date(b.fecha)-new Date(a.fecha));
+  if(pedidosFilter!=="todos")rows=rows.filter(p=>p.estado===pedidosFilter);
+  if(srch)rows=rows.filter(p=>
+    p.id.toLowerCase().includes(srch)||
+    p.items.some(i=>i.nombre.toLowerCase().includes(srch))
+  );
+  if(!rows.length){
+    el.innerHTML=`<div class="pedido-empty">${pedidos.length?"<strong>Sin resultados</strong>No hay pedidos con esos filtros.":"<strong>Aún no hay pedidos</strong>Cuando confirmes uno desde 🛒 Tienda aparece acá."}</div>`;
+    return;
+  }
+  el.innerHTML=rows.map(p=>{
+    const isOpen=pedidosOpen.has(p.id);
+    const f=new Date(p.fecha);
+    const fechaStr=f.toLocaleDateString("es-AR",{day:"2-digit",month:"short"})+", "+f.toLocaleTimeString("es-AR",{hour:"2-digit",minute:"2-digit"});
+    const totalItems=p.items.reduce((a,i)=>a+i.qty,0);
+    const statusLabel={pendiente:"Pendiente",preparando:"Preparando",entregado:"Entregado",cancelado:"Cancelado"}[p.estado]||p.estado;
+    return`<div class="pedido-card ${isOpen?"open":""}">
+      <div class="pedido-head" onclick="togglePedido('${p.id}')">
+        <div class="pedido-meta">
+          <span class="pedido-id">#${p.id}</span>
+          <span class="pedido-info">
+            <span>📅 ${fechaStr}</span>
+            <span>🛒 ${p.items.length} producto${p.items.length===1?"":"s"} (${totalItems} u.)</span>
+            <span>📍 ${p.zona}</span>
+          </span>
+        </div>
+        <span class="pedido-status ${p.estado}">${statusLabel}</span>
+        <span class="pedido-total">${fmt(p.total)}</span>
+      </div>
+      <div class="pedido-body">
+        <div class="pedido-items">
+          ${p.items.map(i=>`<div class="pedido-item-row">
+            <span class="pedido-item-emoji">${i.emoji}</span>
+            <span class="pedido-item-name">${i.nombre}</span>
+            <span class="pedido-item-qty">× ${i.qty} ${i.unidad}</span>
+            <span class="pedido-item-price">${fmt(i.subtotal)}</span>
+          </div>`).join("")}
+        </div>
+        <div class="pedido-totals">
+          <div class="ptr"><span>Subtotal</span><span>${fmt(p.subtotal)}</span></div>
+          <div class="ptr"><span>Envío ${p.envioGratis?"(gratis)":""}</span><span>${p.envioGratis?"$0":fmt(p.costoEnvio)}</span></div>
+          <div class="ptr total"><span>Total</span><span>${fmt(p.total)}</span></div>
+        </div>
+        <div class="pedido-actions">
+          ${p.estado==="pendiente"?`<button class="primary" onclick="cambiarEstadoPedido('${p.id}','preparando')">▶ Marcar preparando</button>`:""}
+          ${p.estado==="preparando"?`<button class="primary" onclick="cambiarEstadoPedido('${p.id}','entregado')">✓ Marcar entregado</button>`:""}
+          ${p.estado!=="cancelado"&&p.estado!=="entregado"?`<button class="danger" onclick="cancelarPedido('${p.id}')">✕ Cancelar</button>`:""}
+          ${p.estado==="entregado"||p.estado==="cancelado"?`<button onclick="eliminarPedido('${p.id}')">🗑 Eliminar</button>`:""}
+        </div>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+function togglePedido(id){
+  if(pedidosOpen.has(id))pedidosOpen.delete(id);
+  else pedidosOpen.add(id);
+  renderPedidosList();
+}
+
+function cambiarEstadoPedido(id,nuevoEstado){
+  const p=pedidos.find(x=>x.id===id);
+  if(!p)return;
+  p.estado=nuevoEstado;
+  saveToLocalStorage();
+  renderPedidosSummary();
+  renderPedidosList();
+}
+
+function cancelarPedido(id){
+  if(!confirm("¿Cancelar este pedido?"))return;
+  cambiarEstadoPedido(id,"cancelado");
+}
+
+function eliminarPedido(id){
+  if(!confirm("¿Eliminar este pedido del historial?\n\nEsta acción no se puede deshacer."))return;
+  pedidos=pedidos.filter(p=>p.id!==id);
+  pedidosOpen.delete(id);
+  saveToLocalStorage();
+  renderPedidosSummary();
+  renderPedidosList();
+}
+
 // ── TAB: TIENDA ──
 const EMOJIS={
   "Acelga":"🥬","Apio":"🌿","Batata":"🍠","Berenjena":"🍆","Brócoli":"🥦","Cebolla":"🧅",
@@ -1550,8 +1730,8 @@ function openCart(){
   renderCartFoot();
 }
 function closeCart(){
-  document.getElementById("cart-drawer").classList.remove("open");
-  document.getElementById("cart-overlay").classList.remove("open");
+  document.getElementById("cart-drawer")?.classList.remove("open");
+  document.getElementById("cart-overlay")?.classList.remove("open");
 }
 
 function renderCartItems(){
@@ -1613,13 +1793,42 @@ function doCheckout(){
   const items=Object.entries(cart).filter(([,q])=>q>0);
   if(!items.length){alert("Tu carrito está vacío");return;}
   const subtotal=Object.entries(cart).reduce((acc,[n,q])=>acc+(pVentas[n]||0)*q,0);
-  alert(`✓ Pedido recibido!\n\nProductos: ${items.length}\nTotal: ${fmt(subtotal)}\n\n(Demo: integrá con tu backend para procesarlo)`);
-  // Limpiar carrito tras confirmar
+  // Resolver zona seleccionada en el drawer del carrito
+  const selEl=document.getElementById("cart-zona-sel");
+  const zi=selEl?parseInt(selEl.value)||0:0;
+  const z=zonas[zi]||zonas[0];
+  const gratis=subtotal>=z.freeMin;
+  const costoEnvio=gratis?0:z.costoFijo;
+  const total=subtotal+costoEnvio;
+  const pedido={
+    id:"ORD-"+Date.now().toString(36).toUpperCase(),
+    fecha:new Date().toISOString(),
+    items:items.map(([n,q])=>({
+      nombre:n,
+      qty:q,
+      precioUnit:pVentas[n]||0,
+      subtotal:(pVentas[n]||0)*q,
+      unidad:(D.find(x=>x.n===n)||{}).u||"",
+      emoji:EMOJIS[n]||"🌿"
+    })),
+    subtotal,
+    zona:z.nombre,
+    costoEnvio,
+    envioGratis:gratis,
+    total,
+    estado:"pendiente"
+  };
+  pedidos.unshift(pedido);
+  saveToLocalStorage();
+  alert(`✓ Pedido #${pedido.id} recibido\n\nProductos: ${items.length}\nTotal: ${fmt(total)}\n\nGestionalo desde la tab 🧾 Pedidos.`);
   cart={};
   updateCartBadge();
-  updateCartBar();
+  if(typeof updateCartBar==="function")updateCartBar();
   renderStoreGrid();
   closeCart();
+  // Si el panel de pedidos ya estaba inicializado, refrescá
+  const pp=document.getElementById("panel-pedidos");
+  if(pp&&pp.dataset.init){renderPedidosSummary();renderPedidosList();}
 }
 
 // ── TAB: RECETAS / COMBOS ──
@@ -2769,6 +2978,7 @@ function snapshotCurrentState(){
     zonas:JSON.parse(JSON.stringify(zonas)),
     proveedores:JSON.parse(JSON.stringify(proveedores)),
     margenObj:margenObj,
+    pedidos:JSON.parse(JSON.stringify(pedidos)),
   };
 }
 
@@ -2780,6 +2990,8 @@ function loadTenantState(t){
   zonas=JSON.parse(JSON.stringify(t.data.zonas));
   proveedores=JSON.parse(JSON.stringify(t.data.proveedores));
   margenObj=t.data.margenObj||40;
+  pedidos=JSON.parse(JSON.stringify(t.data.pedidos||[]));
+  pedidosOpen=new Set();
 }
 
 function initTenants(){
@@ -2833,7 +3045,7 @@ function switchTenant(id){
   storeQtys={};
   D.forEach(r=>{storeQtys[r.n]=1;});
   // Re-render everything visible EXCEPT ubicacion (we keep its map alive)
-  ["original","kg","margen","sugeridos","envio","estacional","proveedor","tienda","recetas","stock","dashboard"].forEach(id=>{
+  ["original","kg","margen","sugeridos","envio","estacional","proveedor","pedidos","tienda","recetas","stock","dashboard"].forEach(id=>{
     const p=document.getElementById("panel-"+id);
     if(p)delete p.dataset.init;
   });
@@ -3724,7 +3936,7 @@ function importAllData(event){
       loadTenantState(tenants[currentTenantId]);
       saveToLocalStorage();
       // Reset all panels
-      ["original","kg","margen","sugeridos","envio","estacional","proveedor","tienda","recetas","stock","dashboard","admin"].forEach(id=>{
+      ["original","kg","margen","sugeridos","envio","estacional","proveedor","pedidos","tienda","recetas","stock","dashboard","admin"].forEach(id=>{
         const p=document.getElementById("panel-"+id);
         if(p)delete p.dataset.init;
       });
@@ -3751,6 +3963,7 @@ const renderMap={
   original:renderOriginal,kg:renderKg,margen:renderMargen,
   sugeridos:renderSugeridos,envio:renderEnvio,
   estacional:renderEstacional,proveedor:renderProveedor,
+  pedidos:renderPedidos,
   tienda:renderTienda,recetas:renderRecetas,ubicacion:renderUbicacion,
   stock:renderStock,dashboard:renderDashboard
 };
