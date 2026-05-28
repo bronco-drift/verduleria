@@ -218,6 +218,9 @@ input.cell-input:focus{outline:none;border-color:var(--brand)}
 .rec-header{margin-bottom:1rem}
 .rec-header h2{font-size:15px;font-weight:700;margin-bottom:4px}
 .rec-header p{font-size:12px;color:var(--ink-soft)}
+.rec-header--with-cart{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.rec-header--with-cart .rec-header-text{flex:1;min-width:240px}
+.rec-header--with-cart .cart-btn-wrap{flex-shrink:0}
 .rec-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;margin-bottom:1.5rem}
 .rec-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;cursor:pointer;transition:all .15s;display:flex;flex-direction:column;gap:6px}
 .rec-card:hover{border-color:var(--brand);box-shadow:0 2px 12px rgba(0,0,0,.08)}
@@ -597,6 +600,25 @@ select.cell-sel{height:26px;padding:0 6px;font-size:11px;border:1px solid var(--
     <button class="admin-close" onclick="closeAdmin()">✕</button>
   </div>
   <div class="admin-drawer-body" id="admin-drawer-body"></div>
+</div>
+
+<!-- CART GLOBAL DRAWER (visible desde Tienda, Combos receta, etc.) -->
+<div class="cart-overlay" id="cart-overlay" onclick="closeCart()"></div>
+<div class="cart-drawer" id="cart-drawer">
+  <div class="cart-head">
+    <h2>Tu carrito</h2>
+    <button class="cart-close" onclick="closeCart()">✕</button>
+  </div>
+  <div class="cart-items" id="cart-items"></div>
+  <div class="cart-foot">
+    <div class="cart-subtotal"><span>Subtotal</span><span id="cart-sub">$0</span></div>
+    <div class="cart-zona">
+      <select onchange="renderCartFoot()" id="cart-zona-sel"></select>
+    </div>
+    <div class="cart-envio-info" id="cart-envio-info"></div>
+    <div class="cart-total"><span>Total</span><span id="cart-total-val">$0</span></div>
+    <button class="checkout-btn" onclick="doCheckout()">Confirmar pedido ↗</button>
+  </div>
 </div>
 
 <script>
@@ -1570,8 +1592,8 @@ function renderTienda(){
           <input type="text" placeholder="Buscar productos..." oninput="storeSearch=this.value.toLowerCase();renderStoreGrid()">
         </div>
         <div class="cart-btn-wrap" onclick="openCart()">
-          <button class="cart-btn">🛒 Carrito <span id="cart-label">vacío</span></button>
-          <div class="cart-badge" id="cart-badge">0</div>
+          <button class="cart-btn">🛒 Carrito <span class="js-cart-label">vacío</span></button>
+          <div class="cart-badge js-cart-badge">0</div>
         </div>
       </div>
       <div class="store-cats fbts" id="store-cats"></div>
@@ -1590,25 +1612,6 @@ function renderTienda(){
             <span id="cart-bar-total">$0</span>
             <span class="cart-bar-cta-arrow">→</span>
           </button>
-        </div>
-      </div>
-      <div class="cart-overlay" id="cart-overlay" onclick="closeCart()"></div>
-      <div class="cart-drawer" id="cart-drawer">
-        <div class="cart-head">
-          <h2>Tu carrito</h2>
-          <button class="cart-close" onclick="closeCart()">✕</button>
-        </div>
-        <div class="cart-items" id="cart-items"></div>
-        <div class="cart-foot">
-          <div class="cart-subtotal"><span>Subtotal</span><span id="cart-sub">$0</span></div>
-          <div class="cart-zona">
-            <select onchange="renderCartFoot()" id="cart-zona-sel">
-              ${zonas.map((z,i)=>`<option value="${i}">${z.nombre}</option>`).join("")}
-            </select>
-          </div>
-          <div class="cart-envio-info" id="cart-envio-info"></div>
-          <div class="cart-total"><span>Total</span><span id="cart-total-val">$0</span></div>
-          <button class="checkout-btn" onclick="doCheckout()">Confirmar pedido ↗</button>
         </div>
       </div>`;
     p.dataset.init="1";
@@ -1717,13 +1720,26 @@ function updateCartBar(){
 
 function updateCartBadge(){
   const total=Object.values(cart).reduce((a,b)=>a+b,0);
-  const badge=document.getElementById("cart-badge");
-  const label=document.getElementById("cart-label");
-  if(badge){badge.style.display=total>0?"flex":"none";badge.textContent=total;}
-  if(label){label.textContent=total>0?`(${total} items)`:"";}
+  // actualiza todos los badges/labels visibles (Tienda, Recetas, etc.)
+  document.querySelectorAll(".js-cart-badge").forEach(b=>{
+    b.style.display=total>0?"flex":"none";
+    b.textContent=total;
+  });
+  document.querySelectorAll(".js-cart-label").forEach(l=>{
+    l.textContent=total>0?`(${total} items)`:"vacío";
+  });
+}
+
+function populateCartZonas(){
+  const sel=document.getElementById("cart-zona-sel");
+  if(!sel)return;
+  const prev=sel.value;
+  sel.innerHTML=zonas.map((z,i)=>`<option value="${i}">${z.nombre}</option>`).join("");
+  if(prev&&zonas[prev])sel.value=prev;
 }
 
 function openCart(){
+  populateCartZonas();
   document.getElementById("cart-drawer").classList.add("open");
   document.getElementById("cart-overlay").classList.add("open");
   renderCartItems();
@@ -2125,14 +2141,21 @@ function renderRecetas(){
   const p=document.getElementById("panel-recetas");
   if(!p.dataset.init){
     p.innerHTML=`
-      <div class="rec-header">
-        <h2>👨‍🍳 Combos por receta</h2>
-        <p>Elegí una receta y cantidad de personas. Te armamos el combo de verduras necesarias y lo agregás al carrito con un click.</p>
+      <div class="rec-header rec-header--with-cart">
+        <div class="rec-header-text">
+          <h2>👨‍🍳 Combos por receta</h2>
+          <p>Elegí una receta y cantidad de personas. Te armamos el combo de verduras necesarias y lo agregás al carrito con un click.</p>
+        </div>
+        <div class="cart-btn-wrap" onclick="openCart()">
+          <button class="cart-btn">🛒 Carrito <span class="js-cart-label">vacío</span></button>
+          <div class="cart-badge js-cart-badge">0</div>
+        </div>
       </div>
       <div class="rec-grid" id="rec-grid"></div>`;
     p.dataset.init="1";
   }
   renderRecGrid();
+  updateCartBadge();
 }
 
 function renderRecGrid(){
