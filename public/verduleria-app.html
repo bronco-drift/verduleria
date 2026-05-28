@@ -232,6 +232,64 @@ input.cell-input:focus{outline:none;border-color:var(--brand)}
 #cart-mini-map{width:100%;height:160px;border-radius:8px;border:1px solid var(--border);background:var(--surface-2);overflow:hidden}
 .map-search-btn{align-self:flex-end;height:28px;padding:0 11px;font-size:11px;font-weight:600;border:1px solid var(--border-strong);background:var(--surface);color:var(--ink);border-radius:7px;cursor:pointer}
 .map-search-btn:hover{background:var(--brand-tint);border-color:var(--brand);color:var(--brand)}
+/* Store layouts (alterna desde el editor de estilo del tenant) */
+.store-grid.store-list{display:flex;flex-direction:column;gap:8px}
+.store-grid.store-list .prod-card{display:grid;grid-template-columns:56px 1fr auto;gap:12px;padding:10px 12px;align-items:center}
+.store-grid.store-list .prod-icon{width:56px;height:56px;font-size:28px;background:var(--bg);border-radius:8px;display:flex;align-items:center;justify-content:center}
+.store-grid.store-list .prod-info{display:flex;flex-direction:column;gap:2px;min-width:0}
+.store-grid.store-list .prod-name{font-size:13px;font-weight:600}
+.store-grid.store-list .prod-unit{font-size:10px;color:var(--ink-mute)}
+.store-grid.store-list .prod-comp{font-size:10px;color:var(--ink-soft)}
+.store-grid.store-list .prod-price{font-size:14px;font-weight:700;color:var(--ink);grid-column:initial;text-align:right;letter-spacing:-0.01em}
+.store-grid.store-list .qty-row{display:none}
+.store-grid.store-list .prod-actions{display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+.store-grid.store-list .add-btn{width:auto;height:30px;padding:0 14px;font-size:11px;margin:0;border-radius:6px}
+.store-grid.store-catalog{grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px}
+.store-grid.store-catalog .prod-card{padding:18px;gap:12px}
+.store-grid.store-catalog .prod-icon{height:120px;font-size:64px;border-radius:10px}
+.store-grid.store-catalog .prod-name{font-size:15px;font-weight:700}
+.store-grid.store-catalog .prod-price{font-size:20px;font-weight:800;letter-spacing:-0.02em}
+.store-grid.store-catalog .add-btn{height:36px;font-size:13px}
+.store-menu-cats{display:flex;flex-direction:column;gap:24px}
+.store-menu-cat-title{font-size:15px;font-weight:700;color:var(--ink);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;letter-spacing:-0.01em}
+.store-menu-cat-title .count{font-size:11px;font-weight:600;color:var(--ink-soft);background:var(--surface-2);padding:2px 8px;border-radius:999px}
+.cat-scroll{display:flex;gap:12px;overflow-x:auto;padding:4px 2px 10px;scroll-snap-type:x proximity}
+.cat-scroll .prod-card{flex:0 0 180px;scroll-snap-align:start}
+.cat-scroll::-webkit-scrollbar{height:6px}
+.cat-scroll::-webkit-scrollbar-thumb{background:var(--border-strong);border-radius:3px}
+
+/* Editor de estilo (admin drawer) */
+.style-section{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;margin-top:14px}
+.style-section-head{display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none;gap:8px}
+.style-section-head h3{font-size:14px;font-weight:700;color:var(--ink);display:flex;align-items:center;gap:8px;margin:0}
+.style-section-head .style-toggle{font-size:14px;color:var(--ink-soft);transition:transform .2s}
+.style-section.open .style-toggle{transform:rotate(180deg)}
+.style-section-body{margin-top:14px;display:none}
+.style-section.open .style-section-body{display:block}
+.style-sub{font-size:12px;font-weight:700;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.04em;margin-bottom:10px}
+.style-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.style-card{position:relative;border:2px solid var(--border);background:var(--bg);border-radius:10px;padding:12px;cursor:pointer;transition:border-color .15s,background .15s}
+.style-card:hover{border-color:var(--border-strong)}
+.style-card.on{border-color:var(--brand);background:var(--brand-tint)}
+.style-card .sc-name{font-size:13px;font-weight:700;color:var(--ink);margin-bottom:4px}
+.style-card .sc-desc{font-size:11px;color:var(--ink-soft);line-height:1.4}
+.style-card .sc-check{position:absolute;top:8px;right:8px;width:18px;height:18px;border-radius:50%;background:var(--brand);color:#fff;font-size:11px;font-weight:700;display:none;align-items:center;justify-content:center}
+.style-card.on .sc-check{display:flex}
+.swatches-row{display:flex;gap:5px;margin-top:8px}
+.swatch{width:18px;height:18px;border-radius:5px;border:1px solid rgba(0,0,0,0.1);flex-shrink:0}
+.layout-mock{width:100%;height:48px;background:var(--surface-2);border-radius:6px;margin-top:8px;display:flex;padding:5px;gap:3px}
+.layout-mock--grid{display:grid;grid-template-columns:repeat(3,1fr);gap:3px}
+.layout-mock--list{flex-direction:column;gap:3px}
+.layout-mock--catalog{display:grid;grid-template-columns:repeat(2,1fr);gap:4px}
+.layout-mock--menu{flex-direction:column;gap:3px}
+.layout-mock .lm-block{background:var(--brand);opacity:0.4;border-radius:3px;min-height:6px}
+.layout-mock--grid .lm-block{height:18px}
+.layout-mock--list .lm-block{height:8px}
+.layout-mock--catalog .lm-block{height:18px}
+.layout-mock--menu .lm-row{display:flex;gap:3px;align-items:center}
+.layout-mock--menu .lm-row::before{content:"";width:18px;height:3px;background:var(--ink-soft);opacity:0.3;border-radius:2px}
+.layout-mock--menu .lm-row .lm-block{flex:1;height:10px}
+
 /* Pickup info */
 .pickup-info{padding:12px 14px;background:var(--brand-tint);border:1px solid var(--brand);border-radius:9px;font-size:12px;line-height:1.6;color:var(--ink)}
 .pickup-info strong{color:var(--brand);font-weight:700;display:block;font-size:13px;margin-bottom:4px}
@@ -1789,40 +1847,79 @@ function renderStoreGrid(){
   const rows=D.filter(r=>{
     if(storeActiveCat!=="Todas"&&r.c!==storeActiveCat)return false;
     if(storeSearch&&!r.n.toLowerCase().includes(storeSearch))return false;
-    // hide inactive products from store
     if(stockState&&stockState[r.n]&&!stockState[r.n].activo)return false;
     return true;
   });
-  const st=stats;
-  grid.innerHTML=rows.map(r=>{
-    const v=pVentas[r.n]||0;
-    const compSt=st(r.p);
-    const inCart=cart[r.n]>0;
-    const qty=storeQtys[r.n]||1;
-    const stockInfo=stockState&&stockState[r.n]?stockState[r.n]:null;
-    const sinStock=stockInfo&&stockInfo.stock<=0;
-    const stockBajo=stockInfo&&stockInfo.stock>0&&stockInfo.stock<=stockInfo.stockMin;
-    const compLabel=compSt.mn&&v?v<=compSt.mn?`<span style="color:var(--success-fg);font-weight:600">✓ Mejor precio</span>`:v>=compSt.mx?`<span style="color:var(--danger)">Más caro del mercado</span>`:`Comp: ${fmt(compSt.mn)}–${fmt(compSt.mx)}`:"";
-    const stockBadge=sinStock?`<div style="position:absolute;top:8px;right:8px;background:var(--danger-bg);color:var(--danger-fg);font-size:9px;font-weight:700;padding:3px 7px;border-radius:10px">SIN STOCK</div>`:stockBajo?`<div style="position:absolute;top:8px;right:8px;background:var(--warn-bg);color:var(--warn-fg);font-size:9px;font-weight:700;padding:3px 7px;border-radius:10px">${stockInfo.stock} restantes</div>`:"";
-    return`<div class="prod-card" id="pcard-${r.n.replace(/\s/g,'_')}" style="position:relative;${sinStock?"opacity:.55":""}">
+  const style=getTenantStyle(tenants[currentTenantId]);
+  const layout=style.layout||"grilla";
+  // Reset clases de layout y aplicar la nueva
+  grid.classList.remove("store-list","store-catalog","store-menu");
+  if(layout==="lista-compacta")grid.classList.add("store-list");
+  else if(layout==="catalogo-grande")grid.classList.add("store-catalog");
+  else if(layout==="menu-categoria")grid.classList.add("store-menu");
+
+  if(!rows.length){
+    grid.innerHTML=`<div style="color:var(--ink-faint);font-size:13px;padding:1rem">Sin productos</div>`;
+    return;
+  }
+  if(layout==="menu-categoria"){
+    // Agrupar por categoría, respetando filtro activo
+    const groups={};
+    rows.forEach(r=>{(groups[r.c]=groups[r.c]||[]).push(r);});
+    grid.innerHTML=`<div class="store-menu-cats">${Object.entries(groups).map(([cat,items])=>`
+      <div class="store-menu-cat">
+        <div class="store-menu-cat-title">${cat} <span class="count">${items.length}</span></div>
+        <div class="cat-scroll">${items.map(r=>buildStoreCardHTML(r,"grilla")).join("")}</div>
+      </div>`).join("")}</div>`;
+    return;
+  }
+  grid.innerHTML=rows.map(r=>buildStoreCardHTML(r,layout)).join("");
+}
+
+function buildStoreCardHTML(r,layout){
+  const v=pVentas[r.n]||0;
+  const compSt=stats(r.p);
+  const inCart=cart[r.n]>0;
+  const qty=storeQtys[r.n]||1;
+  const stockInfo=stockState&&stockState[r.n]?stockState[r.n]:null;
+  const sinStock=stockInfo&&stockInfo.stock<=0;
+  const stockBajo=stockInfo&&stockInfo.stock>0&&stockInfo.stock<=stockInfo.stockMin;
+  const compLabel=compSt.mn&&v?v<=compSt.mn?`<span style="color:var(--success-fg);font-weight:600">✓ Mejor precio</span>`:v>=compSt.mx?`<span style="color:var(--danger)">Más caro del mercado</span>`:`Comp: ${fmt(compSt.mn)}–${fmt(compSt.mx)}`:"";
+  const stockBadge=sinStock?`<div style="position:absolute;top:8px;right:8px;background:var(--danger-bg);color:var(--danger-fg);font-size:9px;font-weight:700;padding:3px 7px;border-radius:10px">SIN STOCK</div>`:stockBajo?`<div style="position:absolute;top:8px;right:8px;background:var(--warn-bg);color:var(--warn-fg);font-size:9px;font-weight:700;padding:3px 7px;border-radius:10px">${stockInfo.stock} restantes</div>`:"";
+  const dis=sinStock?"disabled":"";
+  const disStyle=sinStock?"background:var(--ink-mute);cursor:not-allowed":"";
+  const safeId=r.n.replace(/\s/g,'_');
+  const addBtn=`<button class="add-btn ${inCart?"added":""}" id="abtn-${safeId}" onclick="addToCart('${r.n}')" ${dis} style="${disStyle}">${sinStock?"Sin stock":inCart?`✓ (${cart[r.n]})`:"Agregar"}</button>`;
+  const qtyRow=`<div class="qty-row"><button class="qty-btn" onclick="changeQty('${r.n}',-1)" ${dis}>−</button><div class="qty-num" id="qty-${safeId}">${qty}</div><button class="qty-btn" onclick="changeQty('${r.n}',1)" ${dis}>+</button></div>`;
+  if(layout==="lista-compacta"){
+    return`<div class="prod-card" id="pcard-${safeId}" style="position:relative;${sinStock?"opacity:.55":""}">
       ${stockBadge}
       <div class="prod-icon">${EMOJIS[r.n]||"🌿"}</div>
-      <div>
+      <div class="prod-info">
         <div class="prod-name">${r.n}</div>
         <div class="prod-unit">por ${r.u}</div>
+        <div class="prod-comp">${compLabel}</div>
       </div>
-      <div class="prod-price">${fmt(v)}</div>
-      <div class="prod-comp">${compLabel}</div>
-      <div class="qty-row">
-        <button class="qty-btn" onclick="changeQty('${r.n}',-1)" ${sinStock?"disabled":""}>−</button>
-        <div class="qty-num" id="qty-${r.n.replace(/\s/g,'_')}">${qty}</div>
-        <button class="qty-btn" onclick="changeQty('${r.n}',1)" ${sinStock?"disabled":""}>+</button>
+      <div class="prod-actions">
+        <div class="prod-price">${fmt(v)}</div>
+        ${addBtn}
       </div>
-      <button class="add-btn ${inCart?"added":""}" id="abtn-${r.n.replace(/\s/g,'_')}" onclick="addToCart('${r.n}')" ${sinStock?"disabled":""} style="${sinStock?"background:var(--ink-mute);cursor:not-allowed":""}">
-        ${sinStock?"Sin stock":inCart?`✓ En carrito (${cart[r.n]})`:"Agregar al carrito"}
-      </button>
     </div>`;
-  }).join("")||`<div style="color:var(--ink-faint);font-size:13px;padding:1rem">Sin productos</div>`;
+  }
+  return`<div class="prod-card" id="pcard-${safeId}" style="position:relative;${sinStock?"opacity:.55":""}">
+    ${stockBadge}
+    <div class="prod-icon">${EMOJIS[r.n]||"🌿"}</div>
+    <div>
+      <div class="prod-name">${r.n}</div>
+      <div class="prod-unit">por ${r.u}</div>
+    </div>
+    <div class="prod-price">${fmt(v)}</div>
+    <div class="prod-comp">${compLabel}</div>
+    ${qtyRow}
+    <button class="add-btn ${inCart?"added":""}" id="abtn-${safeId}" onclick="addToCart('${r.n}')" ${dis} style="${disStyle}">
+      ${sinStock?"Sin stock":inCart?`✓ En carrito (${cart[r.n]})`:"Agregar al carrito"}
+    </button>
+  </div>`;
 }
 
 function changeQty(nombre,delta){
@@ -3315,6 +3412,122 @@ function exportCSV(){
 let tenants={};// id -> tenantData
 let currentTenantId="default";
 let editingTenant=null;// for form
+let adminStyleOpen=false;
+
+// ─── ESTILOS DE TIENDA (por tenant) ────────────────────────
+const THEMES={
+  "verde-fresco":{
+    label:"🌱 Verde fresco",
+    desc:"Default actual — orgánico limpio",
+    swatches:["oklch(40% 0.085 220)","oklch(96.5% 0.005 75)","oklch(48% 0.10 145)","oklch(24% 0.015 250)"],
+    vars:{}
+  },
+  "mercado-barrio":{
+    label:"🍅 Mercado de barrio",
+    desc:"Cálido, personalidad",
+    swatches:["oklch(58% 0.18 35)","oklch(75% 0.15 80)","oklch(97% 0.012 75)","oklch(22% 0.02 35)"],
+    vars:{
+      "--brand":"oklch(56% 0.18 35)",
+      "--brand-hover":"oklch(48% 0.19 35)",
+      "--brand-tint":"oklch(94% 0.04 35)",
+      "--bg":"oklch(97% 0.012 75)",
+      "--surface":"oklch(99% 0.006 75)",
+      "--surface-2":"oklch(94% 0.018 75)",
+      "--surface-3":"oklch(91% 0.022 75)",
+      "--ink":"oklch(22% 0.025 35)",
+      "--ink-soft":"oklch(48% 0.020 35)",
+      "--ink-mute":"oklch(62% 0.015 35)",
+      "--ink-faint":"oklch(74% 0.012 35)",
+      "--border":"oklch(88% 0.020 75)",
+      "--border-strong":"oklch(80% 0.025 75)",
+      "--warn":"oklch(70% 0.16 80)",
+      "--warn-bg":"oklch(94% 0.05 80)",
+      "--warn-fg":"oklch(42% 0.13 75)",
+      "--font-sans":'"DM Sans","Segoe UI",system-ui,sans-serif'
+    }
+  },
+  "organico-premium":{
+    label:"🌿 Orgánico premium",
+    desc:"Beige + oliva, serif boutique",
+    swatches:["oklch(94% 0.018 80)","oklch(48% 0.08 110)","oklch(25% 0.025 60)","oklch(70% 0.06 70)"],
+    vars:{
+      "--brand":"oklch(48% 0.085 110)",
+      "--brand-hover":"oklch(40% 0.090 110)",
+      "--brand-tint":"oklch(92% 0.030 100)",
+      "--bg":"oklch(94% 0.018 80)",
+      "--surface":"oklch(97% 0.012 80)",
+      "--surface-2":"oklch(91% 0.022 80)",
+      "--surface-3":"oklch(88% 0.025 80)",
+      "--ink":"oklch(25% 0.025 60)",
+      "--ink-soft":"oklch(48% 0.022 60)",
+      "--ink-mute":"oklch(60% 0.018 60)",
+      "--ink-faint":"oklch(72% 0.015 60)",
+      "--border":"oklch(85% 0.025 80)",
+      "--border-strong":"oklch(75% 0.030 80)",
+      "--font-sans":'Georgia,"Iowan Old Style","Palatino Linotype",serif'
+    }
+  },
+  "nocturno":{
+    label:"🌙 Nocturno",
+    desc:"Modo oscuro real",
+    swatches:["oklch(15% 0.012 250)","oklch(28% 0.060 220)","oklch(70% 0.14 220)","oklch(95% 0.008 250)"],
+    vars:{
+      "--bg":"oklch(16% 0.012 250)",
+      "--surface":"oklch(22% 0.018 250)",
+      "--surface-2":"oklch(27% 0.020 250)",
+      "--surface-3":"oklch(31% 0.022 250)",
+      "--border":"oklch(32% 0.020 250)",
+      "--border-strong":"oklch(42% 0.022 250)",
+      "--ink":"oklch(95% 0.008 250)",
+      "--ink-soft":"oklch(72% 0.015 250)",
+      "--ink-mute":"oklch(60% 0.012 250)",
+      "--ink-faint":"oklch(48% 0.010 250)",
+      "--brand":"oklch(70% 0.14 220)",
+      "--brand-hover":"oklch(78% 0.14 220)",
+      "--brand-tint":"oklch(28% 0.060 220)",
+      "--on-brand":"oklch(16% 0.012 220)",
+      "--success":"oklch(70% 0.14 145)",
+      "--success-bg":"oklch(25% 0.060 145)",
+      "--success-fg":"oklch(78% 0.12 145)",
+      "--warn":"oklch(75% 0.14 75)",
+      "--warn-bg":"oklch(28% 0.060 75)",
+      "--warn-fg":"oklch(80% 0.14 75)",
+      "--danger":"oklch(72% 0.18 25)",
+      "--danger-bg":"oklch(28% 0.080 25)",
+      "--danger-fg":"oklch(80% 0.16 25)",
+      "--info":"oklch(72% 0.14 250)",
+      "--info-bg":"oklch(28% 0.060 250)"
+    }
+  }
+};
+const LAYOUTS={
+  "grilla":{label:"Grilla",desc:"Cards verticales auto-fill"},
+  "lista-compacta":{label:"Lista compacta",desc:"Una columna, ideal pedidos rápidos"},
+  "catalogo-grande":{label:"Catálogo grande",desc:"Cards prominentes con foto destacada"},
+  "menu-categoria":{label:"Menú por categoría",desc:"Agrupa por categoría con scroll horizontal"}
+};
+function getTenantStyle(t){
+  return (t&&t.style)?t.style:{theme:"verde-fresco",layout:"grilla"};
+}
+function applyTenantStyle(t){
+  const style=getTenantStyle(t);
+  const theme=THEMES[style.theme]||THEMES["verde-fresco"];
+  const root=document.documentElement;
+  // limpiar todos los overrides previos (de cualquier tema)
+  const allKeys=new Set();
+  Object.values(THEMES).forEach(th=>Object.keys(th.vars||{}).forEach(k=>allKeys.add(k)));
+  allKeys.forEach(k=>root.style.removeProperty(k));
+  // aplicar el tema nuevo
+  Object.entries(theme.vars||{}).forEach(([k,v])=>root.style.setProperty(k,v));
+  // marker para reglas adicionales (modo dark)
+  root.dataset.theme=style.theme==="nocturno"?"dark":"";
+  // aplicar fuente al body si el tema la define
+  if(theme.vars&&theme.vars["--font-sans"]){
+    document.body.style.fontFamily=theme.vars["--font-sans"];
+  } else {
+    document.body.style.fontFamily="";
+  }
+}
 
 function snapshotCurrentState(){
   return{
@@ -3366,6 +3579,7 @@ function initTenants(){
     diasEnvio:"Lun-Vie",
     lat:-34.5870, lng:-58.4250,
     creada:"2025-01-15",
+    style:{theme:"verde-fresco",layout:"grilla"},
     data:snapshotCurrentState(),
   };
   // Add 2 example tenants with variations
@@ -3377,7 +3591,9 @@ function initTenants(){
     zona:"Zona Norte",direccion:"San Isidro, GBA",
     tel:"+54 11 5555-1234",diasEnvio:"Lun-Sab",
     lat:-34.4710, lng:-58.5060,
-    creada:"2025-03-10",data:t2State,
+    creada:"2025-03-10",
+    style:{theme:"mercado-barrio",layout:"catalogo-grande"},
+    data:t2State,
   };
   const t3State=snapshotCurrentState();
   Object.keys(t3State.pVentas).forEach(k=>{t3State.pVentas[k]=Math.round(t3State.pVentas[k]*1.25);});
@@ -3387,7 +3603,9 @@ function initTenants(){
     zona:"CABA Premium",direccion:"Recoleta, CABA",
     tel:"+54 11 4444-9876",diasEnvio:"Lun-Vie",
     lat:-34.5880, lng:-58.3960,
-    creada:"2025-04-22",data:t3State,
+    creada:"2025-04-22",
+    style:{theme:"organico-premium",layout:"menu-categoria"},
+    data:t3State,
   };
 }
 
@@ -3400,6 +3618,7 @@ function switchTenant(id){
   if(!t){alert("Verdulería no encontrada");return;}
   loadTenantState(t);
   currentTenantId=id;
+  applyTenantStyle(t);
   // Reset transient UI state
   cart={};
   storeQtys={};
@@ -3482,9 +3701,85 @@ function renderAdminContent(){
     <div id="admin-form-container"></div>
     <div id="admin-detail-container"></div>
     <div id="admin-pinstyle-container"></div>
+    <div id="admin-style-container"></div>
   `;
   renderTenantDetail();
   renderPinStyleEditor();
+  renderAdminStyle();
+}
+
+function renderAdminStyle(){
+  const cont=document.getElementById("admin-style-container");
+  if(!cont)return;
+  const t=tenants[currentTenantId];
+  if(!t){cont.innerHTML="";return;}
+  if(!t.style)t.style={theme:"verde-fresco",layout:"grilla"};
+  const curTheme=t.style.theme||"verde-fresco";
+  const curLayout=t.style.layout||"grilla";
+  const themeCards=Object.entries(THEMES).map(([id,th])=>`
+    <div class="style-card ${id===curTheme?"on":""}" onclick="setTenantTheme('${id}')">
+      <div class="sc-check">✓</div>
+      <div class="sc-name">${th.label}</div>
+      <div class="sc-desc">${th.desc}</div>
+      <div class="swatches-row">${th.swatches.map(c=>`<div class="swatch" style="background:${c}"></div>`).join("")}</div>
+    </div>`).join("");
+  const layoutMocks={
+    "grilla":`<div class="layout-mock layout-mock--grid"><div class="lm-block"></div><div class="lm-block"></div><div class="lm-block"></div><div class="lm-block"></div><div class="lm-block"></div><div class="lm-block"></div></div>`,
+    "lista-compacta":`<div class="layout-mock layout-mock--list"><div class="lm-block"></div><div class="lm-block"></div><div class="lm-block"></div><div class="lm-block"></div></div>`,
+    "catalogo-grande":`<div class="layout-mock layout-mock--catalog"><div class="lm-block"></div><div class="lm-block"></div></div>`,
+    "menu-categoria":`<div class="layout-mock layout-mock--menu"><div class="lm-row"><div class="lm-block"></div></div><div class="lm-row"><div class="lm-block"></div></div><div class="lm-row"><div class="lm-block"></div></div></div>`
+  };
+  const layoutCards=Object.entries(LAYOUTS).map(([id,lt])=>`
+    <div class="style-card ${id===curLayout?"on":""}" onclick="setTenantLayout('${id}')">
+      <div class="sc-check">✓</div>
+      <div class="sc-name">${lt.label}</div>
+      <div class="sc-desc">${lt.desc}</div>
+      ${layoutMocks[id]||""}
+    </div>`).join("");
+  cont.innerHTML=`
+    <div class="style-section ${adminStyleOpen?"open":""}" id="style-section-wrap">
+      <div class="style-section-head" onclick="toggleAdminStyle()">
+        <h3>🎨 Estilo de tienda</h3>
+        <div class="style-toggle">▾</div>
+      </div>
+      <div class="style-section-body">
+        <p style="font-size:11px;color:var(--ink-soft);margin-bottom:14px;line-height:1.5">Cada verdulería tiene su propio tema visual y layout de tienda. Los cambios se aplican al instante.</p>
+        <div class="style-sub">🎨 Tema</div>
+        <div class="style-grid">${themeCards}</div>
+        <div class="style-sub" style="margin-top:18px">📐 Layout de la tienda</div>
+        <div class="style-grid">${layoutCards}</div>
+      </div>
+    </div>`;
+}
+
+function toggleAdminStyle(){
+  adminStyleOpen=!adminStyleOpen;
+  const wrap=document.getElementById("style-section-wrap");
+  if(wrap)wrap.classList.toggle("open",adminStyleOpen);
+}
+
+function setTenantTheme(themeId){
+  const t=tenants[currentTenantId];
+  if(!t)return;
+  if(!t.style)t.style={theme:"verde-fresco",layout:"grilla"};
+  t.style.theme=themeId;
+  applyTenantStyle(t);
+  renderAdminStyle();
+  // refrescar la tienda si estaba inicializada
+  const tp=document.getElementById("panel-tienda");
+  if(tp&&tp.dataset.init&&typeof renderStoreGrid==="function")renderStoreGrid();
+  autoSave();
+}
+
+function setTenantLayout(layoutId){
+  const t=tenants[currentTenantId];
+  if(!t)return;
+  if(!t.style)t.style={theme:"verde-fresco",layout:"grilla"};
+  t.style.layout=layoutId;
+  renderAdminStyle();
+  const tp=document.getElementById("panel-tienda");
+  if(tp&&tp.dataset.init&&typeof renderStoreGrid==="function")renderStoreGrid();
+  autoSave();
 }
 
 function renderTenantDetail(){
@@ -4339,6 +4634,11 @@ if(!loaded){
   saveToLocalStorage();
 }
 updateGlobalHeader();
+// Aplicar estilo del tenant activo al boot
+if(tenants[currentTenantId]){
+  if(!tenants[currentTenantId].style)tenants[currentTenantId].style={theme:"verde-fresco",layout:"grilla"};
+  applyTenantStyle(tenants[currentTenantId]);
+}
 
 // Auto-save on any data mutation: wrap key functions
 const _origUpdateField=updateField;
