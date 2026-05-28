@@ -171,10 +171,11 @@ input.cell-input:focus{outline:none;border-color:var(--brand)}
 .cart-overlay.open{display:block}
 .cart-drawer{position:fixed;top:0;right:0;width:340px;max-width:95vw;height:100vh;background:var(--surface);z-index:9999;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .25s ease;box-shadow:-4px 0 24px rgba(0,0,0,.12)}
 .cart-drawer.open{transform:translateX(0)}
-.cart-head{display:flex;align-items:center;justify-content:space-between;padding:16px;border-bottom:1px solid var(--border)}
-.cart-head h2{font-size:15px;font-weight:700}
-.cart-close{width:30px;height:30px;border:none;background:transparent;font-size:20px;cursor:pointer;border-radius:6px;display:flex;align-items:center;justify-content:center;color:var(--ink-soft)}
-.cart-close:hover{background:var(--surface-2)}
+.cart-head{display:flex;align-items:center;justify-content:space-between;padding:16px;border-bottom:1px solid var(--border);gap:8px}
+.cart-head h2{font-size:15px;font-weight:700;flex:1}
+.cart-close,.cart-back{width:30px;height:30px;border:none;background:transparent;font-size:18px;cursor:pointer;border-radius:6px;display:flex;align-items:center;justify-content:center;color:var(--ink-soft);flex-shrink:0}
+.cart-close{font-size:20px}
+.cart-close:hover,.cart-back:hover{background:var(--surface-2);color:var(--ink)}
 .cart-items{flex:1;overflow-y:auto;padding:12px 16px}
 .cart-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--surface-2)}
 .cart-item-icon{font-size:24px;width:36px;text-align:center}
@@ -195,6 +196,20 @@ input.cell-input:focus{outline:none;border-color:var(--brand)}
 .cart-envio-info{font-size:11px;padding:7px 10px;border-radius:6px;margin-bottom:10px;line-height:1.5}
 .checkout-btn{width:100%;height:40px;border:none;border-radius:8px;background:var(--brand);color:#fff;font-size:14px;font-weight:700;cursor:pointer}
 .checkout-btn:hover{background:var(--brand-hover)}
+/* Checkout step: form de datos del cliente */
+.cart-checkout{flex:1;overflow-y:auto;padding:14px 16px;display:none;flex-direction:column;gap:12px}
+.cart-drawer[data-step="checkout"] .cart-items{display:none}
+.cart-drawer[data-step="checkout"] .cart-foot{display:none}
+.cart-drawer[data-step="checkout"] .cart-checkout{display:flex}
+.checkout-field{display:flex;flex-direction:column;gap:5px}
+.checkout-field label{font-size:11px;font-weight:600;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.04em}
+.checkout-field label .req{color:var(--danger);font-weight:700;text-transform:none;letter-spacing:0}
+.checkout-field label .opt{color:var(--ink-faint);font-weight:500;text-transform:none;letter-spacing:0;font-size:10px}
+.checkout-field input,.checkout-field select{width:100%;height:36px;padding:0 12px;font-size:13px;border:1px solid var(--border-strong);border-radius:8px;background:var(--surface);color:var(--ink);font-family:inherit}
+.checkout-field input:focus,.checkout-field select:focus{outline:none;border-color:var(--brand)}
+.checkout-field input.invalid,.checkout-field select.invalid{border-color:var(--danger);background:var(--danger-bg)}
+.checkout-error{font-size:12px;color:var(--danger-fg);background:var(--danger-bg);padding:8px 11px;border-radius:7px;display:none;line-height:1.5}
+.checkout-error.show{display:block}
 /* Sticky bottom cart bar */
 .cart-bar{position:fixed;left:50%;bottom:18px;transform:translate(-50%,140%);width:min(680px,calc(100vw - 32px));background:var(--ink);color:#fff;border-radius:14px;padding:12px 14px 12px 18px;display:flex;align-items:center;justify-content:space-between;gap:14px;box-shadow:0 8px 30px rgba(0,0,0,.28);z-index:90;transition:transform .28s cubic-bezier(.2,.8,.2,1);flex-wrap:wrap}
 .cart-bar.show{transform:translate(-50%,0)}
@@ -575,6 +590,12 @@ select.cell-sel{height:26px;padding:0 6px;font-size:11px;border:1px solid var(--
 .pedido-actions button.danger:hover{background:var(--danger-bg);border-color:var(--danger)}
 .pedido-empty{padding:2.5rem 1rem;text-align:center;color:var(--ink-faint);font-size:13px;background:var(--surface);border:1px dashed var(--border-strong);border-radius:9px;line-height:1.6}
 .pedido-empty strong{color:var(--ink-soft);display:block;margin-bottom:4px;font-size:14px}
+.pedido-cliente{padding:10px 12px;background:var(--bg);border:1px solid var(--border);border-radius:8px;margin-bottom:12px}
+.pedido-cliente-title{font-size:11px;font-weight:700;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px}
+.pedido-cliente-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px}
+.pedido-cliente-grid > div{display:flex;flex-direction:column;gap:2px;font-size:12px}
+.pedido-cliente-grid > div span{color:var(--ink-mute);font-size:10px;text-transform:uppercase;letter-spacing:.04em;font-weight:600}
+.pedido-cliente-grid > div strong{color:var(--ink);font-weight:600;font-size:12px;word-break:break-word}
 </style>
 </head>
 <body>
@@ -604,9 +625,10 @@ select.cell-sel{height:26px;padding:0 6px;font-size:11px;border:1px solid var(--
 
 <!-- CART GLOBAL DRAWER (visible desde Tienda, Combos receta, etc.) -->
 <div class="cart-overlay" id="cart-overlay" onclick="closeCart()"></div>
-<div class="cart-drawer" id="cart-drawer">
+<div class="cart-drawer" id="cart-drawer" data-step="cart">
   <div class="cart-head">
-    <h2>Tu carrito</h2>
+    <button class="cart-back" id="cart-back-btn" onclick="showCartStep()" style="display:none">←</button>
+    <h2 id="cart-title">Tu carrito</h2>
     <button class="cart-close" onclick="closeCart()">✕</button>
   </div>
   <div class="cart-items" id="cart-items"></div>
@@ -617,7 +639,34 @@ select.cell-sel{height:26px;padding:0 6px;font-size:11px;border:1px solid var(--
     </div>
     <div class="cart-envio-info" id="cart-envio-info"></div>
     <div class="cart-total"><span>Total</span><span id="cart-total-val">$0</span></div>
-    <button class="checkout-btn" onclick="doCheckout()">Confirmar pedido ↗</button>
+    <button class="checkout-btn" onclick="showCheckoutStep()">Continuar ↗</button>
+  </div>
+  <div class="cart-checkout" id="cart-checkout">
+    <div class="checkout-field">
+      <label>Dirección de entrega <span class="req">*</span></label>
+      <input type="text" id="co-direccion" placeholder="Calle, número, depto" autocomplete="street-address">
+    </div>
+    <div class="checkout-field">
+      <label>Teléfono <span class="req">*</span></label>
+      <input type="tel" id="co-telefono" placeholder="+54 11 ..." autocomplete="tel">
+    </div>
+    <div class="checkout-field">
+      <label>Correo <span class="opt">(opcional)</span></label>
+      <input type="email" id="co-correo" placeholder="email@ejemplo.com" autocomplete="email">
+    </div>
+    <div class="checkout-field">
+      <label>Forma de pago <span class="req">*</span></label>
+      <select id="co-pago">
+        <option value="">Elegí cómo pagar...</option>
+        <option value="efectivo">💵 Efectivo al recibir</option>
+        <option value="mercadopago">💳 Mercado Pago</option>
+        <option value="transferencia">🏦 Transferencia</option>
+        <option value="tarjeta">💳 Tarjeta al recibir</option>
+      </select>
+    </div>
+    <div class="checkout-error" id="co-error"></div>
+    <div class="cart-total"><span>Total a pagar</span><span id="co-total-val">$0</span></div>
+    <button class="checkout-btn" onclick="submitCheckout()">Confirmar pedido ↗</button>
   </div>
 </div>
 
@@ -1510,6 +1559,15 @@ function renderPedidosList(){
         <span class="pedido-total">${fmt(p.total)}</span>
       </div>
       <div class="pedido-body">
+        ${p.cliente?`<div class="pedido-cliente">
+          <div class="pedido-cliente-title">👤 Cliente</div>
+          <div class="pedido-cliente-grid">
+            <div><span>📍 Dirección</span><strong>${p.cliente.direccion||"—"}</strong></div>
+            <div><span>📞 Teléfono</span><strong>${p.cliente.telefono||"—"}</strong></div>
+            ${p.cliente.correo?`<div><span>✉ Correo</span><strong>${p.cliente.correo}</strong></div>`:""}
+            <div><span>💳 Forma de pago</span><strong>${(FORMA_PAGO_LABEL&&FORMA_PAGO_LABEL[p.cliente.formaDePago])||p.cliente.formaDePago||"—"}</strong></div>
+          </div>
+        </div>`:""}
         <div class="pedido-items">
           ${p.items.map(i=>`<div class="pedido-item-row">
             <span class="pedido-item-emoji">${i.emoji}</span>
@@ -1740,6 +1798,7 @@ function populateCartZonas(){
 
 function openCart(){
   populateCartZonas();
+  showCartStep();
   document.getElementById("cart-drawer").classList.add("open");
   document.getElementById("cart-overlay").classList.add("open");
   renderCartItems();
@@ -1748,6 +1807,48 @@ function openCart(){
 function closeCart(){
   document.getElementById("cart-drawer")?.classList.remove("open");
   document.getElementById("cart-overlay")?.classList.remove("open");
+  // reset al step "cart" para la próxima vez
+  showCartStep();
+}
+
+function showCartStep(){
+  const dr=document.getElementById("cart-drawer");
+  if(!dr)return;
+  dr.dataset.step="cart";
+  const title=document.getElementById("cart-title");
+  if(title)title.textContent="Tu carrito";
+  const back=document.getElementById("cart-back-btn");
+  if(back)back.style.display="none";
+  const err=document.getElementById("co-error");
+  if(err)err.classList.remove("show");
+}
+
+function showCheckoutStep(){
+  const items=Object.entries(cart).filter(([,q])=>q>0);
+  if(!items.length){alert("Tu carrito está vacío");return;}
+  const dr=document.getElementById("cart-drawer");
+  if(!dr)return;
+  dr.dataset.step="checkout";
+  const title=document.getElementById("cart-title");
+  if(title)title.textContent="Datos del pedido";
+  const back=document.getElementById("cart-back-btn");
+  if(back)back.style.display="flex";
+  // Pre-rellenar con datos guardados (reuso del último pedido)
+  const saved=JSON.parse(localStorage.getItem("verduleria_cliente_data")||"{}");
+  const set=(id,v)=>{const e=document.getElementById(id);if(e&&!e.value)e.value=v||"";};
+  set("co-direccion",saved.direccion);
+  set("co-telefono",saved.telefono);
+  set("co-correo",saved.correo);
+  set("co-pago",saved.formaDePago);
+  // Sincronizar total a pagar
+  const subtotal=Object.entries(cart).reduce((acc,[n,q])=>acc+(pVentas[n]||0)*q,0);
+  const selEl=document.getElementById("cart-zona-sel");
+  const zi=selEl?parseInt(selEl.value)||0:0;
+  const z=zonas[zi]||zonas[0];
+  const gratis=subtotal>=z.freeMin;
+  const total=subtotal+(gratis?0:z.costoFijo);
+  const totEl=document.getElementById("co-total-val");
+  if(totEl)totEl.textContent=fmt(total)||"$0";
 }
 
 function renderCartItems(){
@@ -1805,11 +1906,40 @@ function renderCartFoot(){
   if(envEl){envEl.style.background=envioColor;envEl.style.color=gratis?"var(--success-fg)":"var(--danger-fg)";envEl.textContent=envioText;}
 }
 
-function doCheckout(){
+const FORMA_PAGO_LABEL={
+  efectivo:"💵 Efectivo al recibir",
+  mercadopago:"💳 Mercado Pago",
+  transferencia:"🏦 Transferencia",
+  tarjeta:"💳 Tarjeta al recibir"
+};
+
+function submitCheckout(){
   const items=Object.entries(cart).filter(([,q])=>q>0);
   if(!items.length){alert("Tu carrito está vacío");return;}
+  // Leer datos del form
+  const direccion=(document.getElementById("co-direccion")?.value||"").trim();
+  const telefono=(document.getElementById("co-telefono")?.value||"").trim();
+  const correo=(document.getElementById("co-correo")?.value||"").trim();
+  const formaDePago=document.getElementById("co-pago")?.value||"";
+  // Validar
+  const errors=[];
+  const markInvalid=(id,bad)=>{
+    const el=document.getElementById(id);
+    if(el)el.classList.toggle("invalid",bad);
+  };
+  if(direccion.length<5){errors.push("Ingresá una dirección de entrega válida");markInvalid("co-direccion",true);}else markInvalid("co-direccion",false);
+  const telDigits=telefono.replace(/\D/g,"");
+  if(telDigits.length<6){errors.push("Ingresá un teléfono válido");markInvalid("co-telefono",true);}else markInvalid("co-telefono",false);
+  if(correo&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo)){errors.push("El correo no parece válido");markInvalid("co-correo",true);}else markInvalid("co-correo",false);
+  if(!formaDePago){errors.push("Elegí una forma de pago");markInvalid("co-pago",true);}else markInvalid("co-pago",false);
+  const errEl=document.getElementById("co-error");
+  if(errors.length){
+    if(errEl){errEl.textContent=errors.join(" · ");errEl.classList.add("show");}
+    return;
+  }
+  if(errEl)errEl.classList.remove("show");
+  // Resolver totales
   const subtotal=Object.entries(cart).reduce((acc,[n,q])=>acc+(pVentas[n]||0)*q,0);
-  // Resolver zona seleccionada en el drawer del carrito
   const selEl=document.getElementById("cart-zona-sel");
   const zi=selEl?parseInt(selEl.value)||0:0;
   const z=zonas[zi]||zonas[0];
@@ -1832,20 +1962,25 @@ function doCheckout(){
     costoEnvio,
     envioGratis:gratis,
     total,
+    cliente:{direccion,telefono,correo,formaDePago},
     estado:"pendiente"
   };
   pedidos.unshift(pedido);
+  // Guardar datos del cliente para reusar la próxima vez (no sensible)
+  localStorage.setItem("verduleria_cliente_data",JSON.stringify({direccion,telefono,correo,formaDePago}));
   saveToLocalStorage();
-  alert(`✓ Pedido #${pedido.id} recibido\n\nProductos: ${items.length}\nTotal: ${fmt(total)}\n\nGestionalo desde la tab 🧾 Pedidos.`);
+  alert(`✓ Pedido #${pedido.id} recibido\n\nProductos: ${items.length}\nTotal: ${fmt(total)}\nPago: ${FORMA_PAGO_LABEL[formaDePago]||formaDePago}\n\nGestionalo desde la tab 🧾 Pedidos.`);
   cart={};
   updateCartBadge();
   if(typeof updateCartBar==="function")updateCartBar();
   renderStoreGrid();
   closeCart();
-  // Si el panel de pedidos ya estaba inicializado, refrescá
   const pp=document.getElementById("panel-pedidos");
   if(pp&&pp.dataset.init){renderPedidosSummary();renderPedidosList();}
 }
+
+// Alias legacy por compatibilidad si algo viejo lo llama
+function doCheckout(){submitCheckout();}
 
 // ── TAB: RECETAS / COMBOS ──
 // Cada receta tiene ingredientes con cantidad base para 2 personas.
