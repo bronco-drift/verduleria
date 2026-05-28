@@ -67,9 +67,9 @@ h1{font-size:22px;font-weight:700;margin-bottom:.25rem;color:var(--ink);letter-s
 .group-pill-count{font-size:10px;font-weight:700;padding:1px 8px;border-radius:999px;background:rgba(0,0,0,.10);color:inherit;margin-left:2px}
 .group-pill.on .group-pill-count{background:rgba(255,255,255,.25)}
 /* Admin drawer */
-.admin-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:99;display:none}
+.admin-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:9998;display:none}
 .admin-overlay.open{display:block}
-.admin-drawer{position:fixed;top:0;right:0;width:min(720px,95vw);height:100vh;background:var(--bg);z-index:100;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .25s ease;box-shadow:-6px 0 30px rgba(0,0,0,.18)}
+.admin-drawer{position:fixed;top:0;right:0;width:min(720px,95vw);height:100vh;background:var(--bg);z-index:9999;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .25s ease;box-shadow:-6px 0 30px rgba(0,0,0,.18)}
 .admin-drawer.open{transform:translateX(0)}
 .admin-drawer-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;background:var(--brand);color:#fff}
 .admin-drawer-head h2{font-size:16px;font-weight:700}
@@ -151,7 +151,7 @@ input.cell-input:focus{outline:none;border-color:var(--brand)}
 .cart-btn:hover{background:var(--brand-hover)}
 .cart-badge{position:absolute;top:-6px;right:-6px;background:var(--danger);color:#fff;font-size:10px;font-weight:700;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;display:none}
 .store-cats{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:1rem}
-.store-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:1.5rem}
+.store-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:1.5rem;padding-bottom:90px}
 .prod-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:8px;transition:box-shadow .15s}
 .prod-card:hover{box-shadow:0 2px 12px rgba(0,0,0,.08)}
 .prod-icon{width:100%;height:72px;display:flex;align-items:center;justify-content:center;font-size:42px;background:var(--bg);border-radius:8px}
@@ -167,9 +167,9 @@ input.cell-input:focus{outline:none;border-color:var(--brand)}
 .add-btn:hover{background:var(--brand-hover)}
 .add-btn.added{background:var(--success)}
 /* Cart drawer */
-.cart-overlay{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:99;display:none}
+.cart-overlay{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:9998;display:none}
 .cart-overlay.open{display:block}
-.cart-drawer{position:fixed;top:0;right:0;width:340px;max-width:95vw;height:100vh;background:var(--surface);z-index:100;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .25s ease;box-shadow:-4px 0 24px rgba(0,0,0,.12)}
+.cart-drawer{position:fixed;top:0;right:0;width:340px;max-width:95vw;height:100vh;background:var(--surface);z-index:9999;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .25s ease;box-shadow:-4px 0 24px rgba(0,0,0,.12)}
 .cart-drawer.open{transform:translateX(0)}
 .cart-head{display:flex;align-items:center;justify-content:space-between;padding:16px;border-bottom:1px solid var(--border)}
 .cart-head h2{font-size:15px;font-weight:700}
@@ -195,6 +195,25 @@ input.cell-input:focus{outline:none;border-color:var(--brand)}
 .cart-envio-info{font-size:11px;padding:7px 10px;border-radius:6px;margin-bottom:10px;line-height:1.5}
 .checkout-btn{width:100%;height:40px;border:none;border-radius:8px;background:var(--brand);color:#fff;font-size:14px;font-weight:700;cursor:pointer}
 .checkout-btn:hover{background:var(--brand-hover)}
+/* Sticky bottom cart bar */
+.cart-bar{position:fixed;left:50%;bottom:18px;transform:translate(-50%,140%);width:min(680px,calc(100vw - 32px));background:var(--ink);color:#fff;border-radius:14px;padding:12px 14px 12px 18px;display:flex;align-items:center;justify-content:space-between;gap:14px;box-shadow:0 8px 30px rgba(0,0,0,.28);z-index:90;transition:transform .28s cubic-bezier(.2,.8,.2,1);flex-wrap:wrap}
+.cart-bar.show{transform:translate(-50%,0)}
+.cart-bar-info{display:flex;align-items:center;gap:12px;flex:1;min-width:0}
+.cart-bar-icon{font-size:24px;flex-shrink:0}
+.cart-bar-text{display:flex;flex-direction:column;min-width:0}
+.cart-bar-count{font-size:13px;font-weight:700;line-height:1.2}
+.cart-bar-preview{font-size:13px;opacity:.7;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px;letter-spacing:1px}
+.cart-bar-actions{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.cart-bar-detail{background:transparent;border:none;color:rgba(255,255,255,.75);font-size:12px;font-weight:600;cursor:pointer;text-decoration:underline;text-underline-offset:2px;padding:6px 4px;white-space:nowrap}
+.cart-bar-detail:hover{color:#fff}
+.cart-bar-cta{display:flex;align-items:center;gap:8px;background:var(--brand);color:#fff;border:none;border-radius:9px;padding:10px 16px;font-size:14px;font-weight:700;cursor:pointer;white-space:nowrap}
+.cart-bar-cta:hover{background:var(--brand-hover)}
+.cart-bar-cta-arrow{font-size:15px}
+@media(max-width:560px){
+  .cart-bar{bottom:10px;padding:10px 12px}
+  .cart-bar-preview{display:none}
+  .cart-bar-detail{display:none}
+}
 /* Recetas */
 .rec-header{margin-bottom:1rem}
 .rec-header h2{font-size:15px;font-weight:700;margin-bottom:4px}
@@ -203,6 +222,23 @@ input.cell-input:focus{outline:none;border-color:var(--brand)}
 .rec-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;cursor:pointer;transition:all .15s;display:flex;flex-direction:column;gap:6px}
 .rec-card:hover{border-color:var(--brand);box-shadow:0 2px 12px rgba(0,0,0,.08)}
 .rec-card.sel{border-color:var(--brand);background:var(--brand-tint)}
+/* Card expandida in-place: ocupa toda la fila y muestra el detalle adentro */
+.rec-card.expanded{
+  grid-column:1 / -1;
+  cursor:default;
+  background:var(--surface);
+  border-color:var(--brand);
+  border-width:2px;
+  padding:20px;
+  gap:0;
+  animation:recExpand .25s ease-out;
+  position:relative;
+  box-shadow:0 6px 24px rgba(0,0,0,.10);
+}
+.rec-card.expanded:hover{box-shadow:0 6px 24px rgba(0,0,0,.10)}
+@keyframes recExpand{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+.rec-close{position:absolute;top:12px;right:12px;width:30px;height:30px;border:none;background:var(--surface-2);color:var(--ink-soft);font-size:14px;cursor:pointer;border-radius:7px;display:flex;align-items:center;justify-content:center;z-index:2;transition:all .15s}
+.rec-close:hover{background:var(--danger-bg);color:var(--danger)}
 .rec-emoji{font-size:36px;line-height:1}
 .rec-name{font-size:14px;font-weight:700;color:var(--ink)}
 .rec-desc{font-size:11px;color:var(--ink-soft);line-height:1.4;flex:1}
@@ -250,6 +286,11 @@ input.cell-input:focus{outline:none;border-color:var(--brand)}
 .ubi-grid{display:grid;grid-template-columns:1fr 360px;gap:16px;margin-bottom:1rem}
 @media(max-width:900px){.ubi-grid{grid-template-columns:1fr}}
 #map-container{width:100%;height:520px;border-radius:12px;overflow:hidden;border:1px solid var(--border);background:var(--surface-2)}
+.map-wrap{position:relative}
+.map-style-picker{position:absolute;top:10px;right:10px;z-index:500;display:flex;gap:4px;background:rgba(255,255,255,.92);backdrop-filter:blur(6px);padding:4px;border-radius:9px;box-shadow:0 2px 10px rgba(0,0,0,.15);flex-wrap:wrap;max-width:calc(100% - 20px)}
+.map-style-btn{font-size:11px;font-weight:600;padding:5px 10px;border:none;border-radius:6px;background:transparent;color:#555;cursor:pointer;white-space:nowrap;transition:all .12s}
+.map-style-btn:hover{background:rgba(0,0,0,.06)}
+.map-style-btn.on{background:#1a6630;color:#fff}
 .ubi-side{display:flex;flex-direction:column;gap:12px}
 .ubi-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px}
 .ubi-card h3{font-size:13px;font-weight:700;margin-bottom:10px;color:var(--ink);display:flex;align-items:center;gap:6px}
@@ -280,8 +321,11 @@ input.cell-input:focus{outline:none;border-color:var(--brand)}
 .tienda-tiempo{display:inline-block;font-size:10px;color:var(--ink-soft);background:var(--surface-2);padding:1px 6px;border-radius:4px;margin-right:4px}
 .tienda-empty{padding:20px;text-align:center;color:var(--ink-faint);font-size:12px}
 /* Leaflet custom marker */
-.user-marker{background:var(--info);border:3px solid #fff;width:24px!important;height:24px!important;border-radius:50%;box-shadow:0 2px 8px rgba(0,0,0,.3)}
-.tienda-marker{border:3px solid #fff;border-radius:50%;box-shadow:0 2px 8px rgba(0,0,0,.3);display:flex!important;align-items:center;justify-content:center;font-size:14px;color:#fff;font-weight:700}
+.user-marker{background:transparent!important;border:none!important}
+.tienda-marker{background:transparent!important;border:none!important}
+.leaflet-marker-icon.tienda-marker,.leaflet-marker-icon.user-marker{background:transparent!important;border:none!important;box-shadow:none!important}
+.leaflet-div-icon{background:transparent!important;border:none!important}
+.leaflet-marker-shadow{display:none!important}
 .leaflet-popup-content{font-family:system-ui,sans-serif;margin:10px 12px;font-size:12px;line-height:1.5}
 .leaflet-popup-content b{display:block;font-size:13px;margin-bottom:3px}
 /* Stock */
@@ -450,6 +494,26 @@ input.cell-input:focus{outline:none;border-color:var(--brand)}
 .info-item{background:var(--bg);padding:10px 12px;border-radius:7px}
 .info-item .l{font-size:10px;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.04em;font-weight:600}
 .info-item .v{font-size:14px;font-weight:700;color:var(--ink);margin-top:3px}
+
+/* Pin style editor */
+.pin-editor{display:grid;grid-template-columns:180px 1fr;gap:18px}
+@media(max-width:680px){.pin-editor{grid-template-columns:1fr}}
+.pin-preview-box{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:14px;height:fit-content;position:sticky;top:0}
+.pin-preview-label{font-size:10px;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.04em;font-weight:600;margin-bottom:10px;text-align:center}
+.pin-preview-stage{height:130px;border-radius:8px;background:linear-gradient(135deg,#e8eef0,#dde8e0);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.pin-preview-stage::before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(0,0,0,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(0,0,0,.04) 1px,transparent 1px);background-size:18px 18px}
+.pin-preview-render{position:relative;z-index:1;display:flex;align-items:flex-end;justify-content:center}
+.pin-controls{display:flex;flex-direction:column;gap:14px}
+.pin-ctrl-group{display:flex;flex-direction:column;gap:6px}
+.pin-ctrl-label{font-size:11px;font-weight:600;color:var(--ink);display:flex;justify-content:space-between;align-items:center}
+.pin-val{font-size:11px;color:var(--ink-soft);font-weight:500}
+.pin-shape-row,.pin-toggle-row{display:flex;gap:6px;flex-wrap:wrap}
+.pin-shape-btn{font-size:11px;font-weight:600;padding:6px 11px;border:1px solid var(--border);border-radius:7px;background:var(--surface);color:var(--ink-soft);cursor:pointer;transition:all .12s}
+.pin-shape-btn:hover{border-color:var(--ink-soft);color:var(--ink)}
+.pin-shape-btn.on{background:var(--brand);color:#fff;border-color:var(--brand)}
+.pin-range{width:100%;accent-color:var(--brand);height:6px;cursor:pointer}
+.pin-color-row{display:flex;align-items:center;gap:10px}
+.pin-color{width:48px;height:34px;border:1px solid var(--border);border-radius:7px;cursor:pointer;padding:2px;background:var(--surface)}
 
 .zona-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin-bottom:1.25rem}
 .zona-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px}
@@ -1332,6 +1396,22 @@ function renderTienda(){
       </div>
       <div class="store-cats fbts" id="store-cats"></div>
       <div class="store-grid" id="store-grid"></div>
+      <div class="cart-bar" id="cart-bar">
+        <div class="cart-bar-info">
+          <div class="cart-bar-icon">🛒</div>
+          <div class="cart-bar-text">
+            <div class="cart-bar-count" id="cart-bar-count">0 productos</div>
+            <div class="cart-bar-preview" id="cart-bar-preview"></div>
+          </div>
+        </div>
+        <div class="cart-bar-actions">
+          <button class="cart-bar-detail" onclick="openCart()">Ver detalle</button>
+          <button class="cart-bar-cta" onclick="openCart()">
+            <span id="cart-bar-total">$0</span>
+            <span class="cart-bar-cta-arrow">→</span>
+          </button>
+        </div>
+      </div>
       <div class="cart-overlay" id="cart-overlay" onclick="closeCart()"></div>
       <div class="cart-drawer" id="cart-drawer">
         <div class="cart-head">
@@ -1369,6 +1449,7 @@ function renderTienda(){
   }
   renderStoreGrid();
   updateCartBadge();
+  updateCartBar();
 }
 
 function renderStoreGrid(){
@@ -1426,10 +1507,32 @@ function addToCart(nombre){
   storeQtys[nombre]=1;
   updateCartBadge();
   renderStoreGrid();
-  // flash open cart
-  openCart();
-  renderCartItems();
-  renderCartFoot();
+  updateCartBar();
+  // micro feedback: el botón de la card muestra "✓ Agregado" momentáneamente (renderStoreGrid ya lo refleja)
+}
+
+function updateCartBar(){
+  const bar=document.getElementById("cart-bar");
+  if(!bar)return;
+  const items=Object.entries(cart).filter(([,q])=>q>0);
+  const totalItems=items.reduce((a,[,q])=>a+q,0);
+  const subtotal=items.reduce((a,[n,q])=>a+(pVentas[n]||0)*q,0);
+  if(!totalItems){
+    bar.classList.remove("show");
+    return;
+  }
+  bar.classList.add("show");
+  const countEl=document.getElementById("cart-bar-count");
+  const previewEl=document.getElementById("cart-bar-preview");
+  const totalEl=document.getElementById("cart-bar-total");
+  if(countEl)countEl.textContent=`${totalItems} ${totalItems===1?"producto":"productos"}`;
+  if(totalEl)totalEl.textContent=fmt(subtotal)||"$0";
+  if(previewEl){
+    // muestra los emojis de los primeros productos
+    const emojis=items.slice(0,6).map(([n])=>EMOJIS[n]||"🌿").join(" ");
+    const more=items.length>6?` +${items.length-6}`:"";
+    previewEl.textContent=emojis+more;
+  }
 }
 
 function updateCartBadge(){
@@ -1483,6 +1586,7 @@ function cartChangeQty(nombre,delta){
   renderCartItems();
   renderCartFoot();
   renderStoreGrid();
+  updateCartBar();
 }
 function cartRemove(nombre){cartChangeQty(nombre,-(cart[nombre]||0));}
 
@@ -1509,7 +1613,14 @@ function doCheckout(){
   const items=Object.entries(cart).filter(([,q])=>q>0);
   if(!items.length){alert("Tu carrito está vacío");return;}
   const subtotal=Object.entries(cart).reduce((acc,[n,q])=>acc+(pVentas[n]||0)*q,0);
-  alert(`✓ Pedido recibido!\n\nProductos: ${items.length}\nTotal: ${fmt(subtotal)}\n\n(Demo: integrá con tu backend para procesarlo)`);}
+  alert(`✓ Pedido recibido!\n\nProductos: ${items.length}\nTotal: ${fmt(subtotal)}\n\n(Demo: integrá con tu backend para procesarlo)`);
+  // Limpiar carrito tras confirmar
+  cart={};
+  updateCartBadge();
+  updateCartBar();
+  renderStoreGrid();
+  closeCart();
+}
 
 // ── TAB: RECETAS / COMBOS ──
 // Cada receta tiene ingredientes con cantidad base para 2 personas.
@@ -1809,18 +1920,22 @@ function renderRecetas(){
         <h2>👨‍🍳 Combos por receta</h2>
         <p>Elegí una receta y cantidad de personas. Te armamos el combo de verduras necesarias y lo agregás al carrito con un click.</p>
       </div>
-      <div class="rec-grid" id="rec-grid"></div>
-      <div id="rec-detail-container"></div>`;
+      <div class="rec-grid" id="rec-grid"></div>`;
     p.dataset.init="1";
   }
   renderRecGrid();
-  renderRecDetail();
 }
 
 function renderRecGrid(){
   const grid=document.getElementById("rec-grid");
-  grid.innerHTML=RECETAS.map(r=>`
-    <div class="rec-card ${recetaSel===r.id?"sel":""}" onclick="selRecipe('${r.id}')">
+  grid.innerHTML=RECETAS.map(r=>{
+    const isSel=recetaSel===r.id;
+    if(isSel){
+      return `<div class="rec-card sel expanded" onclick="event.stopPropagation()">
+        ${buildRecExpandedHTML(r)}
+      </div>`;
+    }
+    return `<div class="rec-card" onclick="selRecipe('${r.id}')">
       <div class="rec-emoji">${r.emoji}</div>
       <div class="rec-name">${r.nombre}</div>
       <div class="rec-desc">${r.desc}</div>
@@ -1829,34 +1944,40 @@ function renderRecGrid(){
         <span class="rec-tag time">⏱ ${r.tiempo}</span>
         <span class="rec-tag diff">${r.dificultad}</span>
       </div>
-    </div>
-  `).join("");
+    </div>`;
+  }).join("");
+  // Scroll suave a la card seleccionada
+  if(recetaSel){
+    setTimeout(()=>{
+      const el=document.querySelector(".rec-card.expanded");
+      if(el)el.scrollIntoView({behavior:"smooth",block:"nearest"});
+    },50);
+  }
 }
 
 function selRecipe(id){
   recetaSel=recetaSel===id?null:id;
   renderRecGrid();
-  renderRecDetail();
+}
+
+function closeRecipe(e){
+  if(e)e.stopPropagation();
+  recetaSel=null;
+  renderRecGrid();
 }
 
 function changePersonas(delta){
   recetaPersonas=Math.max(1,Math.min(20,recetaPersonas+delta));
-  renderRecDetail();
+  renderRecGrid();
 }
 
-function renderRecDetail(){
-  const cont=document.getElementById("rec-detail-container");
-  if(!recetaSel){cont.innerHTML="";return;}
-  const r=RECETAS.find(x=>x.id===recetaSel);
-  if(!r){cont.innerHTML="";return;}
-
+function buildRecExpandedHTML(r){
   // Build ingredient list with calculated qty and price
   let totalCombo=0;
-  let totalSuelto=0;
   let allAvailable=true;
   const ingHTML=r.ing.map(ing=>{
     const cantNeeded=escalar(ing.cantPorPersona,recetaPersonas,ing.factor);
-    const cantRound=Math.ceil(cantNeeded*10)/10;// redondeo a 1 decimal hacia arriba
+    const cantRound=Math.ceil(cantNeeded*10)/10;
     const cantDisplay=cantRound<1?cantRound.toFixed(2):cantRound%1===0?cantRound.toString():cantRound.toFixed(1);
     const prod=D.find(x=>x.n===ing.n);
     const emoji=EMOJIS[ing.n]||"🌿";
@@ -1871,11 +1992,9 @@ function renderRecDetail(){
       </div>`;
     }
     const precioUnit=pVentas[ing.n]||0;
-    // unidades a comprar (redondeo hacia arriba)
     const unidadesComprar=Math.ceil(cantRound);
     const subtotal=precioUnit*unidadesComprar;
     totalCombo+=subtotal;
-    totalSuelto+=subtotal;
     return`<div class="rec-ing-row">
       <div class="rec-ing-icon">${emoji}</div>
       <div class="rec-ing-info">
@@ -1886,52 +2005,51 @@ function renderRecDetail(){
     </div>`;
   }).join("");
 
-  // Apply 5% combo discount if all available
   const descuentoPct=allAvailable?5:0;
   const descuento=Math.round(totalCombo*descuentoPct/100);
   const totalFinal=totalCombo-descuento;
 
-  cont.innerHTML=`
-    <div class="rec-detail">
-      <div class="rec-detail-head">
-        <div class="rec-detail-emoji">${r.emoji}</div>
-        <div class="rec-detail-info">
-          <h3>${r.nombre}</h3>
-          <p>${r.desc}</p>
-          <div class="rec-meta" style="margin-top:8px">
-            ${r.veg?'<span class="rec-tag veg">Vegetariana</span>':''}
-            <span class="rec-tag time">⏱ ${r.tiempo}</span>
-            <span class="rec-tag diff">${r.dificultad}</span>
-          </div>
-        </div>
-        <div class="rec-personas">
-          <span class="rec-personas-lbl">👥 Personas</span>
-          <button class="rec-personas-btn" onclick="changePersonas(-1)">−</button>
-          <span class="rec-personas-num">${recetaPersonas}</span>
-          <button class="rec-personas-btn" onclick="changePersonas(1)">+</button>
+  return `
+    <button class="rec-close" onclick="closeRecipe(event)" title="Cerrar">✕</button>
+    <div class="rec-detail-head">
+      <div class="rec-detail-emoji">${r.emoji}</div>
+      <div class="rec-detail-info">
+        <h3>${r.nombre}</h3>
+        <p>${r.desc}</p>
+        <div class="rec-meta" style="margin-top:8px">
+          ${r.veg?'<span class="rec-tag veg">Vegetariana</span>':''}
+          <span class="rec-tag time">⏱ ${r.tiempo}</span>
+          <span class="rec-tag diff">${r.dificultad}</span>
         </div>
       </div>
-
-      <div class="rec-ingredientes">
-        <div class="rec-ing-title">🛒 Ingredientes para ${recetaPersonas} ${recetaPersonas===1?"persona":"personas"}</div>
-        <div class="rec-ing-list">${ingHTML}</div>
+      <div class="rec-personas">
+        <span class="rec-personas-lbl">👥 Personas</span>
+        <button class="rec-personas-btn" onclick="changePersonas(-1);event.stopPropagation()">−</button>
+        <span class="rec-personas-num">${recetaPersonas}</span>
+        <button class="rec-personas-btn" onclick="changePersonas(1);event.stopPropagation()">+</button>
       </div>
+    </div>
 
-      <div class="rec-summary">
-        <div class="rec-summary-row"><span>Subtotal verduras</span><span>${fmt(totalCombo)}</span></div>
-        ${descuento>0?`<div class="rec-summary-row" style="color:var(--success-fg)"><span>Descuento combo (${descuentoPct}%)</span><span>−${fmt(descuento)}</span></div>`:''}
-        <div class="rec-summary-row total"><span>Total combo</span><span>${fmt(totalFinal)}</span></div>
-      </div>
+    <div class="rec-ingredientes">
+      <div class="rec-ing-title">🛒 Ingredientes para ${recetaPersonas} ${recetaPersonas===1?"persona":"personas"}</div>
+      <div class="rec-ing-list">${ingHTML}</div>
+    </div>
 
-      <button class="rec-add-btn" onclick="agregarComboAlCarrito('${r.id}')" ${!allAvailable?'disabled':''}>
-        ${allAvailable?`🛒 Agregar combo al carrito (${fmt(totalFinal)})`:'Algunos ingredientes no están disponibles'}
-      </button>
+    <div class="rec-summary">
+      <div class="rec-summary-row"><span>Subtotal verduras</span><span>${fmt(totalCombo)}</span></div>
+      ${descuento>0?`<div class="rec-summary-row" style="color:var(--success-fg)"><span>Descuento combo (${descuentoPct}%)</span><span>−${fmt(descuento)}</span></div>`:''}
+      <div class="rec-summary-row total"><span>Total combo</span><span>${fmt(totalFinal)}</span></div>
+    </div>
 
-      <div class="rec-prep">
-        <h4>📝 Preparación</h4>
-        <ol>${r.prep.map(s=>`<li>${s}</li>`).join("")}</ol>
-      </div>
-    </div>`;
+    <button class="rec-add-btn" onclick="agregarComboAlCarrito('${r.id}');event.stopPropagation()" ${!allAvailable?'disabled':''}>
+      ${allAvailable?`🛒 Agregar combo al carrito (${fmt(totalFinal)})`:'Algunos ingredientes no están disponibles'}
+    </button>
+
+    <div class="rec-prep">
+      <h4>📝 Preparación</h4>
+      <ol>${r.prep.map(s=>`<li>${s}</li>`).join("")}</ol>
+    </div>
+  `;
 }
 
 function agregarComboAlCarrito(recipeId){
@@ -1947,7 +2065,8 @@ function agregarComboAlCarrito(recipeId){
     added++;
   });
   updateCartBadge();
-  alert(`✓ Combo "${r.nombre}" agregado al carrito\n\n${added} productos para ${recetaPersonas} ${recetaPersonas===1?"persona":"personas"}.\nAndá a la tab "🛒 Tienda" para ver el carrito.`);
+  if(typeof updateCartBar==="function")updateCartBar();
+  alert(`✓ Combo "${r.nombre}" agregado al carrito\n\n${added} productos para ${recetaPersonas} ${recetaPersonas===1?"persona":"personas"}.\nVas a verlo en la barra inferior cuando entres a la Tienda.`);
 }
 
 // ── TAB: UBICACIÓN ──
@@ -2011,7 +2130,10 @@ function renderUbicacion(){
         <p>Configurá tu dirección o usá tu ubicación actual para ver qué verdulería tenés más cerca.</p>
       </div>
       <div class="ubi-grid">
-        <div id="map-container"></div>
+        <div class="map-wrap">
+          <div class="map-style-picker" id="map-style-picker"></div>
+          <div id="map-container"></div>
+        </div>
         <div class="ubi-side">
           <div class="ubi-card">
             <h3>🏠 Tu ubicación</h3>
@@ -2033,11 +2155,67 @@ function renderUbicacion(){
     setTimeout(()=>initMap(),50);
   } else {
     if(mapInstance){
-      setTimeout(()=>mapInstance.invalidateSize(),50);
+      setTimeout(()=>{
+        mapInstance.invalidateSize();
+        rebuildMapMarkers();// reflejar cambios de estilo de pin hechos en Admin
+      },50);
     }
   }
   renderTiendaList();
   renderUbiCurrent();
+}
+
+// Estilos de tiles disponibles (todos sin API key)
+const MAP_STYLES={
+  voyager:{
+    label:"Voyager",
+    url:"https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
+    opts:{attribution:'© OpenStreetMap · © CARTO', subdomains:'abcd', maxZoom:20}
+  },
+  positron:{
+    label:"Claro",
+    url:"https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
+    opts:{attribution:'© OpenStreetMap · © CARTO', subdomains:'abcd', maxZoom:20}
+  },
+  dark:{
+    label:"Oscuro",
+    url:"https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
+    opts:{attribution:'© OpenStreetMap · © CARTO', subdomains:'abcd', maxZoom:20}
+  },
+  osm:{
+    label:"OSM",
+    url:"https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+    opts:{attribution:'© OpenStreetMap', maxZoom:19}
+  }
+};
+let currentMapStyle="voyager";
+let tileLayerRef=null;
+
+function applyMapStyle(styleKey){
+  if(!mapInstance||!MAP_STYLES[styleKey])return;
+  currentMapStyle=styleKey;
+  if(tileLayerRef)mapInstance.removeLayer(tileLayerRef);
+  const s=MAP_STYLES[styleKey];
+  tileLayerRef=L.tileLayer(s.url,s.opts).addTo(mapInstance);
+  tileLayerRef.setZIndex(0);
+  // update picker UI
+  document.querySelectorAll(".map-style-btn").forEach(b=>{
+    b.classList.toggle("on",b.dataset.style===styleKey);
+  });
+}
+
+function buildMapStylePicker(){
+  const picker=document.getElementById("map-style-picker");
+  if(!picker||picker.dataset.built)return;
+  picker.dataset.built="1";
+  Object.entries(MAP_STYLES).forEach(([key,s])=>{
+    const b=document.createElement("button");
+    b.className="map-style-btn"+(key===currentMapStyle?" on":"");
+    b.textContent=s.label;
+    b.dataset.style=key;
+    b.onclick=()=>applyMapStyle(key);
+    picker.appendChild(b);
+  });
 }
 
 function initMap(){
@@ -2047,10 +2225,8 @@ function initMap(){
     return;
   }
   mapInstance=L.map("map-container").setView([DEFAULT_CENTER.lat,DEFAULT_CENTER.lng],11);
-  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{
-    attribution:'© OpenStreetMap',
-    maxZoom:19
-  }).addTo(mapInstance);
+  applyMapStyle(currentMapStyle);
+  buildMapStylePicker();
 
   rebuildMapMarkers();
 
@@ -2058,6 +2234,101 @@ function initMap(){
   mapInstance.on("click",e=>{
     setUserLocation(e.latlng.lat,e.latlng.lng,"Punto seleccionado en el mapa");
   });
+}
+
+// ─── ESTILO DE PINES (personalizable) ────────────────────
+const DEFAULT_PIN_STYLE={
+  shape:"pin",        // "circle" | "pin" | "rounded" | "square"
+  size:38,            // px
+  borderWidth:3,
+  borderColor:"#ffffff",
+  shadow:"medium",    // "none" | "soft" | "medium" | "strong"
+  content:"icono",    // "icono" | "inicial" | "foto" | "ninguno"
+  randomColors:true,  // colores aleatorios por verdulería
+  fixedColor:"#1a6630",
+  photo:null,         // dataURL si content==="foto"
+};
+// pinStyle vive por-tenant; se guarda en su data
+let pinStyle={...DEFAULT_PIN_STYLE};
+
+// Paleta de colores agradables para asignación aleatoria estable
+const PIN_PALETTE=["#1a6630","#2563eb","#dc2626","#d97706","#7c3aed","#0891b2","#db2777","#65a30d","#ea580c","#4f46e5"];
+function colorForId(id){
+  // hash estable del id -> índice de paleta
+  let h=0;
+  for(let i=0;i<id.length;i++){h=(h*31+id.charCodeAt(i))>>>0;}
+  return PIN_PALETTE[h%PIN_PALETTE.length];
+}
+
+function shadowCss(level){
+  return{
+    none:"none",
+    soft:"0 1px 3px rgba(0,0,0,.2)",
+    medium:"0 2px 8px rgba(0,0,0,.3)",
+    strong:"0 4px 14px rgba(0,0,0,.45)"
+  }[level]||"0 2px 8px rgba(0,0,0,.3)";
+}
+
+function borderRadiusForShape(shape,size){
+  if(shape==="circle"||shape==="pin")return"50%";
+  if(shape==="rounded")return Math.round(size*0.28)+"px";
+  return"2px";// square
+}
+
+// Genera el HTML interno del pin segun el estilo y la tienda
+function buildPinHTML(t,style){
+  const isMine=t.mia;
+  const st=style||pinStyle;
+  // tamaño: las mías un poco mas grandes, competencia algo menor
+  const baseSize=st.size;
+  const size=isMine?baseSize:Math.round(baseSize*0.82);
+  // color
+  let color;
+  if(!isMine){
+    color=t.color||"#888";// competencia mantiene su color
+  } else if(st.randomColors){
+    color=colorForId(t.tenantId||t.id||t.nombre);
+  } else {
+    color=st.fixedColor;
+  }
+  // contenido
+  let inner="";
+  let bg=color;
+  const tenantPhoto=isMine&&t.tenantId&&tenants[t.tenantId]?tenants[t.tenantId].photo:null;
+  if(st.content==="foto"&&isMine&&tenantPhoto){
+    bg=`center/cover url('${tenantPhoto}')`;
+    inner="";
+  } else if(st.content==="icono"){
+    inner=isMine?(t.icono||"🏪"):t.nombre[0];
+  } else if(st.content==="inicial"){
+    inner=t.nombre[0].toUpperCase();
+  } else if(st.content==="ninguno"){
+    inner="";
+  } else {
+    inner=isMine?(t.icono||"🏪"):t.nombre[0];
+  }
+  const radius=borderRadiusForShape(st.shape,size);
+  const shadow=shadowCss(st.shadow);
+  const fontSize=Math.round(size*0.42);
+  const border=`${st.borderWidth}px solid ${st.borderColor}`;
+
+  if(st.shape==="pin"){
+    // forma de gota (teardrop) clásica de mapa
+    const ps=size;
+    return{
+      html:`<div style="position:relative;width:${ps}px;height:${Math.round(ps*1.3)}px">
+        <div style="box-sizing:border-box;position:absolute;top:0;left:0;width:${ps}px;height:${ps}px;background:${bg};border:${border};border-radius:50% 50% 50% 0;transform:rotate(-45deg);box-shadow:${shadow};display:flex;align-items:center;justify-content:center">
+          <span style="transform:rotate(45deg);color:#fff;font-weight:700;font-size:${fontSize}px;line-height:1">${inner}</span>
+        </div>
+      </div>`,
+      w:ps, h:Math.round(ps*1.3), anchorX:ps/2, anchorY:Math.round(ps*1.3)
+    };
+  }
+  // circle / rounded / square
+  return{
+    html:`<div style="box-sizing:border-box;flex-shrink:0;width:${size}px;height:${size}px;background:${bg};border:${border};border-radius:${radius};display:flex;align-items:center;justify-content:center;box-shadow:${shadow};color:#fff;font-weight:700;font-size:${fontSize}px;line-height:1">${inner}</div>`,
+    w:size, h:size, anchorX:size/2, anchorY:size/2
+  };
 }
 
 function rebuildMapMarkers(){
@@ -2068,14 +2339,12 @@ function rebuildMapMarkers(){
   // Add markers for all tiendas (mine + competition)
   getAllTiendas().forEach(t=>{
     const isMine=t.mia;
-    const size=isMine?36:30;
-    const ring=isMine?"3px solid #fff;outline:2px solid var(--brand);outline-offset:1px":"3px solid #fff";
-    const content=isMine?(t.icono||"🏪"):t.nombre[0];
+    const pin=buildPinHTML(t);
     const icon=L.divIcon({
       className:"tienda-marker",
-      html:`<div style="width:${size}px;height:${size}px;background:${t.color};border:${ring};border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.3);color:#fff;font-weight:700;font-size:${isMine?"16px":"13px"}">${content}</div>`,
-      iconSize:[size,size],
-      iconAnchor:[size/2,size/2]
+      html:pin.html,
+      iconSize:[pin.w,pin.h],
+      iconAnchor:[pin.anchorX,pin.anchorY]
     });
     const marker=L.marker([t.lat,t.lng],{icon}).addTo(mapInstance);
     const tag=isMine?'<span style="background:var(--brand);color:#fff;font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;margin-left:6px">MI VERDULERÍA</span>':'<span style="background:var(--ink-soft);color:#fff;font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;margin-left:6px">REFERENCIA</span>';
@@ -2640,8 +2909,10 @@ function renderAdminContent(){
 
     <div id="admin-form-container"></div>
     <div id="admin-detail-container"></div>
+    <div id="admin-pinstyle-container"></div>
   `;
   renderTenantDetail();
+  renderPinStyleEditor();
 }
 
 function renderTenantDetail(){
@@ -2668,6 +2939,157 @@ function renderTenantDetail(){
         Los cambios que hagas se guardan automáticamente al cambiar de tenant.
       </p>
     </div>`;
+}
+
+// ── EDITOR DE ESTILO DE PINES ──
+function renderPinStyleEditor(){
+  const cont=document.getElementById("admin-pinstyle-container");
+  if(!cont)return;
+  const s=pinStyle;
+  const t=tenants[currentTenantId];
+  const tenantPhoto=t&&t.photo?t.photo:null;
+  // preview tienda fake (la actual)
+  const previewTienda={mia:true,icono:t.icono||"🏪",nombre:t.nombre||"Mi Verdu",color:s.fixedColor,tenantId:currentTenantId,id:currentTenantId};
+  const previewPin=buildPinHTML(previewTienda);
+
+  cont.innerHTML=`
+    <div class="tenant-detail" style="margin-top:1rem">
+      <h3>📍 Estilo de los pines en el mapa</h3>
+      <p style="font-size:11px;color:var(--ink-soft);margin-bottom:14px">Personalizá cómo se ven tus verdulerías en el mapa. Los cambios se aplican en vivo.</p>
+
+      <div class="pin-editor">
+        <!-- Preview -->
+        <div class="pin-preview-box">
+          <div class="pin-preview-label">Vista previa</div>
+          <div class="pin-preview-stage">
+            <div class="pin-preview-render">${previewPin.html}</div>
+          </div>
+          <div style="font-size:10px;color:var(--ink-soft);text-align:center;margin-top:8px">${t?t.nombre:""}</div>
+        </div>
+
+        <!-- Controles -->
+        <div class="pin-controls">
+          <div class="pin-ctrl-group">
+            <label class="pin-ctrl-label">Forma</label>
+            <div class="pin-shape-row">
+              ${[["pin","📍 Gota"],["circle","⬤ Círculo"],["rounded","▢ Redondeado"],["square","■ Cuadrado"]].map(([k,l])=>
+                `<button class="pin-shape-btn ${s.shape===k?"on":""}" onclick="setPinStyle('shape','${k}')">${l}</button>`).join("")}
+            </div>
+          </div>
+
+          <div class="pin-ctrl-group">
+            <label class="pin-ctrl-label">Contenido</label>
+            <div class="pin-shape-row">
+              ${[["icono","Emoji/Ícono"],["inicial","Inicial"],["foto","Foto"],["ninguno","Vacío"]].map(([k,l])=>
+                `<button class="pin-shape-btn ${s.content===k?"on":""}" onclick="setPinStyle('content','${k}')">${l}</button>`).join("")}
+            </div>
+            ${s.content==="foto"?`
+              <div style="margin-top:8px">
+                <button class="ubi-btn alt" style="font-size:11px" onclick="document.getElementById('pin-photo-input').click()">📷 Subir foto de "${t?t.nombre:''}"</button>
+                <input type="file" id="pin-photo-input" accept="image/*" style="display:none" onchange="uploadPinPhoto(event)">
+                ${tenantPhoto?`<button class="ubi-btn alt" style="font-size:11px;color:var(--danger)" onclick="removePinPhoto()">✕ Quitar</button>`:""}
+                <div style="font-size:10px;color:var(--ink-soft);margin-top:4px">${tenantPhoto?"✓ Foto cargada":"Cada verdulería tiene su propia foto"}</div>
+              </div>`:""}
+          </div>
+
+          <div class="pin-ctrl-group">
+            <label class="pin-ctrl-label">Tamaño <span class="pin-val">${s.size}px</span></label>
+            <input type="range" min="24" max="60" value="${s.size}" class="pin-range" oninput="setPinStyle('size',parseInt(this.value))">
+          </div>
+
+          <div class="pin-ctrl-group">
+            <label class="pin-ctrl-label">Grosor del contorno <span class="pin-val">${s.borderWidth}px</span></label>
+            <input type="range" min="0" max="6" value="${s.borderWidth}" class="pin-range" oninput="setPinStyle('borderWidth',parseInt(this.value))">
+          </div>
+
+          <div class="pin-ctrl-group">
+            <label class="pin-ctrl-label">Color del contorno</label>
+            <div class="pin-color-row">
+              <input type="color" value="${s.borderColor}" class="pin-color" oninput="setPinStyle('borderColor',this.value)">
+              <span style="font-size:11px;color:var(--ink-soft)">${s.borderColor}</span>
+            </div>
+          </div>
+
+          <div class="pin-ctrl-group">
+            <label class="pin-ctrl-label">Sombra</label>
+            <div class="pin-shape-row">
+              ${[["none","Ninguna"],["soft","Suave"],["medium","Media"],["strong","Fuerte"]].map(([k,l])=>
+                `<button class="pin-shape-btn ${s.shadow===k?"on":""}" onclick="setPinStyle('shadow','${k}')">${l}</button>`).join("")}
+            </div>
+          </div>
+
+          <div class="pin-ctrl-group">
+            <label class="pin-ctrl-label">Color del pin</label>
+            <div class="pin-toggle-row">
+              <button class="pin-shape-btn ${s.randomColors?"on":""}" onclick="setPinStyle('randomColors',true)">🎨 Aleatorio por verdu</button>
+              <button class="pin-shape-btn ${!s.randomColors?"on":""}" onclick="setPinStyle('randomColors',false)">Color fijo</button>
+            </div>
+            ${!s.randomColors?`
+              <div class="pin-color-row" style="margin-top:8px">
+                <input type="color" value="${s.fixedColor}" class="pin-color" oninput="setPinStyle('fixedColor',this.value)">
+                <span style="font-size:11px;color:var(--ink-soft)">${s.fixedColor}</span>
+              </div>`:`<div style="font-size:10px;color:var(--ink-soft);margin-top:6px">Cada verdulería recibe un color distinto de una paleta agradable.</div>`}
+          </div>
+
+          <div class="pin-ctrl-group" style="display:flex;gap:8px;margin-top:4px">
+            <button class="form-btn alt" style="font-size:11px" onclick="resetPinStyle()">↺ Restablecer</button>
+          </div>
+        </div>
+      </div>
+    </div>`;
+}
+
+function setPinStyle(key,value){
+  pinStyle[key]=value;
+  rebuildMapMarkers();        // actualiza el mapa en vivo
+  renderPinStyleEditor();     // actualiza el preview y controles
+  autoSave();
+}
+
+function resetPinStyle(){
+  pinStyle={...DEFAULT_PIN_STYLE};
+  rebuildMapMarkers();
+  renderPinStyleEditor();
+  autoSave();
+}
+
+function uploadPinPhoto(event){
+  const file=event.target.files[0];
+  if(!file)return;
+  if(file.size>1.5*1024*1024){
+    alert("La imagen es muy grande (máx 1.5MB). Usá una más chica.");
+    return;
+  }
+  const reader=new FileReader();
+  reader.onload=e=>{
+    // Resize to ~120px square via canvas to keep storage small
+    const img=new Image();
+    img.onload=()=>{
+      const canvas=document.createElement("canvas");
+      const sz=120;canvas.width=sz;canvas.height=sz;
+      const ctx=canvas.getContext("2d");
+      // cover crop
+      const min=Math.min(img.width,img.height);
+      const sx=(img.width-min)/2, sy=(img.height-min)/2;
+      ctx.drawImage(img,sx,sy,min,min,0,0,sz,sz);
+      const dataUrl=canvas.toDataURL("image/jpeg",0.82);
+      if(tenants[currentTenantId])tenants[currentTenantId].photo=dataUrl;
+      pinStyle.content="foto";
+      rebuildMapMarkers();
+      renderPinStyleEditor();
+      autoSave();
+    };
+    img.src=e.target.result;
+  };
+  reader.readAsDataURL(file);
+  event.target.value="";
+}
+
+function removePinPhoto(){
+  if(tenants[currentTenantId])tenants[currentTenantId].photo=null;
+  rebuildMapMarkers();
+  renderPinStyleEditor();
+  autoSave();
 }
 
 function showNewTenantForm(){
@@ -3209,6 +3631,7 @@ function saveToLocalStorage(){
       version:1,
       currentTenantId,
       tenants,
+      pinStyle,
       savedAt:new Date().toISOString()
     };
     localStorage.setItem(STORAGE_KEY,JSON.stringify(payload));
@@ -3229,6 +3652,7 @@ function loadFromLocalStorage(){
     if(!data.tenants||!data.currentTenantId)return false;
     tenants=data.tenants;
     currentTenantId=data.currentTenantId;
+    if(data.pinStyle)pinStyle={...DEFAULT_PIN_STYLE,...data.pinStyle};
     if(!tenants[currentTenantId]){
       currentTenantId=Object.keys(tenants)[0];
     }
