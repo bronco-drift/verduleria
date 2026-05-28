@@ -1,0 +1,3365 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Verdulería Online · Panel de Gestión</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+:root{
+  /* paper neutrals — warm hue 75 */
+  --bg:oklch(96.5% 0.005 75);
+  --surface:oklch(99% 0.003 75);
+  --surface-2:oklch(94% 0.006 75);
+  --surface-3:oklch(91% 0.008 75);
+  --border:oklch(89% 0.008 75);
+  --border-strong:oklch(82% 0.012 75);
+  /* ink — cool carbon hue 250 */
+  --ink:oklch(24% 0.015 250);
+  --ink-soft:oklch(48% 0.012 250);
+  --ink-mute:oklch(60% 0.010 250);
+  --ink-faint:oklch(72% 0.008 250);
+  /* brand — deep petrol blue hue 220 */
+  --brand:oklch(40% 0.085 220);
+  --brand-hover:oklch(33% 0.095 220);
+  --brand-tint:oklch(94% 0.018 220);
+  --on-brand:oklch(98% 0.003 220);
+  /* semantic — verde queda solo para success */
+  --success:oklch(48% 0.10 145);
+  --success-bg:oklch(93% 0.035 145);
+  --success-fg:oklch(34% 0.08 145);
+  --warn:oklch(58% 0.12 70);
+  --warn-bg:oklch(94% 0.045 75);
+  --warn-fg:oklch(40% 0.09 70);
+  --danger:oklch(50% 0.14 25);
+  --danger-bg:oklch(94% 0.05 25);
+  --danger-fg:oklch(35% 0.10 25);
+  --info:oklch(45% 0.12 250);
+  --info-bg:oklch(94% 0.035 250);
+  --accent-purple:oklch(45% 0.13 295);
+  /* shape */
+  --r-sm:5px;
+  --r-md:7px;
+  --r-lg:9px;
+  /* shadow */
+  --shadow-sm:0 1px 2px oklch(20% 0.01 250 / 0.06);
+  --shadow-md:0 2px 12px oklch(20% 0.01 250 / 0.10);
+  --shadow-lg:0 6px 30px oklch(20% 0.01 250 / 0.18);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,sans-serif;background:var(--bg);color:var(--ink);padding:1.5rem;font-size:14px;line-height:1.45}
+h1{font-size:22px;font-weight:700;margin-bottom:.25rem;color:var(--ink);letter-spacing:-0.015em}
+.subtitle{font-size:13px;color:var(--ink-soft);margin-bottom:1.25rem}
+/* Topbar with admin button on right */
+.topbar{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:1.25rem;flex-wrap:wrap}
+.topbar-title{flex:1;min-width:240px}
+.topbar-title h1{margin-bottom:.25rem}
+.topbar-title .subtitle{margin-bottom:0}
+.admin-trigger{height:36px;padding:0 16px;background:var(--brand);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;white-space:nowrap;flex-shrink:0}
+.admin-trigger:hover{background:var(--brand-hover)}
+/* Group pills */
+.group-pills{display:flex;gap:6px;margin-bottom:.75rem;flex-wrap:wrap;border-bottom:1px solid var(--border);padding-bottom:.75rem}
+.group-pill{padding:8px 16px;font-size:13px;font-weight:600;color:var(--ink-soft);cursor:pointer;border:1px solid transparent;border-radius:8px;background:transparent;display:flex;align-items:center;gap:7px;transition:all .15s}
+.group-pill:hover{color:var(--ink);background:var(--surface-2)}
+.group-pill.on{color:#fff;background:var(--brand);border-color:var(--brand)}
+.group-pill-icon{font-size:14px;line-height:1}
+.group-pill-count{font-size:10px;font-weight:700;padding:1px 8px;border-radius:999px;background:rgba(0,0,0,.10);color:inherit;margin-left:2px}
+.group-pill.on .group-pill-count{background:rgba(255,255,255,.25)}
+/* Admin drawer */
+.admin-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:99;display:none}
+.admin-overlay.open{display:block}
+.admin-drawer{position:fixed;top:0;right:0;width:min(720px,95vw);height:100vh;background:var(--bg);z-index:100;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .25s ease;box-shadow:-6px 0 30px rgba(0,0,0,.18)}
+.admin-drawer.open{transform:translateX(0)}
+.admin-drawer-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;background:var(--brand);color:#fff}
+.admin-drawer-head h2{font-size:16px;font-weight:700}
+.admin-close{width:32px;height:32px;border:none;background:rgba(255,255,255,.15);color:#fff;font-size:16px;cursor:pointer;border-radius:7px;display:flex;align-items:center;justify-content:center}
+.admin-close:hover{background:rgba(255,255,255,.25)}
+.admin-drawer-body{flex:1;overflow-y:auto;padding:18px}
+.tabs{display:flex;gap:0;margin-bottom:1.5rem;border-bottom:2px solid var(--border);overflow-x:auto}
+.tab{padding:8px 16px;font-size:12px;font-weight:500;color:var(--ink-soft);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;white-space:nowrap;transition:all .15s}
+.tab.on{color:var(--ink);border-bottom-color:var(--brand)}
+.tab:hover{color:var(--ink)}
+.panel{display:none}.panel.on{display:block}
+.top{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:1rem;align-items:center}
+.top input[type=text]{height:34px;padding:0 12px;font-size:13px;border:1px solid var(--border-strong);border-radius:8px;background:var(--surface);color:var(--ink);min-width:180px}
+.top input[type=text]:focus{outline:none;border-color:var(--brand)}
+.fbts{display:flex;gap:6px;flex-wrap:wrap}
+.fb{font-size:11px;padding:4px 11px;border-radius:999px;border:1px solid var(--border-strong);background:transparent;color:var(--ink-soft);cursor:pointer}
+.fb.on{background:var(--brand);color:#fff;border-color:var(--brand);font-weight:500}
+.leg{display:flex;gap:14px;margin-bottom:.75rem;flex-wrap:wrap}
+.li{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--ink-soft)}
+.dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.ow{overflow-x:auto;border-radius:10px;border:1px solid var(--border);background:var(--surface)}
+table{width:100%;border-collapse:collapse;min-width:700px}
+th{background:var(--surface-2);padding:8px 10px;font-weight:600;font-size:11px;color:var(--ink-soft);border-bottom:1px solid var(--border);white-space:nowrap;text-align:center;cursor:pointer}
+th:first-child{text-align:left;cursor:default}
+th.sortable:hover{background:var(--surface-3);color:var(--ink)}
+th .arr{font-size:9px;margin-left:3px;opacity:.5}
+th.asc .arr::after{content:"▲";opacity:1}
+th.desc .arr::after{content:"▼";opacity:1}
+th:not(.asc):not(.desc) .arr::after{content:"⇅"}
+th.grp{border-left:2px solid var(--border-strong)}
+td{padding:7px 10px;vertical-align:middle;text-align:center;border-bottom:1px solid var(--surface-2)}
+td:first-child{text-align:left}
+td.grp{border-left:2px solid var(--border)}
+tr:hover td{background:var(--surface-2)}
+tr.cr td{background:var(--surface-2);font-weight:700;font-size:10px;color:var(--ink-soft);padding:5px 10px;text-align:left;text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid var(--border)}
+.p{font-size:12px;font-weight:600;display:inline-block}
+.p.b{background:var(--success-bg);color:var(--success-fg);border-radius:5px;padding:1px 7px}
+.p.n{color:var(--ink-faint);font-weight:400;font-size:11px}
+.p.av{color:var(--ink-soft);font-weight:500}
+.u{font-size:10px;color:var(--ink-mute);display:block;margin-top:1px}
+.pct{font-size:12px;font-weight:600}
+.pct.hi{color:var(--danger)}
+.pct.lo{color:var(--success-fg)}
+.badge{display:inline-block;font-size:10px;font-weight:600;padding:2px 7px;border-radius:4px}
+.badge.ok{background:var(--success-bg);color:var(--success-fg)}
+.badge.warn{background:var(--warn-bg);color:var(--warn-fg)}
+.badge.bad{background:var(--danger-bg);color:var(--danger-fg)}
+.badge.neu{background:var(--surface-2);color:var(--ink-soft)}
+.foot{margin-top:.75rem;font-size:11px;color:var(--ink-mute);line-height:1.6}
+.note{background:var(--warn-bg);border:1px solid oklch(76% 0.12 70);border-radius:8px;padding:8px 12px;font-size:11px;color:var(--warn-fg);margin-bottom:.75rem}
+
+/* Cards de resumen */
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:1.25rem}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px}
+.card .lbl{font-size:11px;color:var(--ink-soft);margin-bottom:4px}
+.card .val{font-size:20px;font-weight:700;color:var(--ink)}
+.card .sub{font-size:11px;color:var(--ink-mute);margin-top:2px}
+.card.green .val{color:var(--success-fg)}
+.card.red .val{color:var(--danger)}
+.card.amber .val{color:var(--warn-fg)}
+
+/* Input editable en tabla */
+input.cell-input{width:90px;height:28px;padding:0 8px;font-size:12px;border:1px solid var(--border-strong);border-radius:6px;background:var(--surface);color:var(--ink);text-align:right}
+input.cell-input:focus{outline:none;border-color:var(--brand)}
+
+/* Margen bar */
+.mbar{display:flex;align-items:center;gap:6px}
+.mbar-track{flex:1;height:6px;background:var(--surface-2);border-radius:3px;min-width:60px}
+.mbar-fill{height:6px;border-radius:3px;transition:width .3s}
+
+/* Zonas envio */
+/* Tienda */
+.store-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:10px}
+.store-search{display:flex;gap:8px;flex-wrap:wrap;align-items:center;flex:1}
+.store-search input{height:34px;padding:0 12px;font-size:13px;border:1px solid var(--border-strong);border-radius:8px;background:var(--surface);color:var(--ink);min-width:180px}
+.store-search input:focus{outline:none;border-color:var(--brand)}
+.cart-btn-wrap{position:relative;cursor:pointer}
+.cart-btn{height:36px;padding:0 16px;font-size:13px;font-weight:600;border:none;border-radius:8px;background:var(--brand);color:#fff;cursor:pointer;display:flex;align-items:center;gap:7px;white-space:nowrap}
+.cart-btn:hover{background:var(--brand-hover)}
+.cart-badge{position:absolute;top:-6px;right:-6px;background:var(--danger);color:#fff;font-size:10px;font-weight:700;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;display:none}
+.store-cats{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:1rem}
+.store-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:1.5rem}
+.prod-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:8px;transition:box-shadow .15s}
+.prod-card:hover{box-shadow:0 2px 12px rgba(0,0,0,.08)}
+.prod-icon{width:100%;height:72px;display:flex;align-items:center;justify-content:center;font-size:42px;background:var(--bg);border-radius:8px}
+.prod-name{font-size:13px;font-weight:600;color:var(--ink);line-height:1.3}
+.prod-unit{font-size:11px;color:var(--ink-mute)}
+.prod-price{font-size:17px;font-weight:700;color:var(--ink);letter-spacing:-0.01em}
+.prod-comp{font-size:10px;color:var(--ink-soft)}
+.qty-row{display:flex;align-items:center;gap:6px;margin-top:auto}
+.qty-btn{width:26px;height:26px;border-radius:6px;border:1px solid var(--border-strong);background:var(--surface);font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--ink);flex-shrink:0}
+.qty-btn:hover{background:var(--surface-2)}
+.qty-num{flex:1;text-align:center;font-size:13px;font-weight:600}
+.add-btn{width:100%;height:30px;border:none;border-radius:7px;background:var(--brand);color:#fff;font-size:12px;font-weight:600;cursor:pointer;margin-top:2px}
+.add-btn:hover{background:var(--brand-hover)}
+.add-btn.added{background:var(--success)}
+/* Cart drawer */
+.cart-overlay{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:99;display:none}
+.cart-overlay.open{display:block}
+.cart-drawer{position:fixed;top:0;right:0;width:340px;max-width:95vw;height:100vh;background:var(--surface);z-index:100;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .25s ease;box-shadow:-4px 0 24px rgba(0,0,0,.12)}
+.cart-drawer.open{transform:translateX(0)}
+.cart-head{display:flex;align-items:center;justify-content:space-between;padding:16px;border-bottom:1px solid var(--border)}
+.cart-head h2{font-size:15px;font-weight:700}
+.cart-close{width:30px;height:30px;border:none;background:transparent;font-size:20px;cursor:pointer;border-radius:6px;display:flex;align-items:center;justify-content:center;color:var(--ink-soft)}
+.cart-close:hover{background:var(--surface-2)}
+.cart-items{flex:1;overflow-y:auto;padding:12px 16px}
+.cart-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--surface-2)}
+.cart-item-icon{font-size:24px;width:36px;text-align:center}
+.cart-item-info{flex:1}
+.cart-item-name{font-size:13px;font-weight:600}
+.cart-item-unit{font-size:11px;color:var(--ink-mute)}
+.cart-item-price{font-size:13px;font-weight:700;color:var(--ink);white-space:nowrap}
+.cart-item-qty{display:flex;align-items:center;gap:4px;margin-top:4px}
+.cqb{width:22px;height:22px;border-radius:5px;border:1px solid var(--border-strong);background:var(--surface);font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:700}
+.cqb:hover{background:var(--surface-2)}
+.cq-num{font-size:12px;font-weight:600;min-width:20px;text-align:center}
+.cart-empty{text-align:center;padding:2rem;color:var(--ink-faint);font-size:13px}
+.cart-foot{padding:14px 16px;border-top:1px solid var(--border)}
+.cart-subtotal{display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px;color:var(--ink-soft)}
+.cart-total{display:flex;justify-content:space-between;font-size:16px;font-weight:700;margin-bottom:12px}
+.cart-zona{margin-bottom:10px}
+.cart-zona select{width:100%;height:32px;padding:0 8px;font-size:12px;border:1px solid var(--border-strong);border-radius:7px}
+.cart-envio-info{font-size:11px;padding:7px 10px;border-radius:6px;margin-bottom:10px;line-height:1.5}
+.checkout-btn{width:100%;height:40px;border:none;border-radius:8px;background:var(--brand);color:#fff;font-size:14px;font-weight:700;cursor:pointer}
+.checkout-btn:hover{background:var(--brand-hover)}
+/* Recetas */
+.rec-header{margin-bottom:1rem}
+.rec-header h2{font-size:15px;font-weight:700;margin-bottom:4px}
+.rec-header p{font-size:12px;color:var(--ink-soft)}
+.rec-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;margin-bottom:1.5rem}
+.rec-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;cursor:pointer;transition:all .15s;display:flex;flex-direction:column;gap:6px}
+.rec-card:hover{border-color:var(--brand);box-shadow:0 2px 12px rgba(0,0,0,.08)}
+.rec-card.sel{border-color:var(--brand);background:var(--brand-tint)}
+.rec-emoji{font-size:36px;line-height:1}
+.rec-name{font-size:14px;font-weight:700;color:var(--ink)}
+.rec-desc{font-size:11px;color:var(--ink-soft);line-height:1.4;flex:1}
+.rec-meta{display:flex;gap:8px;font-size:10px;color:var(--ink-soft);margin-top:4px;flex-wrap:wrap}
+.rec-tag{background:var(--surface-2);padding:2px 7px;border-radius:4px;font-weight:500}
+.rec-tag.veg{background:var(--success-bg);color:var(--success-fg)}
+.rec-tag.time{background:var(--info-bg);color:var(--info)}
+.rec-tag.diff{background:var(--warn-bg);color:var(--warn-fg)}
+
+/* Receta detail */
+.rec-detail{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px;margin-top:1rem}
+.rec-detail-head{display:flex;align-items:flex-start;gap:14px;margin-bottom:14px;flex-wrap:wrap}
+.rec-detail-emoji{font-size:48px;line-height:1}
+.rec-detail-info{flex:1;min-width:200px}
+.rec-detail-info h3{font-size:18px;font-weight:700;margin-bottom:4px}
+.rec-detail-info p{font-size:12px;color:var(--ink-soft);line-height:1.5}
+.rec-personas{display:flex;align-items:center;gap:8px;background:var(--bg);padding:8px 12px;border-radius:9px}
+.rec-personas-lbl{font-size:11px;color:var(--ink-soft);font-weight:600}
+.rec-personas-btn{width:28px;height:28px;border-radius:6px;border:1px solid var(--border-strong);background:var(--surface);font-size:14px;cursor:pointer;font-weight:700;display:flex;align-items:center;justify-content:center}
+.rec-personas-btn:hover{background:var(--surface-2)}
+.rec-personas-num{font-size:16px;font-weight:700;min-width:24px;text-align:center}
+
+.rec-ingredientes{margin-top:14px}
+.rec-ing-title{font-size:13px;font-weight:700;margin-bottom:10px;color:var(--ink)}
+.rec-ing-list{display:flex;flex-direction:column;gap:6px}
+.rec-ing-row{display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--bg);border-radius:8px}
+.rec-ing-row.miss{background:var(--danger-bg);border:1px dashed oklch(85% 0.05 25)}
+.rec-ing-icon{font-size:18px;width:24px;text-align:center}
+.rec-ing-info{flex:1}
+.rec-ing-name{font-size:12px;font-weight:600;color:var(--ink)}
+.rec-ing-cant{font-size:11px;color:var(--ink-soft)}
+.rec-ing-price{font-size:12px;font-weight:700;color:var(--ink);white-space:nowrap}
+.rec-ing-miss{font-size:11px;color:var(--danger);font-style:italic}
+.rec-summary{margin-top:14px;padding:12px;background:var(--success-bg);border-radius:9px;border:1px solid var(--success-bg)}
+.rec-summary-row{display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px}
+.rec-summary-row.total{font-size:15px;font-weight:700;margin-top:6px;padding-top:6px;border-top:1px solid var(--success-bg);margin-bottom:0}
+.rec-add-btn{width:100%;height:40px;border:none;border-radius:8px;background:var(--brand);color:#fff;font-size:14px;font-weight:700;cursor:pointer;margin-top:12px}
+.rec-add-btn:hover{background:var(--brand-hover)}
+.rec-add-btn:disabled{background:var(--ink-faint);cursor:not-allowed;opacity:0.7}
+.rec-prep{margin-top:14px;padding:12px;background:var(--warn-bg);border-radius:9px;border:1px solid oklch(76% 0.12 70)}
+.rec-prep h4{font-size:12px;font-weight:700;color:var(--warn-fg);margin-bottom:6px}
+.rec-prep ol{padding-left:18px;font-size:12px;color:var(--warn-fg);line-height:1.7}
+.rec-prep li{margin-bottom:3px}
+/* Ubicacion */
+.ubi-grid{display:grid;grid-template-columns:1fr 360px;gap:16px;margin-bottom:1rem}
+@media(max-width:900px){.ubi-grid{grid-template-columns:1fr}}
+#map-container{width:100%;height:520px;border-radius:12px;overflow:hidden;border:1px solid var(--border);background:var(--surface-2)}
+.ubi-side{display:flex;flex-direction:column;gap:12px}
+.ubi-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px}
+.ubi-card h3{font-size:13px;font-weight:700;margin-bottom:10px;color:var(--ink);display:flex;align-items:center;gap:6px}
+.ubi-input-row{display:flex;gap:6px;margin-bottom:8px}
+.ubi-input-row input{flex:1;height:34px;padding:0 12px;font-size:13px;border:1px solid var(--border-strong);border-radius:8px;background:var(--surface);color:var(--ink)}
+.ubi-input-row input:focus{outline:none;border-color:var(--brand)}
+.ubi-btn{height:34px;padding:0 14px;font-size:12px;font-weight:600;border:none;border-radius:8px;background:var(--brand);color:#fff;cursor:pointer;white-space:nowrap}
+.ubi-btn:hover{background:var(--brand-hover)}
+.ubi-btn.alt{background:var(--surface);color:var(--ink);border:1px solid var(--border-strong)}
+.ubi-btn.alt:hover{background:var(--surface-2)}
+.ubi-current{padding:10px 12px;background:var(--bg);border-radius:8px;font-size:12px;color:var(--ink-soft);margin-top:8px;line-height:1.6}
+.ubi-current strong{color:var(--ink)}
+.tienda-list{display:flex;flex-direction:column;gap:8px;max-height:360px;overflow-y:auto}
+.tienda-row{padding:11px 12px;background:var(--surface);border:1.5px solid var(--border);border-radius:9px;cursor:pointer;transition:all .15s}
+.tienda-row:hover{border-color:var(--brand);background:var(--surface-2)}
+.tienda-row.sel{border-color:var(--brand);background:var(--brand-tint);border-width:1.5px}
+.tienda-row.closest{position:relative}
+.tienda-row.is-mia{border-color:var(--brand);background:var(--brand-tint)}
+.tienda-row.is-mia:hover{background:var(--success-bg)}
+.mia-badge{background:var(--brand);color:#fff;font-size:9px;font-weight:700;padding:2px 8px;border-radius:999px;margin-left:auto;letter-spacing:.04em}
+.closest-badge{position:absolute;top:-7px;right:8px;background:var(--brand);color:#fff;font-size:9px;font-weight:700;padding:2px 9px;border-radius:999px}
+.tienda-top{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.tienda-color{width:12px;height:12px;border-radius:50%;flex-shrink:0}
+.tienda-name{font-size:13px;font-weight:700;color:var(--ink);flex:1}
+.tienda-dist{font-size:11px;font-weight:700;color:var(--success-fg);background:var(--success-bg);padding:2px 9px;border-radius:999px}
+.tienda-addr{font-size:11px;color:var(--ink-soft);margin-bottom:4px;line-height:1.4}
+.tienda-meta{font-size:11px;color:var(--ink-soft)}
+.tienda-tiempo{display:inline-block;font-size:10px;color:var(--ink-soft);background:var(--surface-2);padding:1px 6px;border-radius:4px;margin-right:4px}
+.tienda-empty{padding:20px;text-align:center;color:var(--ink-faint);font-size:12px}
+/* Leaflet custom marker */
+.user-marker{background:var(--info);border:3px solid #fff;width:24px!important;height:24px!important;border-radius:50%;box-shadow:0 2px 8px rgba(0,0,0,.3)}
+.tienda-marker{border:3px solid #fff;border-radius:50%;box-shadow:0 2px 8px rgba(0,0,0,.3);display:flex!important;align-items:center;justify-content:center;font-size:14px;color:#fff;font-weight:700}
+.leaflet-popup-content{font-family:system-ui,sans-serif;margin:10px 12px;font-size:12px;line-height:1.5}
+.leaflet-popup-content b{display:block;font-size:13px;margin-bottom:3px}
+/* Stock */
+.stock-toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:1rem;padding:12px;background:var(--surface);border:1px solid var(--border);border-radius:10px}
+.stock-toolbar input[type=text]{flex:1;min-width:160px;height:34px;padding:0 10px;font-size:13px;border:1px solid var(--border-strong);border-radius:7px}
+.stock-toolbar button{height:34px;padding:0 14px;font-size:12px;font-weight:600;border-radius:8px;border:1px solid var(--border-strong);background:var(--surface);cursor:pointer;color:var(--ink)}
+.stock-toolbar button:hover{background:var(--surface-2)}
+.stock-toolbar button.primary{background:var(--brand);color:#fff;border-color:var(--brand)}
+.stock-toolbar button.primary:hover{background:var(--brand-hover)}
+.stock-toolbar button.danger{color:var(--danger);border-color:oklch(85% 0.05 25)}
+.stock-toolbar button.danger:hover{background:var(--danger-bg)}
+.bulk-update{display:flex;gap:8px;align-items:center;font-size:12px;color:var(--ink-soft);padding:6px 10px;background:var(--warn-bg);border-radius:6px;border:1px solid oklch(76% 0.12 70)}
+.bulk-update input{height:28px;padding:0 8px;font-size:12px;border:1px solid var(--border-strong);border-radius:5px;width:70px}
+.stock-table{width:100%;border-collapse:collapse;font-size:12px;min-width:900px}
+.stock-table th{background:var(--surface-2);padding:8px 10px;font-weight:600;font-size:11px;color:var(--ink-soft);border-bottom:1px solid var(--border);white-space:nowrap;text-align:center;cursor:pointer;user-select:none}
+.stock-table th:first-child{text-align:left;width:50px}
+.stock-table th.namec{text-align:left;width:auto}
+.stock-table th.sortable:hover{background:var(--surface-3);color:var(--ink)}
+.stock-table td{padding:6px 8px;text-align:center;border-bottom:1px solid var(--surface-2);vertical-align:middle}
+.stock-table td:first-child{text-align:center}
+.stock-table td.name-td{text-align:left}
+.stock-row:hover td{background:var(--surface-2)}
+.stock-row.disabled td{opacity:.45}
+.stock-row.disabled td.name-td .stock-name{text-decoration:line-through}
+.stock-check{width:16px;height:16px;cursor:pointer;accent-color:var(--success-fg)}
+.stock-emoji{font-size:18px;margin-right:4px}
+.stock-name{font-size:12px;font-weight:600;color:var(--ink)}
+.stock-unit{font-size:10px;color:var(--ink-mute);display:block}
+.stock-input{width:80px;height:28px;padding:0 8px;font-size:12px;border:1px solid var(--border-strong);border-radius:6px;text-align:right;background:var(--surface);color:var(--ink)}
+.stock-input:focus{outline:none;border-color:var(--brand)}
+.stock-input.qty{width:60px}
+.stock-input.changed{background:var(--warn-bg);border-color:oklch(76% 0.12 70)}
+.stock-status{display:inline-block;font-size:10px;font-weight:700;padding:3px 9px;border-radius:999px;white-space:nowrap}
+.stock-status.ok{background:var(--success-bg);color:var(--success-fg)}
+.stock-status.low{background:var(--warn-bg);color:var(--warn-fg)}
+.stock-status.out{background:var(--danger-bg);color:var(--danger-fg)}
+.stock-status.off{background:var(--surface-2);color:var(--ink-soft)}
+.stock-margen-mini{font-size:11px;font-weight:700}
+.stock-margen-mini.good{color:var(--success-fg)}
+.stock-margen-mini.warn{color:var(--warn-fg)}
+.stock-margen-mini.bad{color:var(--danger)}
+.stock-actions{display:flex;gap:4px;justify-content:center}
+.stock-act-btn{width:24px;height:24px;border-radius:5px;border:1px solid var(--border-strong);background:var(--surface);cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center}
+.stock-act-btn:hover{background:var(--surface-2)}
+.summary-bar{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:1rem}
+.summary-card{background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:10px 12px;text-align:center}
+.summary-card .lbl{font-size:10px;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px}
+.summary-card .val{font-size:18px;font-weight:700}
+.summary-card.ok .val{color:var(--success-fg)}
+.summary-card.warn .val{color:var(--warn-fg)}
+.summary-card.bad .val{color:var(--danger)}
+/* Dashboard */
+.dash-headline{display:grid;grid-template-columns:1fr;gap:12px;margin-bottom:12px}
+@media(min-width:760px){.dash-headline{grid-template-columns:1.6fr 1fr 1fr}}
+.dash-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:1.25rem}
+.dash-kpi{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px;position:relative}
+.dash-kpi-lbl{font-size:11px;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.05em;font-weight:600;margin-bottom:8px;display:flex;align-items:center;gap:7px}
+.dash-kpi-lbl::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--ink-faint);flex-shrink:0}
+.dash-kpi.accent-green .dash-kpi-lbl::before{background:var(--success)}
+.dash-kpi.accent-blue .dash-kpi-lbl::before{background:var(--info)}
+.dash-kpi.accent-amber .dash-kpi-lbl::before{background:var(--warn)}
+.dash-kpi.accent-red .dash-kpi-lbl::before{background:var(--danger)}
+.dash-kpi.accent-purple .dash-kpi-lbl::before{background:var(--accent-purple)}
+.dash-kpi-val{font-size:22px;font-weight:700;color:var(--ink);line-height:1.1;letter-spacing:-0.01em}
+.dash-kpi-sub{font-size:11px;color:var(--ink-soft);margin-top:6px;line-height:1.4}
+.dash-kpi--lead{padding:20px 22px;background:var(--surface);border:1px solid var(--border)}
+.dash-kpi--lead .dash-kpi-val{font-size:36px;font-weight:800;letter-spacing:-0.02em}
+.dash-kpi--lead .dash-kpi-sub{font-size:12px;margin-top:8px}
+.dash-trend{position:absolute;top:14px;right:14px;font-size:11px;font-weight:700;padding:2px 9px;border-radius:999px}
+.dash-trend.up{background:var(--success-bg);color:var(--success-fg)}
+.dash-trend.down{background:var(--danger-bg);color:var(--danger-fg)}
+.dash-row{display:grid;grid-template-columns:2fr 1fr;gap:14px;margin-bottom:1.5rem}
+@media(max-width:900px){.dash-row{grid-template-columns:1fr}}
+.dash-block{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px}
+.dash-block h3{font-size:13px;font-weight:700;margin-bottom:14px;color:var(--ink);display:flex;align-items:center;justify-content:space-between}
+.dash-block h3 .tag{font-size:10px;font-weight:600;color:var(--ink-soft);background:var(--surface-2);padding:3px 9px;border-radius:999px}
+/* Bar chart simple */
+.bar-chart{display:flex;flex-direction:column;gap:8px}
+.bar-row{display:grid;grid-template-columns:110px 1fr 60px;align-items:center;gap:10px;font-size:12px}
+.bar-name{color:var(--ink-soft);font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bar-track{height:18px;background:var(--bg);border-radius:5px;overflow:hidden;position:relative}
+.bar-fill{height:100%;border-radius:5px;transition:width .4s}
+.bar-val{text-align:right;font-weight:700;color:var(--ink)}
+/* Donut */
+.donut-wrap{display:flex;align-items:center;gap:16px;flex-wrap:wrap;justify-content:center}
+.donut-svg{width:140px;height:140px;flex-shrink:0}
+.donut-legend{display:flex;flex-direction:column;gap:5px;font-size:11px}
+.donut-leg-row{display:flex;align-items:center;gap:6px}
+.donut-leg-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0}
+.donut-leg-val{font-weight:700;margin-left:4px}
+/* Alert list */
+.alert-list{display:flex;flex-direction:column;gap:6px;max-height:280px;overflow-y:auto}
+.alert-item{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:8px;font-size:11px;line-height:1.4;background:var(--surface-2)}
+.alert-item.crit{background:var(--danger-bg)}
+.alert-item.warn{background:var(--warn-bg)}
+.alert-item.info{background:var(--info-bg)}
+.alert-icon{font-size:14px;flex-shrink:0}
+.alert-body{flex:1}
+.alert-title{font-weight:600;color:var(--ink);font-size:11px}
+.alert-meta{font-size:10px;color:var(--ink-soft);margin-top:2px}
+.dash-table-mini{width:100%;font-size:11px}
+.dash-table-mini th{text-align:left;padding:6px 8px;font-weight:600;color:var(--ink-soft);font-size:10px;text-transform:uppercase;border-bottom:1px solid var(--border)}
+.dash-table-mini th:not(:first-child){text-align:right}
+.dash-table-mini td{padding:6px 8px;border-bottom:1px solid var(--bg)}
+.dash-table-mini td:not(:first-child){text-align:right;font-weight:600}
+.dash-table-mini tr:hover td{background:var(--surface-2)}
+
+/* Hero verdulería - flat, sober */
+.verdu-hero{display:flex;align-items:center;gap:16px;background:var(--surface);border:1px solid var(--border);color:var(--ink);border-radius:12px;padding:16px 20px;margin-bottom:1.25rem;flex-wrap:wrap}
+.verdu-hero-icon{font-size:34px;line-height:1;flex-shrink:0;width:60px;height:60px;display:flex;align-items:center;justify-content:center;background:var(--brand-tint);border-radius:14px}
+.verdu-hero-info{flex:1;min-width:240px}
+.verdu-hero-info h2{font-size:20px;font-weight:700;margin-bottom:4px;color:var(--ink);letter-spacing:-0.01em}
+.verdu-hero-meta{display:flex;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--ink-soft);margin-bottom:0}
+.verdu-hero-since{font-size:11px;color:var(--ink-faint);margin-top:4px}
+.verdu-hero-actions{display:flex;gap:8px;flex-wrap:wrap}
+.verdu-hero-actions .form-btn{background:var(--surface);color:var(--ink);border:1px solid var(--border-strong)}
+.verdu-hero-actions .form-btn:hover{background:var(--bg);border-color:var(--brand)}
+/* Shortcuts */
+.shortcuts{display:flex;flex-direction:column;gap:8px}
+.shortcut{display:flex;align-items:center;gap:12px;padding:11px 14px;background:var(--bg);border-radius:9px;cursor:pointer;transition:all .15s;border:1px solid transparent}
+.shortcut:hover{background:var(--surface);border-color:var(--brand);transform:translateX(2px)}
+.sc-icon{font-size:22px;line-height:1;flex-shrink:0}
+.sc-text{flex:1;display:flex;flex-direction:column}
+.sc-text strong{font-size:12px;color:var(--ink);font-weight:700}
+.sc-text span{font-size:11px;color:var(--ink-soft)}
+.sc-arrow{color:var(--ink-soft);font-size:16px;font-weight:600}
+.shortcut:hover .sc-arrow{color:var(--brand)}
+
+/* Admin tab */
+.admin-header{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:1.5rem;flex-wrap:wrap}
+.admin-current{background:var(--brand);color:#fff;padding:12px 16px;border-radius:10px;font-size:12px;flex:1;min-width:240px}
+.admin-current strong{font-size:14px;display:block;margin-bottom:2px}
+.admin-current .meta{color:var(--ink-mute);font-size:11px}
+.admin-tenants{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;margin-bottom:1.5rem}
+.tenant-card{background:var(--surface);border:2px solid var(--border);border-radius:12px;padding:14px;cursor:pointer;transition:all .15s;position:relative}
+.tenant-card:hover{border-color:var(--brand)}
+.tenant-card.active{border-color:var(--brand);background:var(--brand-tint)}
+.tenant-card.active::after{content:"● Activa";position:absolute;top:10px;right:12px;font-size:10px;font-weight:700;color:var(--success-fg)}
+.tenant-icon{font-size:32px;margin-bottom:6px}
+.tenant-name{font-size:14px;font-weight:700;color:var(--ink);margin-bottom:3px}
+.tenant-zone{font-size:11px;color:var(--ink-soft);margin-bottom:8px}
+.tenant-stats{display:flex;gap:10px;font-size:10px;color:var(--ink-soft);margin-bottom:10px}
+.tenant-stat{background:var(--surface-2);padding:3px 8px;border-radius:4px;font-weight:600}
+.tenant-actions{display:flex;gap:5px}
+.tenant-act-btn{flex:1;font-size:10px;padding:5px;border-radius:5px;border:1px solid var(--border-strong);background:var(--surface);cursor:pointer;color:var(--ink-soft);font-weight:600}
+.tenant-act-btn:hover{background:var(--surface-2);color:var(--ink)}
+.tenant-act-btn.danger:hover{background:var(--danger-bg);color:var(--danger);border-color:oklch(85% 0.05 25)}
+
+.tenant-form{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px;margin-top:8px}
+.tenant-form h3{font-size:14px;font-weight:700;margin-bottom:12px}
+.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:14px}
+.form-field label{font-size:11px;color:var(--ink-soft);font-weight:600;display:block;margin-bottom:4px}
+.form-field input,.form-field select{width:100%;height:34px;padding:0 12px;font-size:13px;border:1px solid var(--border-strong);border-radius:8px;background:var(--surface);color:var(--ink)}
+.form-field input:focus,.form-field select:focus{outline:none;border-color:var(--brand)}
+.form-actions{display:flex;gap:8px}
+.form-btn{height:36px;padding:0 16px;font-size:12px;font-weight:600;border:none;border-radius:8px;cursor:pointer}
+.form-btn.primary{background:var(--brand);color:#fff}
+.form-btn.primary:hover{background:var(--brand-hover)}
+.form-btn.alt:hover{background:var(--bg);border-color:var(--brand)}
+.form-btn.alt{background:var(--surface);color:var(--ink);border:1px solid var(--border-strong)}
+.form-btn.alt:hover{background:var(--surface-2)}
+
+.tenant-detail{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px}
+.tenant-detail h3{font-size:14px;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.tenant-info-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-bottom:14px}
+.info-item{background:var(--bg);padding:10px 12px;border-radius:7px}
+.info-item .l{font-size:10px;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.04em;font-weight:600}
+.info-item .v{font-size:14px;font-weight:700;color:var(--ink);margin-top:3px}
+
+.zona-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin-bottom:1.25rem}
+.zona-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px}
+.zona-card h3{font-size:13px;font-weight:600;margin-bottom:10px;color:var(--ink)}
+.zona-card label{font-size:11px;color:var(--ink-soft);display:block;margin-bottom:2px;margin-top:8px}
+.zona-card input{width:100%;height:32px;padding:0 10px;font-size:13px;border:1px solid var(--border-strong);border-radius:7px;background:var(--surface);color:var(--ink)}
+.zona-card input:focus{outline:none;border-color:var(--brand)}
+.zona-result{margin-top:10px;padding:8px;background:var(--bg);border-radius:6px;font-size:11px;color:var(--ink-soft);line-height:1.7}
+.zona-result strong{color:var(--ink);font-size:12px}
+
+/* Estacionalidad */
+.meses{display:flex;gap:3px;flex-wrap:wrap}
+.mes{width:26px;height:26px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:600;cursor:pointer;border:1px solid transparent;transition:all .15s;user-select:none}
+.mes.on{background:var(--brand);color:#fff;border-color:var(--brand)}
+.mes.off{background:var(--surface-2);color:var(--ink-soft);border-color:var(--border)}
+.mes.off:hover{background:var(--border)}
+.edit-btn{font-size:11px;padding:3px 9px;border-radius:5px;border:1px solid var(--border-strong);background:transparent;color:var(--ink-soft);cursor:pointer}
+.edit-btn:hover{background:var(--surface-2)}
+
+/* Proveedor */
+select.cell-sel{height:26px;padding:0 6px;font-size:11px;border:1px solid var(--border-strong);border-radius:5px;background:var(--surface);color:var(--ink)}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar-title">
+    <h1>🥦 Verdulería Online · Panel de Gestión</h1>
+    <p class="subtitle">Herramienta de análisis de precios, márgenes y logística</p>
+  </div>
+  <button class="admin-trigger" onclick="openAdmin()">⚙ Admin</button>
+</div>
+
+<div class="group-pills" id="group-pills"></div>
+<div class="tabs" id="tabbar"></div>
+
+<!-- PANELS -->
+<div id="panels"></div>
+
+<!-- ADMIN MODAL/DRAWER -->
+<div class="admin-overlay" id="admin-overlay" onclick="closeAdmin()"></div>
+<div class="admin-drawer" id="admin-drawer">
+  <div class="admin-drawer-head">
+    <h2>⚙ Administración</h2>
+    <button class="admin-close" onclick="closeAdmin()">✕</button>
+  </div>
+  <div class="admin-drawer-body" id="admin-drawer-body"></div>
+</div>
+
+<script>
+// ─── DATA ───────────────────────────────────────────────
+const MESES_NAMES=["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"];
+const MESES_ALL=[0,1,2,3,4,5,6,7,8,9,10,11];
+
+const D=[
+  {c:"Verduras",n:"Acelga",u:"unidad",p:[2900,null,3500,1900],kg:500,costo:700,pVenta:2200},
+  {c:"Verduras",n:"Apio",u:"unidad",p:[2000,null,1400,3000],kg:600,costo:600,pVenta:1800},
+  {c:"Verduras",n:"Batata",u:"kg",p:[2500,null,4500,1850],kg:1000,costo:900,pVenta:2200},
+  {c:"Verduras",n:"Berenjena",u:"kg",p:[3900,null,null,3000],kg:1000,costo:1200,pVenta:3500},
+  {c:"Verduras",n:"Brócoli",u:"unidad",p:[null,null,null,3000],kg:600,costo:1000,pVenta:2700},
+  {c:"Verduras",n:"Cebolla",u:"kg",p:[1600,null,2800,2000],kg:1000,costo:600,pVenta:1500},
+  {c:"Verduras",n:"Choclo",u:"unidad",p:[2050,null,null,900],kg:300,costo:350,pVenta:1500},
+  {c:"Verduras",n:"Espinaca",u:"atado",p:[1900,null,3900,2000],kg:300,costo:600,pVenta:1700},
+  {c:"Verduras",n:"Espárragos",u:"atado",p:[null,14000,null,null],kg:500,costo:5000,pVenta:12000},
+  {c:"Verduras",n:"Kale",u:"atado",p:[null,3400,3300,2500],kg:200,costo:900,pVenta:3000},
+  {c:"Verduras",n:"Lechuga",u:"unidad",p:[1400,3000,null,null],kg:300,costo:450,pVenta:1300},
+  {c:"Verduras",n:"Morrón rojo",u:"unidad",p:[1300,null,null,null],kg:200,costo:450,pVenta:1200},
+  {c:"Verduras",n:"Morrón verde",u:"unidad",p:[900,null,null,null],kg:150,costo:300,pVenta:850},
+  {c:"Verduras",n:"Papa",u:"kg",p:[1150,null,2600,2500],kg:1000,costo:450,pVenta:1100},
+  {c:"Verduras",n:"Papines",u:"500g",p:[null,null,5600,5000],kg:500,costo:2000,pVenta:5000},
+  {c:"Verduras",n:"Perejil",u:"atado",p:[null,null,1500,950],kg:80,costo:300,pVenta:900},
+  {c:"Verduras",n:"Puerro",u:"500g",p:[1700,null,2900,null],kg:500,costo:700,pVenta:1600},
+  {c:"Verduras",n:"Remolacha",u:"kg",p:[null,null,3900,4000],kg:1000,costo:1200,pVenta:3500},
+  {c:"Verduras",n:"Repollo blanco",u:"kg",p:[2000,null,3900,2300],kg:1000,costo:700,pVenta:1900},
+  {c:"Verduras",n:"Repollitos de Bruselas",u:"500g",p:[3400,3000,2500,4000],kg:500,costo:1100,pVenta:3000},
+  {c:"Verduras",n:"Rúcula",u:"unidad",p:[null,null,2200,700],kg:100,costo:250,pVenta:650},
+  {c:"Verduras",n:"Tomate cherry",u:"500g",p:[1600,null,1900,null],kg:500,costo:600,pVenta:1500},
+  {c:"Verduras",n:"Zanahoria",u:"kg",p:[2500,null,null,2500],kg:1000,costo:800,pVenta:2200},
+  {c:"Verduras",n:"Zapallo anco",u:"unidad",p:[1900,null,null,null],kg:2000,costo:700,pVenta:1700},
+  {c:"Verduras",n:"Zapallo kabutia",u:"unidad",p:[2600,null,4500,null],kg:1500,costo:900,pVenta:2400},
+  {c:"Verduras",n:"Zapallito",u:"kg",p:[4900,null,null,4500],kg:1000,costo:1500,pVenta:4500},
+  {c:"Frutas",n:"Ananá",u:"unidad",p:[null,6500,null,7000],kg:1200,costo:2500,pVenta:6000},
+  {c:"Frutas",n:"Banana",u:"kg",p:[3350,null,6000,3000],kg:1000,costo:1100,pVenta:3000},
+  {c:"Frutas",n:"Granada",u:"unidad",p:[null,8000,null,3500],kg:350,costo:1500,pVenta:3200},
+  {c:"Frutas",n:"Kiwi",u:"500g",p:[7000,null,4900,null],kg:500,costo:2000,pVenta:4500},
+  {c:"Frutas",n:"Lima",u:"kg",p:[null,3000,null,5000],kg:1000,costo:1200,pVenta:2800},
+  {c:"Frutas",n:"Limón",u:"kg",p:[4400,null,4400,1300],kg:1000,costo:500,pVenta:1200},
+  {c:"Frutas",n:"Mandarina",u:"kg",p:[1800,null,2900,1300],kg:1000,costo:500,pVenta:1700},
+  {c:"Frutas",n:"Mango",u:"unidad",p:[null,null,null,2800],kg:400,costo:900,pVenta:2500},
+  {c:"Frutas",n:"Manzana verde",u:"kg",p:[6300,7000,7600,5500],kg:1000,costo:2200,pVenta:5800},
+  {c:"Frutas",n:"Manzana roja",u:"kg",p:[6900,null,7600,5500],kg:1000,costo:2200,pVenta:6200},
+  {c:"Frutas",n:"Melón",u:"kg",p:[null,7500,null,4000],kg:1000,costo:1500,pVenta:3800},
+  {c:"Frutas",n:"Naranja ombligo",u:"kg",p:[null,null,3500,2000],kg:1000,costo:700,pVenta:1900},
+  {c:"Frutas",n:"Palta Hass",u:"unidad",p:[2600,null,null,1500],kg:200,costo:600,pVenta:1400},
+  {c:"Frutas",n:"Sandía",u:"unidad",p:[null,5000,null,null],kg:5000,costo:2000,pVenta:4500},
+  {c:"Frutas",n:"Uva blanca",u:"500g",p:[9000,7000,null,null],kg:500,costo:3000,pVenta:6500},
+  {c:"Frutas",n:"Uva negra",u:"kg",p:[null,5500,null,null],kg:1000,costo:2500,pVenta:5000},
+  {c:"Hongos",n:"Champiñones",u:"200g",p:[null,null,8400,6550],kg:200,costo:2500,pVenta:6000},
+  {c:"Hongos",n:"Portobellos",u:"200g",p:[null,null,8700,6550],kg:200,costo:3000,pVenta:6500},
+  {c:"Hongos",n:"Girgolas frescas",u:"200g",p:[null,null,6800,null],kg:200,costo:2200,pVenta:6000},
+  {c:"Almacén",n:"Aceite de oliva",u:"500ml",p:[null,null,18700,19990],kg:500,costo:9000,pVenta:17000},
+  {c:"Almacén",n:"Huevos",u:"docena",p:[4000,null,null,3000],kg:null,costo:1800,pVenta:3200},
+  {c:"Almacén",n:"Quinoa",u:"250g",p:[null,null,8900,null],kg:250,costo:3500,pVenta:8000},
+  {c:"Almacén",n:"Lentejas",u:"450g",p:[null,null,4900,null],kg:450,costo:1800,pVenta:4500},
+  {c:"Almacén",n:"Garbanzos",u:"500g",p:[null,null,4200,null],kg:500,costo:1700,pVenta:3900},
+];
+
+// Estacionalidad default (meses disponibles, 0=Ene)
+const ESTACIONALIDAD = {
+  "Acelga":MESES_ALL,"Apio":MESES_ALL,"Batata":[2,3,4,5,6,7,8,9,10],"Berenjena":[0,1,2,3,10,11],
+  "Brócoli":[3,4,5,6,7,8,9],"Cebolla":MESES_ALL,"Choclo":[0,1,2,11],"Espinaca":[2,3,4,5,6,7,8,9],
+  "Espárragos":[7,8,9,10],"Kale":MESES_ALL,"Lechuga":MESES_ALL,"Morrón rojo":[0,1,2,11],
+  "Morrón verde":[0,1,2,11],"Papa":MESES_ALL,"Papines":[2,3,4,5,6],"Perejil":MESES_ALL,
+  "Puerro":[3,4,5,6,7,8],"Remolacha":MESES_ALL,"Repollo blanco":MESES_ALL,"Repollitos de Bruselas":[4,5,6,7,8],
+  "Rúcula":MESES_ALL,"Tomate cherry":[0,1,2,11],"Zanahoria":MESES_ALL,"Zapallo anco":[2,3,4,5,6,7,8],
+  "Zapallo kabutia":[2,3,4,5,6,7,8],"Zapallito":[0,1,2,10,11],
+  "Ananá":[0,1,2,10,11],"Banana":MESES_ALL,"Granada":[3,4,5,6],"Kiwi":[4,5,6,7,8,9],
+  "Lima":[0,1,2,10,11],"Limón":MESES_ALL,"Mandarina":[4,5,6,7,8,9],"Mango":[0,1,11],
+  "Manzana verde":MESES_ALL,"Manzana roja":MESES_ALL,"Melón":[0,1,2,11],"Naranja ombligo":[4,5,6,7,8,9],
+  "Palta Hass":MESES_ALL,"Sandía":[0,1,2,11],"Uva blanca":[0,1,2,3,11],"Uva negra":[0,1,2,3,11],
+  "Champiñones":MESES_ALL,"Portobellos":MESES_ALL,"Girgolas frescas":MESES_ALL,
+  "Aceite de oliva":MESES_ALL,"Huevos":MESES_ALL,"Quinoa":MESES_ALL,"Lentejas":MESES_ALL,"Garbanzos":MESES_ALL
+};
+
+// Proveedores
+const PROVEEDORES_LIST = ["Mercado Central","Mercado de Haedo","Proveedor directo","Mayorista Palermo","Importador","Otro"];
+const PROVEEDOR_DEFAULT = {
+  "Acelga":"Mercado Central","Apio":"Mercado Central","Batata":"Mercado Central","Berenjena":"Mercado Central",
+  "Brócoli":"Mercado Central","Cebolla":"Mercado de Haedo","Choclo":"Mercado Central","Espinaca":"Mercado Central",
+  "Espárragos":"Mayorista Palermo","Kale":"Proveedor directo","Lechuga":"Mercado Central","Morrón rojo":"Mercado Central",
+  "Morrón verde":"Mercado Central","Papa":"Mercado de Haedo","Papines":"Proveedor directo","Perejil":"Mercado Central",
+  "Puerro":"Mercado Central","Remolacha":"Mercado de Haedo","Repollo blanco":"Mercado de Haedo",
+  "Repollitos de Bruselas":"Mayorista Palermo","Rúcula":"Proveedor directo","Tomate cherry":"Proveedor directo",
+  "Zanahoria":"Mercado de Haedo","Zapallo anco":"Mercado de Haedo","Zapallo kabutia":"Mercado de Haedo",
+  "Zapallito":"Mercado Central","Ananá":"Importador","Banana":"Importador","Granada":"Mercado Central",
+  "Kiwi":"Importador","Lima":"Importador","Limón":"Mercado Central","Mandarina":"Mercado Central",
+  "Mango":"Importador","Manzana verde":"Mercado Central","Manzana roja":"Mercado Central","Melón":"Mercado Central",
+  "Naranja ombligo":"Mercado Central","Palta Hass":"Importador","Sandía":"Mercado Central",
+  "Uva blanca":"Proveedor directo","Uva negra":"Proveedor directo","Champiñones":"Mayorista Palermo",
+  "Portobellos":"Mayorista Palermo","Girgolas frescas":"Proveedor directo","Aceite de oliva":"Mayorista Palermo",
+  "Huevos":"Proveedor directo","Quinoa":"Mayorista Palermo","Lentejas":"Mayorista Palermo","Garbanzos":"Mayorista Palermo"
+};
+
+// Mutable state
+let costos = {};
+let pVentas = {};
+let estacionalidad = {};
+let proveedores = {};
+let ultimaActualizacion = {};
+D.forEach(r=>{
+  costos[r.n] = r.costo;
+  pVentas[r.n] = r.pVenta;
+  estacionalidad[r.n] = [...(ESTACIONALIDAD[r.n]||MESES_ALL)];
+  proveedores[r.n] = PROVEEDOR_DEFAULT[r.n]||"Mercado Central";
+  ultimaActualizacion[r.n] = "2025-05-20";
+});
+
+// Zonas
+let zonas = [
+  {nombre:"CABA Centro",costoFijo:1500,costoPorKm:0,freeMin:8000,tiempoMin:30,tiempoMax:60},
+  {nombre:"CABA Norte/Sur",costoFijo:2200,costoPorKm:0,freeMin:12000,tiempoMin:45,tiempoMax:90},
+  {nombre:"GBA Zona 1",costoFijo:3500,costoPorKm:0,freeMin:18000,tiempoMin:60,tiempoMax:120},
+  {nombre:"GBA Zona 2",costoFijo:5000,costoPorKm:0,freeMin:25000,tiempoMin:90,tiempoMax:180},
+];
+
+// Margen objetivo global
+let margenObj = 40;
+
+// ─── HELPERS ─────────────────────────────────────────────
+function fmt(v){return v!=null?"$"+Math.round(v).toLocaleString("es-AR"):null}
+function pct(v){return v!=null?Math.round(v)+"%":null}
+function margen(costo,venta){
+  if(!costo||!venta||venta<=0)return null;
+  return ((venta-costo)/venta)*100;
+}
+function markup(costo,venta){
+  if(!costo||!venta||costo<=0)return null;
+  return ((venta-costo)/costo)*100;
+}
+function precioSugerido(costo,margenPct){
+  if(!costo)return null;
+  return Math.round(costo/(1-margenPct/100));
+}
+function stats(p){
+  const def=p.filter(x=>x!==null);
+  if(!def.length)return{mn:null,mx:null,avg:null,spread:null,avglo:null,avghi:null};
+  const mn=Math.min(...def),mx=Math.max(...def);
+  const avg=def.reduce((a,b)=>a+b,0)/def.length;
+  const spread=def.length>1?Math.round((mx-mn)/mn*100):null;
+  const avglo=def.length>1?Math.round((avg-mn)/mn*100):null;
+  const avghi=def.length>1?Math.round((mx-avg)/avg*100):null;
+  return{mn,mx,avg,spread,avglo,avghi};
+}
+
+const CATS=["Todas",...[...new Set(D.map(r=>r.c))]];
+
+// Sort state per tab
+const sortState={};
+
+function getSortState(tid){
+  if(!sortState[tid])sortState[tid]={col:null,dir:1};
+  return sortState[tid];
+}
+
+// ─── TAB SYSTEM ──────────────────────────────────────────
+const TABS=[
+  // GESTIÓN
+  {id:"dashboard",label:"🏪 Mi verdulería", group:"gestion"},
+  {id:"stock",label:"📦 Precios y Stock", group:"gestion"},
+  {id:"margen",label:"💰 Margen bruto", group:"gestion"},
+  {id:"sugeridos",label:"🎯 Precios sugeridos", group:"gestion"},
+  {id:"envio",label:"🚚 Costo de envío", group:"gestion"},
+  {id:"estacional",label:"📅 Estacionalidad", group:"gestion"},
+  {id:"proveedor",label:"📋 Proveedores", group:"gestion"},
+  // PÚBLICO (cara al cliente)
+  {id:"tienda",label:"🛒 Tienda", group:"publico"},
+  {id:"recetas",label:"👨‍🍳 Combos receta", group:"publico"},
+  {id:"ubicacion",label:"📍 Mi ubicación", group:"publico"},
+  // REFERENCIA (competencia)
+  {id:"original",label:"📊 Precios competencia", group:"referencia"},
+  {id:"kg",label:"⚖ Por kg", group:"referencia"},
+];
+
+const GROUPS=[
+  {id:"gestion", label:"Gestión", icon:"⚙"},
+  {id:"publico", label:"Público", icon:"👥"},
+  {id:"referencia", label:"Referencia", icon:"📊"},
+];
+let activeGroup="gestion";
+
+const tabbar=document.getElementById("tabbar");
+const panelsEl=document.getElementById("panels");
+const groupPillsEl=document.getElementById("group-pills");
+
+// Build group pills
+GROUPS.forEach(g=>{
+  const count=TABS.filter(t=>t.group===g.id).length;
+  const pill=document.createElement("button");
+  pill.className="group-pill"+(g.id===activeGroup?" on":"");
+  pill.innerHTML=`<span class="group-pill-icon">${g.icon}</span>${g.label}<span class="group-pill-count">${count}</span>`;
+  pill.dataset.group=g.id;
+  pill.onclick=()=>switchGroup(g.id);
+  groupPillsEl.appendChild(pill);
+});
+
+// Build all panels (always exist but hidden); tabs render dynamically per group
+TABS.forEach(t=>{
+  const p=document.createElement("div");
+  p.className="panel";
+  p.id="panel-"+t.id;
+  panelsEl.appendChild(p);
+});
+
+function renderTabsForGroup(){
+  tabbar.innerHTML="";
+  const groupTabs=TABS.filter(t=>t.group===activeGroup);
+  // Determine which tab to activate: previously active in this group, or first
+  const stored=document.body.dataset["activeIn_"+activeGroup];
+  const initialId=stored&&groupTabs.find(t=>t.id===stored)?stored:groupTabs[0]?.id;
+  groupTabs.forEach(t=>{
+    const el=document.createElement("div");
+    el.className="tab"+(t.id===initialId?" on":"");
+    el.textContent=t.label;
+    el.dataset.tabId=t.id;
+    el.onclick=()=>switchTab(t.id,el);
+    tabbar.appendChild(el);
+  });
+  // Hide all panels, show only the active one
+  document.querySelectorAll(".panel").forEach(p=>p.classList.remove("on"));
+  if(initialId){
+    document.getElementById("panel-"+initialId).classList.add("on");
+    renderTab(initialId);
+  }
+}
+
+function switchGroup(gid){
+  activeGroup=gid;
+  document.querySelectorAll(".group-pill").forEach(p=>p.classList.toggle("on",p.dataset.group===gid));
+  renderTabsForGroup();
+}
+
+function switchTab(id,el){
+  document.querySelectorAll(".tab").forEach(t=>t.classList.remove("on"));
+  document.querySelectorAll(".panel").forEach(p=>p.classList.remove("on"));
+  el.classList.add("on");
+  document.getElementById("panel-"+id).classList.add("on");
+  document.body.dataset["activeIn_"+activeGroup]=id;
+  renderTab(id);
+}
+
+// Admin drawer (was a tab, now a drawer)
+function openAdmin(){
+  document.getElementById("admin-overlay").classList.add("open");
+  document.getElementById("admin-drawer").classList.add("open");
+  renderAdminDrawer();
+}
+function closeAdmin(){
+  document.getElementById("admin-overlay").classList.remove("open");
+  document.getElementById("admin-drawer").classList.remove("open");
+}
+function renderAdminDrawer(){
+  // delegate to existing admin content renderer but target the drawer body
+  const body=document.getElementById("admin-drawer-body");
+  if(!body)return;
+  // ensure there's an inner container the admin functions expect
+  body.innerHTML=`<div id="admin-content"></div>`;
+  renderAdminContent();
+}
+
+// ─── RENDER TABS ─────────────────────────────────────────
+
+function buildFilters(containerId, tid, renderFn){
+  const c=document.getElementById(containerId);
+  if(c.dataset.built)return;
+  c.dataset.built="1";
+  CATS.forEach(cat=>{
+    const b=document.createElement("button");
+    b.className="fb"+(cat==="Todas"?" on":"");
+    b.textContent=cat;
+    b.dataset.cat=cat;
+    b.onclick=()=>{
+      c.querySelectorAll(".fb").forEach(x=>x.classList.remove("on"));
+      b.classList.add("on");
+      renderFn();
+    };
+    c.appendChild(b);
+  });
+}
+
+function getActiveCat(containerId){
+  const el=document.querySelector(`#${containerId} .fb.on`);
+  return el?el.dataset.cat:"Todas";
+}
+
+function getSearch(inputId){
+  const el=document.getElementById(inputId);
+  return el?el.value.toLowerCase():"";
+}
+
+function filteredData(containerId,inputId){
+  const cat=getActiveCat(containerId);
+  const sv=getSearch(inputId);
+  return D.filter(r=>(cat==="Todas"||r.c===cat)&&(!sv||r.n.toLowerCase().includes(sv)));
+}
+
+function makeSortableTh(th, tid, col, renderFn){
+  th.classList.add("sortable");
+  const span=document.createElement("span");
+  span.className="arr";
+  th.appendChild(span);
+  th.onclick=()=>{
+    const s=getSortState(tid);
+    if(s.col===col){if(s.dir===1)s.dir=-1;else{s.col=null;s.dir=1;}}
+    else{s.col=col;s.dir=1;}
+    document.querySelectorAll(`[data-sort-tid="${tid}"]`).forEach(t=>t.classList.remove("asc","desc"));
+    if(s.col!==null)th.classList.add(s.dir===1?"asc":"desc");
+    renderFn();
+  };
+  th.dataset.sortTid=tid;
+  th.dataset.sortCol=col;
+}
+
+function applySort(rows, tid, getValue){
+  const s=getSortState(tid);
+  if(s.col===null)return rows;
+  return [...rows].sort((a,b)=>{
+    let va=getValue(a,s.col), vb=getValue(b,s.col);
+    if(va==null&&vb==null)return 0;
+    if(va==null)return 1;
+    if(vb==null)return -1;
+    return(va-vb)*s.dir;
+  });
+}
+
+// ── TAB: ORIGINAL ──
+function renderOriginal(){
+  const pid="panel-original";
+  const p=document.getElementById(pid);
+  if(!p.dataset.init){
+    p.innerHTML=`
+      <div class="top">
+        <input type="text" id="srch-orig" placeholder="Buscar..." oninput="renderOriginal()">
+        <div class="fbts" id="fcat-orig"></div>
+      </div>
+      <div class="leg">
+        <div class="li"><div class="dot" style="background:var(--brand)"></div>precio más bajo</div>
+        <div class="li"><div class="dot" style="background:var(--ink-faint)"></div>no disponible</div>
+      </div>
+      <div class="ow"><table id="tbl-orig">
+        <thead><tr id="thead-orig">
+          <th>Producto</th>
+          <th data-sort-tid="orig" data-sort-col="0">La Barata</th>
+          <th data-sort-tid="orig" data-sort-col="1">Verde Puro</th>
+          <th data-sort-tid="orig" data-sort-col="2">El Click</th>
+          <th data-sort-tid="orig" data-sort-col="3">Nico</th>
+          <th data-sort-tid="orig" data-sort-col="avg" class="grp">Promedio</th>
+          <th data-sort-tid="orig" data-sort-col="spread" class="grp">% min→max</th>
+          <th data-sort-tid="orig" data-sort-col="avglo">% prom/mín</th>
+          <th data-sort-tid="orig" data-sort-col="avghi">% máx/prom</th>
+        </tr></thead>
+        <tbody id="tb-orig"></tbody>
+      </table></div>`;
+    p.dataset.init="1";
+    buildFilters("fcat-orig","orig",renderOriginal);
+    p.querySelectorAll("th[data-sort-col]").forEach(th=>{
+      makeSortableTh(th,"orig",th.dataset.sortCol,renderOriginal);
+    });
+  }
+  let rows=filteredData("fcat-orig","srch-orig");
+  const s=getSortState("orig");
+  rows=applySort(rows,"orig",(r,col)=>{
+    const st=stats(r.p);
+    if(col==="avg")return st.avg;
+    if(col==="spread")return st.spread;
+    if(col==="avglo")return st.avglo;
+    if(col==="avghi")return st.avghi;
+    return r.p[parseInt(col)];
+  });
+  let lc=null,h="";
+  rows.forEach(r=>{
+    const st=stats(r.p);
+    if(s.col===null&&r.c!==lc){h+=`<tr class="cr"><td colspan="9">${r.c}</td></tr>`;lc=r.c;}
+    const cs=r.p.map(v=>{
+      if(v==null)return`<td><span class="p n">—</span></td>`;
+      const b=(v===st.mn&&st.mn!==st.mx)?" b":"";
+      return`<td><span class="p${b}">${fmt(v)}</span><span class="u">${r.u}</span></td>`;
+    }).join("");
+    const avgC=st.avg?`<td class="grp"><span class="p av">${fmt(st.avg)}</span><span class="u">${r.u}</span></td>`:`<td class="grp"><span class="p n">—</span></td>`;
+    const spC=st.spread!=null?`<td class="grp"><span class="pct hi">${st.spread}%</span></td>`:`<td class="grp"><span class="p n">—</span></td>`;
+    const alC=st.avglo!=null?`<td><span class="pct lo">+${st.avglo}%</span></td>`:`<td><span class="p n">—</span></td>`;
+    const ahC=st.avghi!=null?`<td><span class="pct hi">+${st.avghi}%</span></td>`:`<td><span class="p n">—</span></td>`;
+    h+=`<tr><td>${r.n}</td>${cs}${avgC}${spC}${alC}${ahC}</tr>`;
+  });
+  document.getElementById("tb-orig").innerHTML=h||`<tr><td colspan="9" style="text-align:center;padding:1.5rem;color:var(--ink-faint)">Sin resultados</td></tr>`;
+}
+
+// ── TAB: POR KG ──
+function renderKg(){
+  const p=document.getElementById("panel-kg");
+  if(!p.dataset.init){
+    p.innerHTML=`
+      <div class="note">Precios normalizados a $/kg usando peso estimado por unidad cuando aplica.</div>
+      <div class="top">
+        <input type="text" id="srch-kg" placeholder="Buscar..." oninput="renderKg()">
+        <div class="fbts" id="fcat-kg"></div>
+      </div>
+      <div class="leg">
+        <div class="li"><div class="dot" style="background:var(--brand)"></div>precio/kg más bajo</div>
+        <div class="li"><div class="dot" style="background:var(--ink-faint)"></div>no disponible</div>
+      </div>
+      <div class="ow"><table>
+        <thead><tr>
+          <th>Producto</th>
+          <th data-sort-tid="kg" data-sort-col="0">La Barata</th>
+          <th data-sort-tid="kg" data-sort-col="1">Verde Puro</th>
+          <th data-sort-tid="kg" data-sort-col="2">El Click</th>
+          <th data-sort-tid="kg" data-sort-col="3">Nico</th>
+          <th data-sort-tid="kg" data-sort-col="avg" class="grp">Promedio/kg</th>
+          <th data-sort-tid="kg" data-sort-col="spread" class="grp">% min→max</th>
+          <th data-sort-tid="kg" data-sort-col="avglo">% prom/mín</th>
+          <th data-sort-tid="kg" data-sort-col="avghi">% máx/prom</th>
+        </tr></thead>
+        <tbody id="tb-kg"></tbody>
+      </table></div>`;
+    p.dataset.init="1";
+    buildFilters("fcat-kg","kg",renderKg);
+    p.querySelectorAll("th[data-sort-col]").forEach(th=>makeSortableTh(th,"kg",th.dataset.sortCol,renderKg));
+  }
+  let rows=filteredData("fcat-kg","srch-kg").filter(r=>r.kg);
+  const kgRows=rows.map(r=>{
+    const f=1000/r.kg;
+    return{...r,p:r.p.map(v=>v!=null?Math.round(v*f):null),u:"kg"};
+  });
+  const s=getSortState("kg");
+  const sorted=applySort(kgRows,"kg",(r,col)=>{
+    const st=stats(r.p);
+    if(col==="avg")return st.avg;if(col==="spread")return st.spread;
+    if(col==="avglo")return st.avglo;if(col==="avghi")return st.avghi;
+    return r.p[parseInt(col)];
+  });
+  let lc=null,h="";
+  sorted.forEach(r=>{
+    const st=stats(r.p);
+    if(s.col===null&&r.c!==lc){h+=`<tr class="cr"><td colspan="9">${r.c}</td></tr>`;lc=r.c;}
+    const cs=r.p.map(v=>{
+      if(v==null)return`<td><span class="p n">—</span></td>`;
+      const b=(v===st.mn&&st.mn!==st.mx)?" b":"";
+      return`<td><span class="p${b}">${fmt(v)}</span><span class="u">kg</span></td>`;
+    }).join("");
+    const avgC=st.avg?`<td class="grp"><span class="p av">${fmt(st.avg)}</span><span class="u">kg</span></td>`:`<td class="grp"><span class="p n">—</span></td>`;
+    const spC=st.spread!=null?`<td class="grp"><span class="pct hi">${st.spread}%</span></td>`:`<td class="grp"><span class="p n">—</span></td>`;
+    const alC=st.avglo!=null?`<td><span class="pct lo">+${st.avglo}%</span></td>`:`<td><span class="p n">—</span></td>`;
+    const ahC=st.avghi!=null?`<td><span class="pct hi">+${st.avghi}%</span></td>`:`<td><span class="p n">—</span></td>`;
+    h+=`<tr><td>${r.n}</td>${cs}${avgC}${spC}${alC}${ahC}</tr>`;
+  });
+  document.getElementById("tb-kg").innerHTML=h||`<tr><td colspan="9" style="text-align:center;padding:1.5rem;color:var(--ink-faint)">Sin resultados</td></tr>`;
+}
+
+// ── TAB: MARGEN BRUTO ──
+function renderMargen(){
+  const p=document.getElementById("panel-margen");
+  if(!p.dataset.init){
+    p.innerHTML=`
+      <div class="cards" id="cards-margen"></div>
+      <div class="top">
+        <input type="text" id="srch-margen" placeholder="Buscar..." oninput="renderMargenTable()">
+        <div class="fbts" id="fcat-margen"></div>
+      </div>
+      <div class="ow"><table>
+        <thead><tr>
+          <th>Producto</th>
+          <th data-sort-tid="margen" data-sort-col="costo">Costo compra</th>
+          <th data-sort-tid="margen" data-sort-col="venta">Precio venta</th>
+          <th data-sort-tid="margen" data-sort-col="ganancia">Ganancia</th>
+          <th data-sort-tid="margen" data-sort-col="margen" class="grp">Margen %</th>
+          <th data-sort-tid="margen" data-sort-col="markup">Markup %</th>
+          <th>Estado</th>
+        </tr></thead>
+        <tbody id="tb-margen"></tbody>
+      </table></div>
+      <p class="foot">Editá los campos de costo y precio de venta directamente en la tabla. Margen = (venta−costo)/venta. Markup = (venta−costo)/costo.</p>`;
+    p.dataset.init="1";
+    buildFilters("fcat-margen","margen",renderMargenTable);
+    p.querySelectorAll("th[data-sort-col]").forEach(th=>makeSortableTh(th,"margen",th.dataset.sortCol,renderMargenTable));
+  }
+  renderMargenCards();
+  renderMargenTable();
+}
+
+function renderMargenCards(){
+  const all=D.map(r=>({m:margen(costos[r.n],pVentas[r.n])})).filter(x=>x.m!=null);
+  const avg=all.reduce((a,b)=>a+b.m,0)/all.length;
+  const bajos=all.filter(x=>x.m<20).length;
+  const buenos=all.filter(x=>x.m>=margenObj).length;
+  document.getElementById("cards-margen").innerHTML=`
+    <div class="card"><div class="lbl">Margen promedio</div><div class="val ${avg>=margenObj?"green":avg<20?"red":"amber"}">${Math.round(avg)}%</div><div class="sub">sobre ${all.length} productos</div></div>
+    <div class="card green"><div class="lbl">Sobre objetivo (${margenObj}%)</div><div class="val">${buenos}</div><div class="sub">productos</div></div>
+    <div class="card red"><div class="lbl">Margen bajo (&lt;20%)</div><div class="val">${bajos}</div><div class="sub">productos</div></div>
+    <div class="card amber"><div class="lbl">Objetivo margen</div><div class="val"><input type="number" id="margen-obj-input" value="${margenObj}" min="1" max="99" style="width:60px;font-size:18px;font-weight:700;border:none;border-bottom:2px solid #ccc;background:transparent;color:var(--warn-fg)" oninput="margenObj=parseInt(this.value)||40;renderMargenCards();renderMargenTable()"></div><div class="sub">% objetivo global</div></div>`;
+}
+
+function renderMargenTable(){
+  let rows=filteredData("fcat-margen","srch-margen");
+  const s=getSortState("margen");
+  rows=applySort(rows,"margen",(r,col)=>{
+    const c=costos[r.n]||0,v=pVentas[r.n]||0;
+    if(col==="costo")return c;if(col==="venta")return v;
+    if(col==="ganancia")return v-c;if(col==="margen")return margen(c,v);
+    if(col==="markup")return markup(c,v);return null;
+  });
+  let lc=null,h="";
+  const sc=getSortState("margen");
+  rows.forEach(r=>{
+    if(sc.col===null&&r.c!==lc){h+=`<tr class="cr"><td colspan="7">${r.c}</td></tr>`;lc=r.c;}
+    const c=costos[r.n]||0,v=pVentas[r.n]||0;
+    const mg=margen(c,v),mk=markup(c,v),gan=v-c;
+    const mgR=Math.round(mg)||0;
+    const barColor=mgR>=margenObj?"var(--success)":mgR>=20?"var(--warn)":"var(--danger)";
+    const badgeCls=mgR>=margenObj?"ok":mgR>=20?"warn":"bad";
+    const badgeTxt=mgR>=margenObj?"✓ Bueno":mgR>=20?"~ Ajustado":"✗ Bajo";
+    h+=`<tr>
+      <td>${r.n}<span class="u">${r.u}</span></td>
+      <td><input class="cell-input" type="number" value="${c}" onchange="costos['${r.n}']=parseInt(this.value)||0;renderMargenCards();renderMargenTable()"></td>
+      <td><input class="cell-input" type="number" value="${v}" onchange="pVentas['${r.n}']=parseInt(this.value)||0;renderMargenCards();renderMargenTable()"></td>
+      <td><span class="p" style="color:${gan>=0?"var(--success-fg)":"var(--danger)"}">${fmt(gan)}</span></td>
+      <td class="grp">
+        <div class="mbar">
+          <div class="mbar-track"><div class="mbar-fill" style="width:${Math.min(mgR,100)}%;background:${barColor}"></div></div>
+          <span style="font-size:12px;font-weight:600;color:${barColor};min-width:36px">${mgR}%</span>
+        </div>
+      </td>
+      <td><span class="pct ${mk>=margenObj?"lo":"hi"}">${Math.round(mk||0)}%</span></td>
+      <td><span class="badge ${badgeCls}">${badgeTxt}</span></td>
+    </tr>`;
+  });
+  document.getElementById("tb-margen").innerHTML=h||`<tr><td colspan="7" style="text-align:center;padding:1.5rem;color:var(--ink-faint)">Sin resultados</td></tr>`;
+}
+
+// ── TAB: PRECIOS SUGERIDOS ──
+function renderSugeridos(){
+  const p=document.getElementById("panel-sugeridos");
+  if(!p.dataset.init){
+    p.innerHTML=`
+      <div class="note">Dado tu costo de compra y el margen objetivo, calculamos el precio de venta sugerido y lo comparamos con la competencia.</div>
+      <div class="top">
+        <input type="text" id="srch-sug" placeholder="Buscar..." oninput="renderSugeridosTable()">
+        <div class="fbts" id="fcat-sug"></div>
+      </div>
+      <div class="ow"><table>
+        <thead><tr>
+          <th>Producto</th>
+          <th data-sort-tid="sug" data-sort-col="costo">Tu costo</th>
+          <th data-sort-tid="sug" data-sort-col="actual">Tu precio actual</th>
+          <th data-sort-tid="sug" data-sort-col="sugerido" class="grp">Precio sugerido (${margenObj}%)</th>
+          <th data-sort-tid="sug" data-sort-col="compMin">Comp. mínimo</th>
+          <th data-sort-tid="sug" data-sort-col="compMax">Comp. máximo</th>
+          <th data-sort-tid="sug" data-sort-col="posicion">Posición</th>
+        </tr></thead>
+        <tbody id="tb-sug"></tbody>
+      </table></div>
+      <p class="foot">Posición: comparación de tu precio actual vs la competencia. Verde = sos el más barato, rojo = sos el más caro, amarillo = estás en rango.</p>`;
+    p.dataset.init="1";
+    buildFilters("fcat-sug","sug",renderSugeridosTable);
+    p.querySelectorAll("th[data-sort-col]").forEach(th=>makeSortableTh(th,"sug",th.dataset.sortCol,renderSugeridosTable));
+  }
+  renderSugeridosTable();
+}
+
+function renderSugeridosTable(){
+  let rows=filteredData("fcat-sug","srch-sug");
+  const s=getSortState("sug");
+  rows=applySort(rows,"sug",(r,col)=>{
+    const c=costos[r.n]||0,v=pVentas[r.n]||0;
+    const st=stats(r.p);
+    if(col==="costo")return c;if(col==="actual")return v;
+    if(col==="sugerido")return precioSugerido(c,margenObj);
+    if(col==="compMin")return st.mn;if(col==="compMax")return st.mx;
+    if(col==="posicion")return v;return null;
+  });
+  // update header
+  const thSug=document.querySelector('[data-sort-tid="sug"][data-sort-col="sugerido"]');
+  if(thSug)thSug.childNodes[0].textContent=`Precio sugerido (${margenObj}%)`;
+
+  let lc=null,h="";
+  rows.forEach(r=>{
+    if(s.col===null&&r.c!==lc){h+=`<tr class="cr"><td colspan="7">${r.c}</td></tr>`;lc=r.c;}
+    const c=costos[r.n]||0,v=pVentas[r.n]||0;
+    const sug=precioSugerido(c,margenObj);
+    const st=stats(r.p);
+    let posHTML="<span class='badge neu'>Sin datos</span>";
+    if(st.mn!=null&&v>0){
+      if(v<=st.mn)posHTML=`<span class='badge ok'>Más barato</span>`;
+      else if(v>=st.mx)posHTML=`<span class='badge bad'>Más caro</span>`;
+      else posHTML=`<span class='badge warn'>En rango</span>`;
+    }
+    const difSug=sug&&v?Math.round(((v-sug)/sug)*100):null;
+    const difColor=difSug==null?"var(--ink-soft)":difSug>0?"var(--success-fg)":"var(--danger)";
+    h+=`<tr>
+      <td>${r.n}<span class="u">${r.u}</span></td>
+      <td>${fmt(c)}</td>
+      <td><span style="font-weight:600">${fmt(v)}</span>${difSug!=null?`<span class="u" style="color:${difColor}">${difSug>0?"+":""}${difSug}% vs sugerido</span>`:""}</td>
+      <td class="grp"><span class="p b">${fmt(sug)}</span></td>
+      <td>${st.mn?fmt(st.mn):`<span class="p n">—</span>`}</td>
+      <td>${st.mx?fmt(st.mx):`<span class="p n">—</span>`}</td>
+      <td>${posHTML}</td>
+    </tr>`;
+  });
+  document.getElementById("tb-sug").innerHTML=h||`<tr><td colspan="7" style="text-align:center;padding:1.5rem;color:var(--ink-faint)">Sin resultados</td></tr>`;
+}
+
+// ── TAB: COSTO ENVÍO ──
+function renderEnvio(){
+  const p=document.getElementById("panel-envio");
+  if(!p.dataset.init){
+    p.innerHTML=`
+      <p style="margin-bottom:1rem;font-size:13px;color:var(--ink-soft)">Configurá cada zona de entrega. El sistema calcula el punto de break-even para ofrecer envío gratis.</p>
+      <div class="zona-grid" id="zona-grid"></div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;margin-top:4px">
+        <h3 style="font-size:13px;font-weight:600;margin-bottom:10px">Simulador de pedido</h3>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end">
+          <div>
+            <label style="font-size:11px;color:var(--ink-soft);display:block;margin-bottom:3px">Monto del pedido ($)</label>
+            <input type="number" id="sim-monto" value="10000" style="height:34px;padding:0 10px;font-size:14px;border:1px solid var(--border-strong);border-radius:7px;width:150px" oninput="renderSimulador()">
+          </div>
+        </div>
+        <div id="sim-result" style="margin-top:12px;display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px"></div>
+      </div>`;
+    p.dataset.init="1";
+  }
+  renderZonas();
+  renderSimulador();
+}
+
+function renderZonas(){
+  const grid=document.getElementById("zona-grid");
+  grid.innerHTML="";
+  zonas.forEach((z,i)=>{
+    const d=document.createElement("div");
+    d.className="zona-card";
+    d.innerHTML=`
+      <h3>📍 ${z.nombre}</h3>
+      <label>Costo fijo de envío ($)</label>
+      <input type="number" value="${z.costoFijo}" onchange="zonas[${i}].costoFijo=parseInt(this.value)||0;renderZonaResult(${i});renderSimulador()">
+      <label>Mínimo para envío gratis ($)</label>
+      <input type="number" value="${z.freeMin}" onchange="zonas[${i}].freeMin=parseInt(this.value)||0;renderZonaResult(${i});renderSimulador()">
+      <label>Tiempo estimado (min)</label>
+      <div style="display:flex;gap:6px">
+        <input type="number" value="${z.tiempoMin}" placeholder="Mín" onchange="zonas[${i}].tiempoMin=parseInt(this.value)||0;renderZonaResult(${i})">
+        <input type="number" value="${z.tiempoMax}" placeholder="Máx" onchange="zonas[${i}].tiempoMax=parseInt(this.value)||0;renderZonaResult(${i})">
+      </div>
+      <div class="zona-result" id="zres-${i}"></div>`;
+    grid.appendChild(d);
+    renderZonaResult(i);
+  });
+}
+
+function renderZonaResult(i){
+  const z=zonas[i];
+  const prom=Math.round((z.tiempoMin+z.tiempoMax)/2);
+  const avgTicket=15000;
+  const pctFreeOrders=z.freeMin?`${Math.round((avgTicket/z.freeMin)*100)}% de pedidos promedio llegan al free`:"";
+  document.getElementById("zres-"+i).innerHTML=`
+    <strong>Envío gratis desde:</strong> ${fmt(z.freeMin)}<br>
+    <strong>Costo por debajo del mínimo:</strong> ${fmt(z.costoFijo)}<br>
+    <strong>Entrega estimada:</strong> ${z.tiempoMin}–${z.tiempoMax} min (prom. ${prom} min)<br>
+    <strong>Break-even envío:</strong> con margen del ${margenObj}%, necesitás vender ${fmt(Math.round(z.costoFijo/(margenObj/100)))} para cubrir el envío`;
+}
+
+function renderSimulador(){
+  const monto=parseInt(document.getElementById("sim-monto").value)||0;
+  const res=document.getElementById("sim-result");
+  res.innerHTML=zonas.map(z=>{
+    const gratis=monto>=z.freeMin;
+    const costoEnvio=gratis?0:z.costoFijo;
+    const faltan=gratis?0:z.freeMin-monto;
+    return`<div style="background:${gratis?"var(--success-bg)":"var(--danger-bg)"};border-radius:8px;padding:10px 12px">
+      <div style="font-weight:600;font-size:12px;margin-bottom:4px">${z.nombre}</div>
+      <div style="font-size:13px;font-weight:700;color:${gratis?"var(--success-fg)":"var(--danger)"}">${gratis?"✓ Envío GRATIS":"Envío: "+fmt(z.costoFijo)}</div>
+      <div style="font-size:11px;color:var(--ink-soft);margin-top:3px">${gratis?"El pedido supera el mínimo":"Faltan "+fmt(faltan)+" para envío gratis"}</div>
+      <div style="font-size:11px;color:var(--ink-soft)">Total con envío: ${fmt(monto+costoEnvio)}</div>
+    </div>`;
+  }).join("");
+}
+
+// ── TAB: ESTACIONALIDAD ──
+function renderEstacional(){
+  const p=document.getElementById("panel-estacional");
+  if(!p.dataset.init){
+    p.innerHTML=`
+      <div class="note">Marcá los meses en que cada producto está disponible. Hacé clic en los meses para activar/desactivar.</div>
+      <div class="top">
+        <input type="text" id="srch-est" placeholder="Buscar..." oninput="renderEstacionalTable()">
+        <div class="fbts" id="fcat-est"></div>
+      </div>
+      <div style="margin-bottom:.75rem;font-size:11px;color:var(--ink-soft)">Mes actual resaltado en azul</div>
+      <div class="ow"><table style="min-width:800px">
+        <thead><tr>
+          <th style="width:160px">Producto</th>
+          ${MESES_NAMES.map((m,i)=>`<th style="width:48px;padding:6px 2px;font-size:10px;${i===new Date().getMonth()?"background:var(--info-bg);color:var(--info)":""}">${m}</th>`).join("")}
+          <th>Meses</th>
+        </tr></thead>
+        <tbody id="tb-est"></tbody>
+      </table></div>`;
+    p.dataset.init="1";
+    buildFilters("fcat-est","est",renderEstacionalTable);
+  }
+  renderEstacionalTable();
+}
+
+function renderEstacionalTable(){
+  let rows=filteredData("fcat-est","srch-est");
+  const curMes=new Date().getMonth();
+  let lc=null,h="";
+  rows.forEach(r=>{
+    const meses=estacionalidad[r.n]||MESES_ALL;
+    if(r.c!==lc){h+=`<tr class="cr"><td colspan="${13+1}">${r.c}</td></tr>`;lc=r.c;}
+    const mCells=MESES_NAMES.map((m,i)=>{
+      const on=meses.includes(i);
+      const cur=i===curMes;
+      return`<td style="padding:4px 2px;${cur?"background:var(--info-bg)":""}">
+        <div class="mes ${on?"on":"off"}" onclick="toggleMes('${r.n}',${i})" title="${on?"Disponible":"No disponible"}">${m.slice(0,1)}</div>
+      </td>`;
+    }).join("");
+    const disponible=meses.includes(curMes);
+    h+=`<tr>
+      <td>${r.n}</td>
+      ${mCells}
+      <td><span class="badge ${disponible?"ok":"bad"}">${meses.length} meses${disponible?" ✓":" ✗ hoy"}</span></td>
+    </tr>`;
+  });
+  document.getElementById("tb-est").innerHTML=h||`<tr><td colspan="14" style="text-align:center;padding:1.5rem;color:var(--ink-faint)">Sin resultados</td></tr>`;
+}
+
+function toggleMes(nombre,mes){
+  const arr=estacionalidad[nombre];
+  const idx=arr.indexOf(mes);
+  if(idx>=0)arr.splice(idx,1);else arr.push(mes);
+  arr.sort((a,b)=>a-b);
+  renderEstacionalTable();
+}
+
+// ── TAB: PROVEEDORES ──
+function renderProveedor(){
+  const p=document.getElementById("panel-proveedor");
+  if(!p.dataset.init){
+    p.innerHTML=`
+      <div class="top">
+        <input type="text" id="srch-prov" placeholder="Buscar..." oninput="renderProveedorTable()">
+        <div class="fbts" id="fcat-prov"></div>
+      </div>
+      <div class="ow"><table>
+        <thead><tr>
+          <th>Producto</th>
+          <th data-sort-tid="prov" data-sort-col="proveedor">Proveedor</th>
+          <th data-sort-tid="prov" data-sort-col="costo">Precio mayorista</th>
+          <th data-sort-tid="prov" data-sort-col="fecha">Última actualización</th>
+          <th data-sort-tid="prov" data-sort-col="dias">Días sin actualizar</th>
+          <th>Estado precio</th>
+        </tr></thead>
+        <tbody id="tb-prov"></tbody>
+      </table></div>
+      <p class="foot">Editá el proveedor, precio y fecha directamente. Rojo = más de 7 días sin actualizar el precio mayorista.</p>`;
+    p.dataset.init="1";
+    buildFilters("fcat-prov","prov",renderProveedorTable);
+    p.querySelectorAll("th[data-sort-col]").forEach(th=>makeSortableTh(th,"prov",th.dataset.sortCol,renderProveedorTable));
+  }
+  renderProveedorTable();
+}
+
+function diasSinActualizar(fecha){
+  const d=new Date(fecha),hoy=new Date();
+  return Math.floor((hoy-d)/(1000*60*60*24));
+}
+
+function renderProveedorTable(){
+  let rows=filteredData("fcat-prov","srch-prov");
+  const s=getSortState("prov");
+  rows=applySort(rows,"prov",(r,col)=>{
+    if(col==="proveedor")return proveedores[r.n]||"";
+    if(col==="costo")return costos[r.n]||0;
+    if(col==="fecha")return ultimaActualizacion[r.n]||"";
+    if(col==="dias")return diasSinActualizar(ultimaActualizacion[r.n]||"2020-01-01");
+    return null;
+  });
+  let lc=null,h="";
+  rows.forEach(r=>{
+    if(s.col===null&&r.c!==lc){h+=`<tr class="cr"><td colspan="6">${r.c}</td></tr>`;lc=r.c;}
+    const prov=proveedores[r.n]||"Mercado Central";
+    const costo=costos[r.n]||0;
+    const fecha=ultimaActualizacion[r.n]||"2025-05-20";
+    const dias=diasSinActualizar(fecha);
+    const staleClass=dias>14?"bad":dias>7?"warn":"ok";
+    const staleTxt=dias>14?"Desactualizado":dias>7?"Revisar":"Al día";
+    const opts=PROVEEDORES_LIST.map(pr=>`<option ${pr===prov?"selected":""}>${pr}</option>`).join("");
+    h+=`<tr>
+      <td>${r.n}<span class="u">${r.u}</span></td>
+      <td>
+        <select class="cell-sel" onchange="proveedores['${r.n}']=this.value">${opts}</select>
+      </td>
+      <td><input class="cell-input" type="number" value="${costo}" onchange="costos['${r.n}']=parseInt(this.value)||0;renderMargen&&renderMargenTable&&renderMargenTable()"></td>
+      <td><input class="cell-input" type="date" value="${fecha}" style="width:120px" onchange="ultimaActualizacion['${r.n}']=this.value;renderProveedorTable()"></td>
+      <td><span class="pct ${dias>7?"hi":"lo"}">${dias}d</span></td>
+      <td><span class="badge ${staleClass}">${staleTxt}</span></td>
+    </tr>`;
+  });
+  document.getElementById("tb-prov").innerHTML=h||`<tr><td colspan="6" style="text-align:center;padding:1.5rem;color:var(--ink-faint)">Sin resultados</td></tr>`;
+}
+
+// ── TAB: TIENDA ──
+const EMOJIS={
+  "Acelga":"🥬","Apio":"🌿","Batata":"🍠","Berenjena":"🍆","Brócoli":"🥦","Cebolla":"🧅",
+  "Choclo":"🌽","Espinaca":"🥬","Espárragos":"🌱","Kale":"🥬","Lechuga":"🥬","Morrón rojo":"🫑",
+  "Morrón verde":"🫑","Papa":"🥔","Papines":"🥔","Perejil":"🌿","Puerro":"🌿","Remolacha":"🫚",
+  "Repollo blanco":"🥬","Repollitos de Bruselas":"🥦","Rúcula":"🌿","Tomate cherry":"🍅",
+  "Zanahoria":"🥕","Zapallo anco":"🎃","Zapallo kabutia":"🎃","Zapallito":"🥒",
+  "Ananá":"🍍","Banana":"🍌","Granada":"🍎","Kiwi":"🥝","Lima":"🍋","Limón":"🍋",
+  "Mandarina":"🍊","Mango":"🥭","Manzana verde":"🍏","Manzana roja":"🍎","Melón":"🍈",
+  "Naranja ombligo":"🍊","Palta Hass":"🥑","Sandía":"🍉","Uva blanca":"🍇","Uva negra":"🍇",
+  "Champiñones":"🍄","Portobellos":"🍄","Girgolas frescas":"🍄",
+  "Aceite de oliva":"🫒","Huevos":"🥚","Quinoa":"🌾","Lentejas":"🫘","Garbanzos":"🫘"
+};
+
+let cart={};// {nombre: qty}
+let storeActiveCat="Todas";
+let storeSearch="";
+let storeQtys={};// draft qty per card
+D.forEach(r=>{ storeQtys[r.n]=1; });
+
+function renderTienda(){
+  const p=document.getElementById("panel-tienda");
+  if(!p.dataset.init){
+    p.innerHTML=`
+      <div class="store-header">
+        <div class="store-search">
+          <input type="text" placeholder="Buscar productos..." oninput="storeSearch=this.value.toLowerCase();renderStoreGrid()">
+        </div>
+        <div class="cart-btn-wrap" onclick="openCart()">
+          <button class="cart-btn">🛒 Carrito <span id="cart-label">vacío</span></button>
+          <div class="cart-badge" id="cart-badge">0</div>
+        </div>
+      </div>
+      <div class="store-cats fbts" id="store-cats"></div>
+      <div class="store-grid" id="store-grid"></div>
+      <div class="cart-overlay" id="cart-overlay" onclick="closeCart()"></div>
+      <div class="cart-drawer" id="cart-drawer">
+        <div class="cart-head">
+          <h2>Tu carrito</h2>
+          <button class="cart-close" onclick="closeCart()">✕</button>
+        </div>
+        <div class="cart-items" id="cart-items"></div>
+        <div class="cart-foot">
+          <div class="cart-subtotal"><span>Subtotal</span><span id="cart-sub">$0</span></div>
+          <div class="cart-zona">
+            <select onchange="renderCartFoot()" id="cart-zona-sel">
+              ${zonas.map((z,i)=>`<option value="${i}">${z.nombre}</option>`).join("")}
+            </select>
+          </div>
+          <div class="cart-envio-info" id="cart-envio-info"></div>
+          <div class="cart-total"><span>Total</span><span id="cart-total-val">$0</span></div>
+          <button class="checkout-btn" onclick="doCheckout()">Confirmar pedido ↗</button>
+        </div>
+      </div>`;
+    p.dataset.init="1";
+    // build cat filters
+    const sc=document.getElementById("store-cats");
+    CATS.forEach(c=>{
+      const b=document.createElement("button");
+      b.className="fb"+(c==="Todas"?" on":"");
+      b.textContent=c;
+      b.onclick=()=>{
+        storeActiveCat=c;
+        sc.querySelectorAll(".fb").forEach(x=>x.classList.remove("on"));
+        b.classList.add("on");
+        renderStoreGrid();
+      };
+      sc.appendChild(b);
+    });
+  }
+  renderStoreGrid();
+  updateCartBadge();
+}
+
+function renderStoreGrid(){
+  const grid=document.getElementById("store-grid");
+  if(!grid)return;
+  const rows=D.filter(r=>{
+    if(storeActiveCat!=="Todas"&&r.c!==storeActiveCat)return false;
+    if(storeSearch&&!r.n.toLowerCase().includes(storeSearch))return false;
+    // hide inactive products from store
+    if(stockState&&stockState[r.n]&&!stockState[r.n].activo)return false;
+    return true;
+  });
+  const st=stats;
+  grid.innerHTML=rows.map(r=>{
+    const v=pVentas[r.n]||0;
+    const compSt=st(r.p);
+    const inCart=cart[r.n]>0;
+    const qty=storeQtys[r.n]||1;
+    const stockInfo=stockState&&stockState[r.n]?stockState[r.n]:null;
+    const sinStock=stockInfo&&stockInfo.stock<=0;
+    const stockBajo=stockInfo&&stockInfo.stock>0&&stockInfo.stock<=stockInfo.stockMin;
+    const compLabel=compSt.mn&&v?v<=compSt.mn?`<span style="color:var(--success-fg);font-weight:600">✓ Mejor precio</span>`:v>=compSt.mx?`<span style="color:var(--danger)">Más caro del mercado</span>`:`Comp: ${fmt(compSt.mn)}–${fmt(compSt.mx)}`:"";
+    const stockBadge=sinStock?`<div style="position:absolute;top:8px;right:8px;background:var(--danger-bg);color:var(--danger-fg);font-size:9px;font-weight:700;padding:3px 7px;border-radius:10px">SIN STOCK</div>`:stockBajo?`<div style="position:absolute;top:8px;right:8px;background:var(--warn-bg);color:var(--warn-fg);font-size:9px;font-weight:700;padding:3px 7px;border-radius:10px">${stockInfo.stock} restantes</div>`:"";
+    return`<div class="prod-card" id="pcard-${r.n.replace(/\s/g,'_')}" style="position:relative;${sinStock?"opacity:.55":""}">
+      ${stockBadge}
+      <div class="prod-icon">${EMOJIS[r.n]||"🌿"}</div>
+      <div>
+        <div class="prod-name">${r.n}</div>
+        <div class="prod-unit">por ${r.u}</div>
+      </div>
+      <div class="prod-price">${fmt(v)}</div>
+      <div class="prod-comp">${compLabel}</div>
+      <div class="qty-row">
+        <button class="qty-btn" onclick="changeQty('${r.n}',-1)" ${sinStock?"disabled":""}>−</button>
+        <div class="qty-num" id="qty-${r.n.replace(/\s/g,'_')}">${qty}</div>
+        <button class="qty-btn" onclick="changeQty('${r.n}',1)" ${sinStock?"disabled":""}>+</button>
+      </div>
+      <button class="add-btn ${inCart?"added":""}" id="abtn-${r.n.replace(/\s/g,'_')}" onclick="addToCart('${r.n}')" ${sinStock?"disabled":""} style="${sinStock?"background:var(--ink-mute);cursor:not-allowed":""}">
+        ${sinStock?"Sin stock":inCart?`✓ En carrito (${cart[r.n]})`:"Agregar al carrito"}
+      </button>
+    </div>`;
+  }).join("")||`<div style="color:var(--ink-faint);font-size:13px;padding:1rem">Sin productos</div>`;
+}
+
+function changeQty(nombre,delta){
+  const key=nombre.replace(/\s/g,'_');
+  storeQtys[nombre]=Math.max(1,(storeQtys[nombre]||1)+delta);
+  const el=document.getElementById("qty-"+key);
+  if(el)el.textContent=storeQtys[nombre];
+}
+
+function addToCart(nombre){
+  const qty=storeQtys[nombre]||1;
+  cart[nombre]=(cart[nombre]||0)+qty;
+  storeQtys[nombre]=1;
+  updateCartBadge();
+  renderStoreGrid();
+  // flash open cart
+  openCart();
+  renderCartItems();
+  renderCartFoot();
+}
+
+function updateCartBadge(){
+  const total=Object.values(cart).reduce((a,b)=>a+b,0);
+  const badge=document.getElementById("cart-badge");
+  const label=document.getElementById("cart-label");
+  if(badge){badge.style.display=total>0?"flex":"none";badge.textContent=total;}
+  if(label){label.textContent=total>0?`(${total} items)`:"";}
+}
+
+function openCart(){
+  document.getElementById("cart-drawer").classList.add("open");
+  document.getElementById("cart-overlay").classList.add("open");
+  renderCartItems();
+  renderCartFoot();
+}
+function closeCart(){
+  document.getElementById("cart-drawer").classList.remove("open");
+  document.getElementById("cart-overlay").classList.remove("open");
+}
+
+function renderCartItems(){
+  const el=document.getElementById("cart-items");
+  if(!el)return;
+  const items=Object.entries(cart).filter(([,q])=>q>0);
+  if(!items.length){el.innerHTML=`<div class="cart-empty">🛒<br>Tu carrito está vacío</div>`;return;}
+  el.innerHTML=items.map(([nombre,qty])=>{
+    const r=D.find(x=>x.n===nombre);
+    const v=pVentas[nombre]||0;
+    return`<div class="cart-item">
+      <div class="cart-item-icon">${EMOJIS[nombre]||"🌿"}</div>
+      <div class="cart-item-info">
+        <div class="cart-item-name">${nombre}</div>
+        <div class="cart-item-unit">por ${r?r.u:""}</div>
+        <div class="cart-item-qty">
+          <button class="cqb" onclick="cartChangeQty('${nombre}',-1)">−</button>
+          <span class="cq-num">${qty}</span>
+          <button class="cqb" onclick="cartChangeQty('${nombre}',1)">+</button>
+          <button class="cqb" style="margin-left:4px;color:var(--danger);border-color:oklch(85% 0.05 25)" onclick="cartRemove('${nombre}')">✕</button>
+        </div>
+      </div>
+      <div class="cart-item-price">${fmt(v*qty)}</div>
+    </div>`;
+  }).join("");
+}
+
+function cartChangeQty(nombre,delta){
+  cart[nombre]=Math.max(0,(cart[nombre]||0)+delta);
+  if(cart[nombre]===0)delete cart[nombre];
+  updateCartBadge();
+  renderCartItems();
+  renderCartFoot();
+  renderStoreGrid();
+}
+function cartRemove(nombre){cartChangeQty(nombre,-(cart[nombre]||0));}
+
+function renderCartFoot(){
+  const subtotal=Object.entries(cart).reduce((acc,[n,q])=>acc+(pVentas[n]||0)*q,0);
+  const selEl=document.getElementById("cart-zona-sel");
+  const zi=selEl?parseInt(selEl.value):0;
+  const z=zonas[zi]||zonas[0];
+  const gratis=subtotal>=z.freeMin;
+  const costoEnvio=gratis?0:z.costoFijo;
+  const total=subtotal+costoEnvio;
+  const faltaStr=gratis?"":`Agregá ${fmt(z.freeMin-subtotal)} más para envío gratis`;
+  const envioColor=gratis?"var(--success-bg)":"var(--danger-bg)";
+  const envioText=gratis?"✓ Envío GRATIS incluido":`Costo de envío: ${fmt(z.costoFijo)}. ${faltaStr}`;
+  const subEl=document.getElementById("cart-sub");
+  const totEl=document.getElementById("cart-total-val");
+  const envEl=document.getElementById("cart-envio-info");
+  if(subEl)subEl.textContent=fmt(subtotal)||"$0";
+  if(totEl)totEl.textContent=fmt(total)||"$0";
+  if(envEl){envEl.style.background=envioColor;envEl.style.color=gratis?"var(--success-fg)":"var(--danger-fg)";envEl.textContent=envioText;}
+}
+
+function doCheckout(){
+  const items=Object.entries(cart).filter(([,q])=>q>0);
+  if(!items.length){alert("Tu carrito está vacío");return;}
+  const subtotal=Object.entries(cart).reduce((acc,[n,q])=>acc+(pVentas[n]||0)*q,0);
+  alert(`✓ Pedido recibido!\n\nProductos: ${items.length}\nTotal: ${fmt(subtotal)}\n\n(Demo: integrá con tu backend para procesarlo)`);}
+
+// ── TAB: RECETAS / COMBOS ──
+// Cada receta tiene ingredientes con cantidad base para 2 personas.
+// "factor" indica cómo escala: "lineal" multiplica, "fijo" no cambia, "sublineal" crece pero menos que lineal
+const RECETAS=[
+  {
+    id:"cesar",
+    emoji:"🥗",
+    nombre:"Ensalada César",
+    desc:"Clásica con lechuga, pollo grillado, croutones y aderezo.",
+    veg:false, tiempo:"25 min", dificultad:"Fácil",
+    ing:[
+      {n:"Lechuga", cantPorPersona:0.5, unidad:"unidad", factor:"sublineal"},
+      {n:"Huevos", cantPorPersona:0.5, unidad:"unidad", factor:"lineal"},
+      {n:"Limón", cantPorPersona:0.25, unidad:"kg", factor:"sublineal"},
+    ],
+    prep:["Lavá y cortá la lechuga en trozos grandes.","Herví los huevos 10 min, pelalos y cortalos en cuartos.","Doralo cubos de pan en sartén con aceite de oliva.","Mezclá todo con aderezo César y exprimí limón fresco encima."]
+  },
+  {
+    id:"tarta",
+    emoji:"🥧",
+    nombre:"Tarta de acelga",
+    desc:"Tarta clásica con acelga, cebolla y huevo.",
+    veg:true, tiempo:"50 min", dificultad:"Fácil",
+    ing:[
+      {n:"Acelga", cantPorPersona:1, unidad:"atado", factor:"sublineal"},
+      {n:"Cebolla", cantPorPersona:0.25, unidad:"kg", factor:"lineal"},
+      {n:"Huevos", cantPorPersona:1, unidad:"unidad", factor:"lineal"},
+    ],
+    prep:["Salteá la cebolla picada hasta dorarla.","Herví la acelga 5 min, escurrila bien y picala.","Mezclá acelga, cebolla y huevos batidos. Salpimentá.","Volcá sobre masa de tarta y horneá 30 min a 180°C."]
+  },
+  {
+    id:"locro",
+    emoji:"🍲",
+    nombre:"Locro",
+    desc:"Guiso espeso con zapallo, choclo y carne. Plato de invierno.",
+    veg:false, tiempo:"3 hs", dificultad:"Media",
+    ing:[
+      {n:"Zapallo kabutia", cantPorPersona:0.4, unidad:"unidad", factor:"sublineal"},
+      {n:"Choclo", cantPorPersona:0.5, unidad:"unidad", factor:"lineal"},
+      {n:"Cebolla", cantPorPersona:0.2, unidad:"kg", factor:"sublineal"},
+      {n:"Morrón rojo", cantPorPersona:0.5, unidad:"unidad", factor:"lineal"},
+      {n:"Batata", cantPorPersona:0.2, unidad:"kg", factor:"lineal"},
+    ],
+    prep:["Remojá maíz y porotos la noche anterior.","Cociná los porotos 1 hora.","Agregá carne, panceta, zapallo cortado y batata.","Cociná 1 hora más a fuego bajo, hasta que el zapallo se deshaga.","Servir con cebolla picada y morrón salteado encima."]
+  },
+  {
+    id:"sopa",
+    emoji:"🥣",
+    nombre:"Sopa de verduras",
+    desc:"Sopa nutritiva con verduras de estación. Calentita para el invierno.",
+    veg:true, tiempo:"45 min", dificultad:"Fácil",
+    ing:[
+      {n:"Zanahoria", cantPorPersona:0.2, unidad:"kg", factor:"lineal"},
+      {n:"Cebolla", cantPorPersona:0.15, unidad:"kg", factor:"sublineal"},
+      {n:"Apio", cantPorPersona:0.25, unidad:"unidad", factor:"sublineal"},
+      {n:"Papa", cantPorPersona:0.25, unidad:"kg", factor:"lineal"},
+      {n:"Puerro", cantPorPersona:0.25, unidad:"500g", factor:"sublineal"},
+    ],
+    prep:["Picá todas las verduras en cubos chicos.","Salteá cebolla, puerro y apio en una olla con aceite.","Agregá papa, zanahoria, y cubrí con caldo o agua.","Hervir 25 min hasta que todo esté tierno.","Procesar opcional para crema, o dejar entero."]
+  },
+  {
+    id:"gramajo",
+    emoji:"🍳",
+    nombre:"Revuelto Gramajo",
+    desc:"Plato porteño con papas pay, jamón y huevos revueltos.",
+    veg:false, tiempo:"30 min", dificultad:"Fácil",
+    ing:[
+      {n:"Papa", cantPorPersona:0.3, unidad:"kg", factor:"lineal"},
+      {n:"Huevos", cantPorPersona:2, unidad:"unidad", factor:"lineal"},
+      {n:"Cebolla", cantPorPersona:0.1, unidad:"kg", factor:"sublineal"},
+    ],
+    prep:["Cortá las papas en bastones bien finos y freílas hasta dorar.","Picá la cebolla y dorala en sartén con jamón cortado.","Batí los huevos apenas y volcalos sobre la cebolla.","Cuando los huevos cuajen, mezclá con las papas y servir."]
+  },
+  {
+    id:"wokverdura",
+    emoji:"🥢",
+    nombre:"Wok de verduras",
+    desc:"Salteado oriental rápido con verduras crocantes.",
+    veg:true, tiempo:"20 min", dificultad:"Fácil",
+    ing:[
+      {n:"Zanahoria", cantPorPersona:0.15, unidad:"kg", factor:"lineal"},
+      {n:"Morrón rojo", cantPorPersona:0.5, unidad:"unidad", factor:"lineal"},
+      {n:"Morrón verde", cantPorPersona:0.5, unidad:"unidad", factor:"lineal"},
+      {n:"Zapallito", cantPorPersona:0.2, unidad:"kg", factor:"lineal"},
+      {n:"Champiñones", cantPorPersona:0.5, unidad:"200g", factor:"lineal"},
+    ],
+    prep:["Cortá todas las verduras en juliana fina.","Calentá el wok bien caliente con aceite de sésamo.","Salteá las verduras más duras primero (zanahoria) y luego las blandas.","Terminá con salsa de soja y servir inmediatamente."]
+  },
+  {
+    id:"caprese",
+    emoji:"🍅",
+    nombre:"Ensalada Caprese",
+    desc:"Tomates, muzzarella y albahaca. Italiana clásica.",
+    veg:true, tiempo:"10 min", dificultad:"Fácil",
+    ing:[
+      {n:"Tomate cherry", cantPorPersona:0.5, unidad:"500g", factor:"lineal"},
+      {n:"Aceite de oliva", cantPorPersona:0.1, unidad:"500ml", factor:"sublineal"},
+    ],
+    prep:["Cortá tomates al medio y muzzarella en rodajas.","Disponé en plato alternando colores.","Rociá con aceite de oliva y vinagre balsámico.","Terminá con hojas de albahaca y sal gruesa."]
+  },
+  {
+    id:"gazpacho",
+    emoji:"🍅",
+    nombre:"Gazpacho",
+    desc:"Sopa fría española de tomate y morrón. Ideal verano.",
+    veg:true, tiempo:"15 min + frío", dificultad:"Fácil",
+    ing:[
+      {n:"Tomate cherry", cantPorPersona:0.4, unidad:"500g", factor:"lineal"},
+      {n:"Morrón rojo", cantPorPersona:0.5, unidad:"unidad", factor:"lineal"},
+      {n:"Morrón verde", cantPorPersona:0.5, unidad:"unidad", factor:"lineal"},
+      {n:"Cebolla", cantPorPersona:0.1, unidad:"kg", factor:"sublineal"},
+      {n:"Aceite de oliva", cantPorPersona:0.1, unidad:"500ml", factor:"sublineal"},
+    ],
+    prep:["Lavá y trozá todos los vegetales.","Procesá tomate, morrones, cebolla y un diente de ajo.","Agregá pan remojado, aceite de oliva y vinagre.","Refrigerá al menos 2 horas antes de servir bien frío."]
+  },
+  {
+    id:"tortilla",
+    emoji:"🥔",
+    nombre:"Tortilla española",
+    desc:"Tortilla de papa y huevo. Súper rendidora.",
+    veg:true, tiempo:"35 min", dificultad:"Media",
+    ing:[
+      {n:"Papa", cantPorPersona:0.3, unidad:"kg", factor:"lineal"},
+      {n:"Huevos", cantPorPersona:2, unidad:"unidad", factor:"lineal"},
+      {n:"Cebolla", cantPorPersona:0.15, unidad:"kg", factor:"sublineal"},
+    ],
+    prep:["Pelá y cortá papas en rodajas finas.","Freílas en abundante aceite con cebolla a fuego bajo, 20 min.","Escurrí, mezclá con huevos batidos y sal.","Cuajá en sartén 4 min por lado dándola vuelta con un plato."]
+  },
+  {
+    id:"hummus",
+    emoji:"🫘",
+    nombre:"Hummus casero",
+    desc:"Pasta de garbanzos para untar. Saludable y rendidor.",
+    veg:true, tiempo:"15 min", dificultad:"Fácil",
+    ing:[
+      {n:"Garbanzos", cantPorPersona:1, unidad:"500g", factor:"sublineal"},
+      {n:"Limón", cantPorPersona:0.1, unidad:"kg", factor:"sublineal"},
+      {n:"Aceite de oliva", cantPorPersona:0.1, unidad:"500ml", factor:"sublineal"},
+    ],
+    prep:["Si usás garbanzos secos, dejarlos en remojo 12 hs y cocinarlos.","Procesar garbanzos con jugo de limón, ajo, aceite de oliva y comino.","Agregar agua de cocción hasta lograr textura cremosa.","Servir con un chorrito de aceite y pimentón."]
+  },
+  {
+    id:"milanesanapo",
+    emoji:"🍖",
+    nombre:"Milanesa napolitana",
+    desc:"Milanesa con jamón, queso y salsa de tomate. Clásico argentino.",
+    veg:false, tiempo:"40 min", dificultad:"Fácil",
+    ing:[
+      {n:"Tomate cherry", cantPorPersona:0.3, unidad:"500g", factor:"lineal"},
+      {n:"Papa", cantPorPersona:0.25, unidad:"kg", factor:"lineal"},
+      {n:"Cebolla", cantPorPersona:0.1, unidad:"kg", factor:"sublineal"},
+    ],
+    prep:["Pasar las milanesas por huevo y pan rallado.","Freír o hornear hasta dorar.","Cubrir con salsa de tomate casera, jamón y queso.","Gratinar al horno 5 min hasta que se derrita el queso.","Acompañar con papas fritas o al horno."]
+  },
+  {
+    id:"riscoto",
+    emoji:"🍚",
+    nombre:"Risotto de hongos",
+    desc:"Arroz cremoso con hongos portobello y champiñones.",
+    veg:true, tiempo:"40 min", dificultad:"Media",
+    ing:[
+      {n:"Portobellos", cantPorPersona:0.5, unidad:"200g", factor:"lineal"},
+      {n:"Champiñones", cantPorPersona:0.5, unidad:"200g", factor:"lineal"},
+      {n:"Cebolla", cantPorPersona:0.15, unidad:"kg", factor:"sublineal"},
+      {n:"Aceite de oliva", cantPorPersona:0.1, unidad:"500ml", factor:"sublineal"},
+    ],
+    prep:["Picá cebolla fina y salteá en olla con manteca.","Agregá arroz arborio, tostar 2 min, deglasar con vino blanco.","Ir agregando caldo caliente de a poco, revolviendo.","Saltear hongos aparte y mezclar al final con queso parmesano."]
+  },
+  {
+    id:"pastasalsa",
+    emoji:"🍝",
+    nombre:"Pasta con salsa fresca",
+    desc:"Fideos con salsa de tomate cherry, ajo y albahaca.",
+    veg:true, tiempo:"25 min", dificultad:"Fácil",
+    ing:[
+      {n:"Tomate cherry", cantPorPersona:0.5, unidad:"500g", factor:"lineal"},
+      {n:"Cebolla", cantPorPersona:0.1, unidad:"kg", factor:"sublineal"},
+      {n:"Aceite de oliva", cantPorPersona:0.1, unidad:"500ml", factor:"sublineal"},
+    ],
+    prep:["Cortar tomates cherry al medio.","Saltear cebolla y ajo picado en aceite de oliva.","Sumar tomates y cocinar 10 min hasta que se rompan.","Mezclar con pasta cocida al dente y queso rallado."]
+  },
+  {
+    id:"rellpapa",
+    emoji:"🥔",
+    nombre:"Papas rellenas",
+    desc:"Papas al horno rellenas con verduras y queso.",
+    veg:true, tiempo:"60 min", dificultad:"Fácil",
+    ing:[
+      {n:"Papa", cantPorPersona:1, unidad:"kg", factor:"lineal"},
+      {n:"Espinaca", cantPorPersona:0.5, unidad:"atado", factor:"sublineal"},
+      {n:"Cebolla", cantPorPersona:0.1, unidad:"kg", factor:"sublineal"},
+    ],
+    prep:["Horneá papas enteras 45 min a 200°C.","Saltear espinaca picada con cebolla.","Abrir papas al medio, vaciar pulpa.","Mezclar pulpa con espinaca, rellenar y gratinar con queso."]
+  },
+  {
+    id:"buddhabowl",
+    emoji:"🥗",
+    nombre:"Buddha Bowl",
+    desc:"Bowl saludable con quinoa, palta, vegetales y legumbres.",
+    veg:true, tiempo:"30 min", dificultad:"Fácil",
+    ing:[
+      {n:"Quinoa", cantPorPersona:0.5, unidad:"250g", factor:"sublineal"},
+      {n:"Palta Hass", cantPorPersona:0.5, unidad:"unidad", factor:"lineal"},
+      {n:"Garbanzos", cantPorPersona:0.4, unidad:"500g", factor:"sublineal"},
+      {n:"Zanahoria", cantPorPersona:0.1, unidad:"kg", factor:"lineal"},
+      {n:"Rúcula", cantPorPersona:0.5, unidad:"unidad", factor:"lineal"},
+      {n:"Limón", cantPorPersona:0.1, unidad:"kg", factor:"sublineal"},
+    ],
+    prep:["Cocinar quinoa con doble cantidad de agua, 15 min.","Tostar garbanzos en sartén con especias.","Cortar palta y zanahoria rallada.","Armar el bowl con base de rúcula, quinoa al centro y vegetales alrededor.","Aderezar con jugo de limón, aceite de oliva y sal."]
+  },
+  {
+    id:"empanadas",
+    emoji:"🥟",
+    nombre:"Empanadas de verdura",
+    desc:"Empanadas rellenas con espinaca, acelga y queso.",
+    veg:true, tiempo:"60 min", dificultad:"Media",
+    ing:[
+      {n:"Espinaca", cantPorPersona:1, unidad:"atado", factor:"sublineal"},
+      {n:"Acelga", cantPorPersona:0.5, unidad:"atado", factor:"sublineal"},
+      {n:"Cebolla", cantPorPersona:0.1, unidad:"kg", factor:"sublineal"},
+      {n:"Huevos", cantPorPersona:0.5, unidad:"unidad", factor:"sublineal"},
+    ],
+    prep:["Hervir espinaca y acelga, escurrir bien y picar.","Saltear cebolla y mezclar con las verduras.","Sumar huevo duro picado, queso rallado y condimentar.","Rellenar tapas, hacer repulgue y hornear 20 min a 200°C."]
+  },
+  {
+    id:"frittata",
+    emoji:"🍳",
+    nombre:"Frittata de verduras",
+    desc:"Tortilla horneada con huevos, espinaca y morrones.",
+    veg:true, tiempo:"35 min", dificultad:"Fácil",
+    ing:[
+      {n:"Huevos", cantPorPersona:2, unidad:"unidad", factor:"lineal"},
+      {n:"Espinaca", cantPorPersona:0.5, unidad:"atado", factor:"sublineal"},
+      {n:"Morrón rojo", cantPorPersona:0.5, unidad:"unidad", factor:"lineal"},
+      {n:"Cebolla", cantPorPersona:0.1, unidad:"kg", factor:"sublineal"},
+    ],
+    prep:["Saltear cebolla y morrón en sartén apta para horno.","Agregar espinaca y cocinar hasta reducir.","Batir huevos con queso rallado y volcar sobre vegetales.","Cocinar 3 min en hornalla y terminar 10 min en horno fuerte."]
+  },
+  {
+    id:"curryverdura",
+    emoji:"🍛",
+    nombre:"Curry de verduras",
+    desc:"Curry indio con coliflor, zanahoria y garbanzos.",
+    veg:true, tiempo:"40 min", dificultad:"Media",
+    ing:[
+      {n:"Zanahoria", cantPorPersona:0.15, unidad:"kg", factor:"lineal"},
+      {n:"Cebolla", cantPorPersona:0.15, unidad:"kg", factor:"sublineal"},
+      {n:"Garbanzos", cantPorPersona:0.5, unidad:"500g", factor:"sublineal"},
+      {n:"Zapallo kabutia", cantPorPersona:0.3, unidad:"unidad", factor:"sublineal"},
+    ],
+    prep:["Saltear cebolla, ajo y jengibre con especias (curry, comino, cúrcuma).","Sumar verduras cortadas en cubos y garbanzos cocidos.","Agregar leche de coco y dejar cocinar 20 min.","Servir con arroz basmati y un toque de cilantro fresco."]
+  },
+  {
+    id:"sandwichcaprese",
+    emoji:"🥪",
+    nombre:"Sándwich Caprese",
+    desc:"Sándwich italiano con tomate, muzzarella y pesto de albahaca.",
+    veg:true, tiempo:"10 min", dificultad:"Fácil",
+    ing:[
+      {n:"Tomate cherry", cantPorPersona:0.3, unidad:"500g", factor:"lineal"},
+      {n:"Rúcula", cantPorPersona:0.5, unidad:"unidad", factor:"lineal"},
+      {n:"Aceite de oliva", cantPorPersona:0.05, unidad:"500ml", factor:"sublineal"},
+    ],
+    prep:["Cortar pan de campo en rebanadas y tostar levemente.","Untar con pesto de albahaca o mostaza.","Apilar tomates en rodajas, muzzarella y rúcula.","Rociar con aceite de oliva y servir."]
+  },
+  {
+    id:"smoothiebowl",
+    emoji:"🍌",
+    nombre:"Smoothie Bowl",
+    desc:"Desayuno energético con banana, frutas y semillas.",
+    veg:true, tiempo:"10 min", dificultad:"Fácil",
+    ing:[
+      {n:"Banana", cantPorPersona:0.25, unidad:"kg", factor:"lineal"},
+      {n:"Kiwi", cantPorPersona:0.25, unidad:"500g", factor:"lineal"},
+      {n:"Manzana verde", cantPorPersona:0.2, unidad:"kg", factor:"lineal"},
+    ],
+    prep:["Congelar las bananas la noche anterior.","Procesar bananas congeladas con yogur o leche vegetal.","Servir en bowl y decorar con kiwi y manzana en rodajas.","Terminar con granola, semillas y miel."]
+  },
+];
+
+let recetaSel=null;
+let recetaPersonas=2;
+
+function escalar(cant,personas,factor){
+  if(factor==="lineal")return cant*personas;
+  if(factor==="fijo")return cant*2;// no depende
+  // sublineal: crece pero menos que lineal — usamos formula tipo cant * personas^0.8
+  return cant*Math.pow(personas,0.85);
+}
+
+function renderRecetas(){
+  const p=document.getElementById("panel-recetas");
+  if(!p.dataset.init){
+    p.innerHTML=`
+      <div class="rec-header">
+        <h2>👨‍🍳 Combos por receta</h2>
+        <p>Elegí una receta y cantidad de personas. Te armamos el combo de verduras necesarias y lo agregás al carrito con un click.</p>
+      </div>
+      <div class="rec-grid" id="rec-grid"></div>
+      <div id="rec-detail-container"></div>`;
+    p.dataset.init="1";
+  }
+  renderRecGrid();
+  renderRecDetail();
+}
+
+function renderRecGrid(){
+  const grid=document.getElementById("rec-grid");
+  grid.innerHTML=RECETAS.map(r=>`
+    <div class="rec-card ${recetaSel===r.id?"sel":""}" onclick="selRecipe('${r.id}')">
+      <div class="rec-emoji">${r.emoji}</div>
+      <div class="rec-name">${r.nombre}</div>
+      <div class="rec-desc">${r.desc}</div>
+      <div class="rec-meta">
+        ${r.veg?'<span class="rec-tag veg">Vegetariana</span>':''}
+        <span class="rec-tag time">⏱ ${r.tiempo}</span>
+        <span class="rec-tag diff">${r.dificultad}</span>
+      </div>
+    </div>
+  `).join("");
+}
+
+function selRecipe(id){
+  recetaSel=recetaSel===id?null:id;
+  renderRecGrid();
+  renderRecDetail();
+}
+
+function changePersonas(delta){
+  recetaPersonas=Math.max(1,Math.min(20,recetaPersonas+delta));
+  renderRecDetail();
+}
+
+function renderRecDetail(){
+  const cont=document.getElementById("rec-detail-container");
+  if(!recetaSel){cont.innerHTML="";return;}
+  const r=RECETAS.find(x=>x.id===recetaSel);
+  if(!r){cont.innerHTML="";return;}
+
+  // Build ingredient list with calculated qty and price
+  let totalCombo=0;
+  let totalSuelto=0;
+  let allAvailable=true;
+  const ingHTML=r.ing.map(ing=>{
+    const cantNeeded=escalar(ing.cantPorPersona,recetaPersonas,ing.factor);
+    const cantRound=Math.ceil(cantNeeded*10)/10;// redondeo a 1 decimal hacia arriba
+    const cantDisplay=cantRound<1?cantRound.toFixed(2):cantRound%1===0?cantRound.toString():cantRound.toFixed(1);
+    const prod=D.find(x=>x.n===ing.n);
+    const emoji=EMOJIS[ing.n]||"🌿";
+    if(!prod){
+      allAvailable=false;
+      return`<div class="rec-ing-row miss">
+        <div class="rec-ing-icon">${emoji}</div>
+        <div class="rec-ing-info">
+          <div class="rec-ing-name">${ing.n}</div>
+          <div class="rec-ing-miss">No disponible en el catálogo</div>
+        </div>
+      </div>`;
+    }
+    const precioUnit=pVentas[ing.n]||0;
+    // unidades a comprar (redondeo hacia arriba)
+    const unidadesComprar=Math.ceil(cantRound);
+    const subtotal=precioUnit*unidadesComprar;
+    totalCombo+=subtotal;
+    totalSuelto+=subtotal;
+    return`<div class="rec-ing-row">
+      <div class="rec-ing-icon">${emoji}</div>
+      <div class="rec-ing-info">
+        <div class="rec-ing-name">${ing.n}</div>
+        <div class="rec-ing-cant">Necesitás: ${cantDisplay} ${ing.unidad} → comprar ${unidadesComprar} × ${prod.u}</div>
+      </div>
+      <div class="rec-ing-price">${fmt(subtotal)}</div>
+    </div>`;
+  }).join("");
+
+  // Apply 5% combo discount if all available
+  const descuentoPct=allAvailable?5:0;
+  const descuento=Math.round(totalCombo*descuentoPct/100);
+  const totalFinal=totalCombo-descuento;
+
+  cont.innerHTML=`
+    <div class="rec-detail">
+      <div class="rec-detail-head">
+        <div class="rec-detail-emoji">${r.emoji}</div>
+        <div class="rec-detail-info">
+          <h3>${r.nombre}</h3>
+          <p>${r.desc}</p>
+          <div class="rec-meta" style="margin-top:8px">
+            ${r.veg?'<span class="rec-tag veg">Vegetariana</span>':''}
+            <span class="rec-tag time">⏱ ${r.tiempo}</span>
+            <span class="rec-tag diff">${r.dificultad}</span>
+          </div>
+        </div>
+        <div class="rec-personas">
+          <span class="rec-personas-lbl">👥 Personas</span>
+          <button class="rec-personas-btn" onclick="changePersonas(-1)">−</button>
+          <span class="rec-personas-num">${recetaPersonas}</span>
+          <button class="rec-personas-btn" onclick="changePersonas(1)">+</button>
+        </div>
+      </div>
+
+      <div class="rec-ingredientes">
+        <div class="rec-ing-title">🛒 Ingredientes para ${recetaPersonas} ${recetaPersonas===1?"persona":"personas"}</div>
+        <div class="rec-ing-list">${ingHTML}</div>
+      </div>
+
+      <div class="rec-summary">
+        <div class="rec-summary-row"><span>Subtotal verduras</span><span>${fmt(totalCombo)}</span></div>
+        ${descuento>0?`<div class="rec-summary-row" style="color:var(--success-fg)"><span>Descuento combo (${descuentoPct}%)</span><span>−${fmt(descuento)}</span></div>`:''}
+        <div class="rec-summary-row total"><span>Total combo</span><span>${fmt(totalFinal)}</span></div>
+      </div>
+
+      <button class="rec-add-btn" onclick="agregarComboAlCarrito('${r.id}')" ${!allAvailable?'disabled':''}>
+        ${allAvailable?`🛒 Agregar combo al carrito (${fmt(totalFinal)})`:'Algunos ingredientes no están disponibles'}
+      </button>
+
+      <div class="rec-prep">
+        <h4>📝 Preparación</h4>
+        <ol>${r.prep.map(s=>`<li>${s}</li>`).join("")}</ol>
+      </div>
+    </div>`;
+}
+
+function agregarComboAlCarrito(recipeId){
+  const r=RECETAS.find(x=>x.id===recipeId);
+  if(!r)return;
+  let added=0;
+  r.ing.forEach(ing=>{
+    const prod=D.find(x=>x.n===ing.n);
+    if(!prod)return;
+    const cantNeeded=escalar(ing.cantPorPersona,recetaPersonas,ing.factor);
+    const unidades=Math.ceil(cantNeeded);
+    cart[ing.n]=(cart[ing.n]||0)+unidades;
+    added++;
+  });
+  updateCartBadge();
+  alert(`✓ Combo "${r.nombre}" agregado al carrito\n\n${added} productos para ${recetaPersonas} ${recetaPersonas===1?"persona":"personas"}.\nAndá a la tab "🛒 Tienda" para ver el carrito.`);
+}
+
+// ── TAB: UBICACIÓN ──
+// Ubicaciones aproximadas en CABA (lat, lng) basadas en lo declarado por cada verdulería
+// Competencia (verdulerías de referencia)
+const COMPETENCIA=[
+  {id:"barata",  nombre:"La Barata Shop",  color:"#e24b4a", direccion:"Palermo, CABA",        zona:"CABA",       lat:-34.5780, lng:-58.4300, tel:"+54 9 11 4192-0076", web:"labarata.shop", entrega:"Todos los días", mia:false},
+  {id:"verde",   nombre:"Verde Puro",      color:"#1d9e75", direccion:"Zona Norte, GBA",      zona:"Zona Norte", lat:-34.4708, lng:-58.5230, tel:"+54 11 2669-1368", web:"verdepuro.com.ar", entrega:"Lun a Vie", mia:false},
+  {id:"click",   nombre:"El Click Bolsones",color:"#7f77dd", direccion:"CABA y AMBA",         zona:"CABA + AMBA",lat:-34.6118, lng:-58.4173, tel:"-", web:"elclick.com.ar", entrega:"Lun a Vie", mia:false},
+  {id:"nico",    nombre:"Verdulería de Nico",color:"#ef9f27", direccion:"Zona Norte, GBA",    zona:"Zona Norte", lat:-34.4900, lng:-58.5000, tel:"-", web:"-", entrega:"A coordinar", mia:false},
+];
+
+// TIENDAS combina mis verdulerías (tenants con coords) + competencia
+function getAllTiendas(){
+  const mias=Object.values(tenants||{}).filter(t=>t.lat!=null&&t.lng!=null).map(t=>({
+    id:"tenant_"+t.id,
+    nombre:t.nombre,
+    color:"#2a5f7a",// petróleo: marca propia (no verde)
+    direccion:t.direccion||"-",
+    zona:t.zona||"-",
+    lat:t.lat,
+    lng:t.lng,
+    tel:t.tel||"-",
+    web:"-",
+    entrega:t.diasEnvio||"-",
+    icono:t.icono||"🥬",
+    mia:true,
+    tenantId:t.id,
+  }));
+  return[...mias,...COMPETENCIA];
+}
+
+let userLocation=null;
+let selectedTienda=null;
+let mapInstance=null;
+let userMarker=null;
+let tiendaMarkers={};
+const DEFAULT_CENTER={lat:-34.6037, lng:-58.3816};// CABA centro
+
+// Haversine distance in km
+function distKm(a,b){
+  const R=6371;
+  const dLat=(b.lat-a.lat)*Math.PI/180;
+  const dLng=(b.lng-a.lng)*Math.PI/180;
+  const x=Math.sin(dLat/2)**2+Math.cos(a.lat*Math.PI/180)*Math.cos(b.lat*Math.PI/180)*Math.sin(dLng/2)**2;
+  return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x));
+}
+
+function tiendasOrdenadas(){
+  const all=getAllTiendas();
+  if(!userLocation)return all.map(t=>({...t,dist:null}));
+  return all.map(t=>({...t,dist:distKm(userLocation,t)})).sort((a,b)=>a.dist-b.dist);
+}
+
+function renderUbicacion(){
+  const p=document.getElementById("panel-ubicacion");
+  if(!p.dataset.init){
+    p.innerHTML=`
+      <div class="rec-header">
+        <h2>📍 Encontrá la verdulería más cercana</h2>
+        <p>Configurá tu dirección o usá tu ubicación actual para ver qué verdulería tenés más cerca.</p>
+      </div>
+      <div class="ubi-grid">
+        <div id="map-container"></div>
+        <div class="ubi-side">
+          <div class="ubi-card">
+            <h3>🏠 Tu ubicación</h3>
+            <div class="ubi-input-row">
+              <input type="text" id="ubi-addr" placeholder="Ej: Av. Corrientes 1234, CABA">
+              <button class="ubi-btn" onclick="buscarDireccion()">Buscar</button>
+            </div>
+            <button class="ubi-btn alt" style="width:100%;height:32px" onclick="usarMiUbicacion()">📡 Usar mi ubicación actual</button>
+            <div class="ubi-current" id="ubi-current">Aún no configuraste una ubicación</div>
+          </div>
+          <div class="ubi-card">
+            <h3>🥬 Verdulerías disponibles</h3>
+            <div class="tienda-list" id="tienda-list"></div>
+          </div>
+        </div>
+      </div>`;
+    p.dataset.init="1";
+    // Init map once
+    setTimeout(()=>initMap(),50);
+  } else {
+    if(mapInstance){
+      setTimeout(()=>mapInstance.invalidateSize(),50);
+    }
+  }
+  renderTiendaList();
+  renderUbiCurrent();
+}
+
+function initMap(){
+  if(mapInstance)return;
+  if(typeof L==="undefined"){
+    document.getElementById("map-container").innerHTML=`<div style="padding:2rem;text-align:center;color:var(--ink-soft)">No se pudo cargar el mapa. Verificá tu conexión a internet.</div>`;
+    return;
+  }
+  mapInstance=L.map("map-container").setView([DEFAULT_CENTER.lat,DEFAULT_CENTER.lng],11);
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{
+    attribution:'© OpenStreetMap',
+    maxZoom:19
+  }).addTo(mapInstance);
+
+  rebuildMapMarkers();
+
+  // map click sets user location
+  mapInstance.on("click",e=>{
+    setUserLocation(e.latlng.lat,e.latlng.lng,"Punto seleccionado en el mapa");
+  });
+}
+
+function rebuildMapMarkers(){
+  if(!mapInstance)return;
+  // Remove existing markers
+  Object.values(tiendaMarkers).forEach(m=>mapInstance.removeLayer(m));
+  tiendaMarkers={};
+  // Add markers for all tiendas (mine + competition)
+  getAllTiendas().forEach(t=>{
+    const isMine=t.mia;
+    const size=isMine?36:30;
+    const ring=isMine?"3px solid #fff;outline:2px solid var(--brand);outline-offset:1px":"3px solid #fff";
+    const content=isMine?(t.icono||"🏪"):t.nombre[0];
+    const icon=L.divIcon({
+      className:"tienda-marker",
+      html:`<div style="width:${size}px;height:${size}px;background:${t.color};border:${ring};border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.3);color:#fff;font-weight:700;font-size:${isMine?"16px":"13px"}">${content}</div>`,
+      iconSize:[size,size],
+      iconAnchor:[size/2,size/2]
+    });
+    const marker=L.marker([t.lat,t.lng],{icon}).addTo(mapInstance);
+    const tag=isMine?'<span style="background:var(--brand);color:#fff;font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;margin-left:6px">MI VERDULERÍA</span>':'<span style="background:var(--ink-soft);color:#fff;font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;margin-left:6px">REFERENCIA</span>';
+    marker.bindPopup(`<b>${t.nombre}${tag}</b>${t.direccion}<br><span style="color:var(--ink-soft)">${t.zona}</span><br>📦 ${t.entrega}`);
+    marker.on("click",()=>selectTienda(t.id));
+    tiendaMarkers[t.id]=marker;
+  });
+}
+
+function setUserLocation(lat,lng,label){
+  userLocation={lat,lng,label};
+  if(!mapInstance)return;
+  if(userMarker)mapInstance.removeLayer(userMarker);
+  const icon=L.divIcon({
+    className:"user-marker",
+    html:`<div style="width:22px;height:22px;background:var(--info);border:3px solid #fff;border-radius:50%;box-shadow:0 2px 8px rgba(0,0,0,.4)"></div>`,
+    iconSize:[22,22],
+    iconAnchor:[11,11]
+  });
+  userMarker=L.marker([lat,lng],{icon}).addTo(mapInstance);
+  userMarker.bindPopup(`<b>📍 Tu ubicación</b>${label||""}`);
+  // Auto-select closest tienda
+  const ordered=tiendasOrdenadas();
+  if(ordered[0])selectedTienda=ordered[0].id;
+  // Fit map to show user + closest tienda
+  if(ordered[0]){
+    const bounds=L.latLngBounds([[lat,lng],[ordered[0].lat,ordered[0].lng]]).pad(0.3);
+    mapInstance.fitBounds(bounds);
+  } else {
+    mapInstance.setView([lat,lng],13);
+  }
+  renderTiendaList();
+  renderUbiCurrent();
+}
+
+function selectTienda(id){
+  selectedTienda=id;
+  renderTiendaList();
+  const t=getAllTiendas().find(x=>x.id===id);
+  if(t&&mapInstance){
+    mapInstance.setView([t.lat,t.lng],14);
+    if(tiendaMarkers[id])tiendaMarkers[id].openPopup();
+  }
+}
+
+function renderTiendaList(){
+  const el=document.getElementById("tienda-list");
+  if(!el)return;
+  const ordered=tiendasOrdenadas();
+  if(!userLocation){
+    el.innerHTML=`<div class="tienda-empty">Configurá tu ubicación para ver las verdulerías ordenadas por cercanía.</div>` +
+      ordered.map(t=>`
+        <div class="tienda-row ${selectedTienda===t.id?"sel":""} ${t.mia?"is-mia":""}" onclick="selectTienda('${t.id}')">
+          <div class="tienda-top">
+            <div class="tienda-color" style="background:${t.color}"></div>
+            <div class="tienda-name">${t.mia?(t.icono||"🏪")+" ":""}${t.nombre}</div>
+            ${t.mia?'<span class="mia-badge">MÍA</span>':''}
+          </div>
+          <div class="tienda-addr">${t.direccion}</div>
+          <div class="tienda-meta"><span class="tienda-tiempo">${t.zona}</span><span class="tienda-tiempo">📦 ${t.entrega}</span></div>
+        </div>
+      `).join("");
+    return;
+  }
+  el.innerHTML=ordered.map((t,i)=>{
+    const distStr=t.dist<1?`${Math.round(t.dist*1000)} m`:`${t.dist.toFixed(1)} km`;
+    const tiempo=Math.round(t.dist*4+15);// estimación rough delivery
+    return`
+      <div class="tienda-row ${selectedTienda===t.id?"sel":""} ${i===0?"closest":""} ${t.mia?"is-mia":""}" onclick="selectTienda('${t.id}')">
+        ${i===0?'<div class="closest-badge">⭐ MÁS CERCA</div>':''}
+        <div class="tienda-top">
+          <div class="tienda-color" style="background:${t.color}"></div>
+          <div class="tienda-name">${t.mia?(t.icono||"🏪")+" ":""}${t.nombre}</div>
+          ${t.mia?'<span class="mia-badge">MÍA</span>':''}
+          <div class="tienda-dist">${distStr}</div>
+        </div>
+        <div class="tienda-addr">${t.direccion}</div>
+        <div class="tienda-meta"><span class="tienda-tiempo">⏱ ~${tiempo} min</span><span class="tienda-tiempo">📦 ${t.entrega}</span></div>
+      </div>`;
+  }).join("");
+}
+
+function renderUbiCurrent(){
+  const el=document.getElementById("ubi-current");
+  if(!el)return;
+  if(!userLocation){
+    el.innerHTML=`<em style="color:var(--ink-mute)">Aún no configuraste una ubicación</em>`;
+    return;
+  }
+  const ordered=tiendasOrdenadas();
+  const closest=ordered[0];
+  const distStr=closest?(closest.dist<1?`${Math.round(closest.dist*1000)} m`:`${closest.dist.toFixed(1)} km`):"-";
+  el.innerHTML=`
+    <strong>${userLocation.label||"Ubicación seleccionada"}</strong><br>
+    Coordenadas: ${userLocation.lat.toFixed(4)}, ${userLocation.lng.toFixed(4)}<br>
+    ${closest?`Más cercana: <strong>${closest.nombre}</strong> a ${distStr}`:""}`;
+}
+
+async function buscarDireccion(){
+  const input=document.getElementById("ubi-addr");
+  const q=input.value.trim();
+  if(!q){alert("Ingresá una dirección");return;}
+  // Append Argentina if not specified
+  const query=q.toLowerCase().includes("argentina")?q:`${q}, Buenos Aires, Argentina`;
+  try{
+    const r=await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`);
+    const data=await r.json();
+    if(!data.length){alert("No se encontró la dirección. Probá con más detalle (ej: calle, número, barrio)");return;}
+    const result=data[0];
+    setUserLocation(parseFloat(result.lat),parseFloat(result.lon),result.display_name.split(",").slice(0,3).join(","));
+  }catch(e){
+    alert("Error al buscar la dirección: "+e.message);
+  }
+}
+
+function usarMiUbicacion(){
+  if(!navigator.geolocation){alert("Tu navegador no soporta geolocalización");return;}
+  navigator.geolocation.getCurrentPosition(
+    pos=>{
+      setUserLocation(pos.coords.latitude,pos.coords.longitude,"Tu ubicación actual (GPS)");
+    },
+    err=>{
+      alert("No se pudo obtener tu ubicación: "+err.message+"\n\nProbá ingresar la dirección manualmente.");
+    },
+    {enableHighAccuracy:true,timeout:10000}
+  );
+}
+
+// ── TAB: STOCK Y PRECIOS ──
+// stock state per product
+let stockState={};
+// seed deterministico: hash del nombre para que el demo no cambie en cada reload
+function _seedFromName(s){let h=0;for(let i=0;i<s.length;i++){h=(h*31+s.charCodeAt(i))>>>0}return(h%1000)/1000}
+D.forEach(r=>{
+  const rnd=_seedFromName(r.n);
+  stockState[r.n]={
+    activo: rnd > 0.05,
+    stock: rnd > 0.85 ? 0 : Math.floor(rnd*40)+2,
+    stockMin: 5,
+  };
+});
+
+let stockFilters={cat:"Todas",search:"",status:"all"};
+let stockSort={col:null,dir:1};
+let stockOriginalVals={};// track original to highlight changes
+
+function stockStatus(n){
+  const s=stockState[n];
+  if(!s||!s.activo)return"off";
+  if(s.stock<=0)return"out";
+  if(s.stock<=s.stockMin)return"low";
+  return"ok";
+}
+function stockStatusLabel(st){
+  return{ok:"✓ OK",low:"⚠ Bajo",out:"✗ Sin stock",off:"○ Inactivo"}[st]||"";
+}
+
+function renderStock(){
+  const p=document.getElementById("panel-stock");
+  if(!p.dataset.init){
+    p.innerHTML=`
+      <div class="rec-header">
+        <h2>📦 Gestión de precios y stock</h2>
+        <p>Activá/desactivá productos, ajustá precios de venta y costos, y controlá el stock disponible.</p>
+      </div>
+      <div class="summary-bar" id="stock-summary"></div>
+      <div class="stock-toolbar">
+        <input type="text" id="stock-search" placeholder="Buscar producto..." oninput="stockFilters.search=this.value.toLowerCase();renderStockTable();renderStockSummary()">
+        <div class="fbts" id="stock-cats"></div>
+        <div class="fbts" id="stock-status-filter"></div>
+        <button class="primary" onclick="bulkActivate(true)">✓ Activar todos</button>
+        <button class="danger" onclick="bulkActivate(false)">✗ Desactivar todos</button>
+        <button onclick="document.getElementById('bulk-panel').style.display=document.getElementById('bulk-panel').style.display==='none'?'flex':'none'">⚙ Acciones masivas</button>
+        <button onclick="exportCSV()">⬇ Exportar CSV</button>
+      </div>
+      <div class="bulk-update" id="bulk-panel" style="display:none;margin-bottom:1rem">
+        <span>Aplicar a filtrados:</span>
+        <span>Aumentar precio</span>
+        <input type="number" id="bulk-price-pct" value="10" min="-50" max="100">
+        <span>%</span>
+        <button class="primary" onclick="bulkAdjustPrices()">Aplicar</button>
+        <span style="margin-left:14px">Stock mínimo:</span>
+        <input type="number" id="bulk-stock-min" value="5" min="0">
+        <button class="primary" onclick="bulkSetStockMin()">Aplicar</button>
+        <span style="margin-left:14px">Reponer stock:</span>
+        <input type="number" id="bulk-restock" value="50" min="0">
+        <button class="primary" onclick="bulkRestock()">Aplicar</button>
+      </div>
+      <div class="ow">
+        <table class="stock-table" id="stock-table-el">
+          <thead><tr>
+            <th><input type="checkbox" class="stock-check" id="stock-all-check" onchange="toggleAll(this.checked)"></th>
+            <th class="namec sortable" data-col="name">Producto <span class="arr">⇅</span></th>
+            <th class="sortable" data-col="cat">Categoría <span class="arr">⇅</span></th>
+            <th class="sortable" data-col="costo">Costo <span class="arr">⇅</span></th>
+            <th class="sortable" data-col="venta">Precio venta <span class="arr">⇅</span></th>
+            <th class="sortable" data-col="margen">Margen <span class="arr">⇅</span></th>
+            <th class="sortable" data-col="stock">Stock <span class="arr">⇅</span></th>
+            <th class="sortable" data-col="stockMin">Mín <span class="arr">⇅</span></th>
+            <th class="sortable" data-col="status">Estado <span class="arr">⇅</span></th>
+            <th>Acciones</th>
+          </tr></thead>
+          <tbody id="stock-tbody"></tbody>
+        </table>
+      </div>
+      <p class="foot">Tip: Los cambios se reflejan en tiempo real en las otras tabs (Margen bruto, Tienda, Recetas). Productos inactivos no aparecen en la Tienda.</p>`;
+    p.dataset.init="1";
+    // build cat filters
+    const fc=document.getElementById("stock-cats");
+    CATS.forEach(c=>{
+      const b=document.createElement("button");
+      b.className="fb"+(c==="Todas"?" on":"");
+      b.textContent=c;
+      b.onclick=()=>{
+        stockFilters.cat=c;
+        fc.querySelectorAll(".fb").forEach(x=>x.classList.remove("on"));
+        b.classList.add("on");
+        renderStockTable();renderStockSummary();
+      };
+      fc.appendChild(b);
+    });
+    // build status filters
+    const fs=document.getElementById("stock-status-filter");
+    [["all","Todos"],["ok","Con stock"],["low","Bajos"],["out","Sin stock"],["off","Inactivos"]].forEach(([k,v])=>{
+      const b=document.createElement("button");
+      b.className="fb"+(k==="all"?" on":"");
+      b.textContent=v;
+      b.onclick=()=>{
+        stockFilters.status=k;
+        fs.querySelectorAll(".fb").forEach(x=>x.classList.remove("on"));
+        b.classList.add("on");
+        renderStockTable();renderStockSummary();
+      };
+      fs.appendChild(b);
+    });
+    // sortable headers
+    p.querySelectorAll(".stock-table th.sortable").forEach(th=>{
+      th.onclick=()=>{
+        const c=th.dataset.col;
+        if(stockSort.col===c){
+          if(stockSort.dir===1)stockSort.dir=-1;
+          else{stockSort.col=null;stockSort.dir=1;}
+        } else {stockSort.col=c;stockSort.dir=1;}
+        p.querySelectorAll(".arr").forEach(a=>a.textContent="⇅");
+        if(stockSort.col){
+          const arr=th.querySelector(".arr");
+          if(arr)arr.textContent=stockSort.dir===1?"▲":"▼";
+        }
+        renderStockTable();
+      };
+    });
+  }
+  renderStockSummary();
+  renderStockTable();
+}
+
+function filteredStock(){
+  return D.filter(r=>{
+    if(stockFilters.cat!=="Todas"&&r.c!==stockFilters.cat)return false;
+    if(stockFilters.search&&!r.n.toLowerCase().includes(stockFilters.search))return false;
+    if(stockFilters.status!=="all"&&stockStatus(r.n)!==stockFilters.status)return false;
+    return true;
+  });
+}
+
+function renderStockSummary(){
+  const el=document.getElementById("stock-summary");
+  if(!el)return;
+  const all=D;
+  const activos=all.filter(r=>stockState[r.n].activo);
+  const bajos=all.filter(r=>stockStatus(r.n)==="low");
+  const sinStock=all.filter(r=>stockStatus(r.n)==="out");
+  const valorTotal=all.reduce((a,r)=>{
+    return a+(stockState[r.n].activo?stockState[r.n].stock*(costos[r.n]||0):0);
+  },0);
+  const margProm=(()=>{
+    const arr=activos.map(r=>margen(costos[r.n],pVentas[r.n])).filter(x=>x!=null);
+    return arr.length?arr.reduce((a,b)=>a+b,0)/arr.length:0;
+  })();
+  el.innerHTML=`
+    <div class="summary-card ok"><div class="lbl">Activos</div><div class="val">${activos.length}/${all.length}</div></div>
+    <div class="summary-card warn"><div class="lbl">Stock bajo</div><div class="val">${bajos.length}</div></div>
+    <div class="summary-card bad"><div class="lbl">Sin stock</div><div class="val">${sinStock.length}</div></div>
+    <div class="summary-card"><div class="lbl">Valor stock</div><div class="val">${fmt(valorTotal)||"$0"}</div></div>
+    <div class="summary-card ${margProm>=margenObj?"ok":margProm>=20?"warn":"bad"}"><div class="lbl">Margen prom</div><div class="val">${Math.round(margProm)}%</div></div>`;
+}
+
+function renderStockTable(){
+  let rows=filteredStock();
+  if(stockSort.col){
+    rows=[...rows].sort((a,b)=>{
+      let va,vb;
+      const c=stockSort.col;
+      if(c==="name"){va=a.n;vb=b.n;}
+      else if(c==="cat"){va=a.c;vb=b.c;}
+      else if(c==="costo"){va=costos[a.n]||0;vb=costos[b.n]||0;}
+      else if(c==="venta"){va=pVentas[a.n]||0;vb=pVentas[b.n]||0;}
+      else if(c==="margen"){va=margen(costos[a.n],pVentas[a.n])||0;vb=margen(costos[b.n],pVentas[b.n])||0;}
+      else if(c==="stock"){va=stockState[a.n].stock;vb=stockState[b.n].stock;}
+      else if(c==="stockMin"){va=stockState[a.n].stockMin;vb=stockState[b.n].stockMin;}
+      else if(c==="status"){va=stockStatus(a.n);vb=stockStatus(b.n);}
+      if(typeof va==="string")return va.localeCompare(vb)*stockSort.dir;
+      return(va-vb)*stockSort.dir;
+    });
+  }
+  const tb=document.getElementById("stock-tbody");
+  if(!tb)return;
+  tb.innerHTML=rows.map(r=>{
+    const s=stockState[r.n];
+    const c=costos[r.n]||0,v=pVentas[r.n]||0;
+    const mg=margen(c,v);
+    const mgClass=mg>=margenObj?"good":mg>=20?"warn":"bad";
+    const st=stockStatus(r.n);
+    const stLabel=stockStatusLabel(st);
+    const emoji=EMOJIS[r.n]||"🌿";
+    return`<tr class="stock-row ${!s.activo?"disabled":""}">
+      <td><input type="checkbox" class="stock-check" ${s.activo?"checked":""} onchange="toggleActive('${r.n}',this.checked)"></td>
+      <td class="name-td"><span class="stock-emoji">${emoji}</span><span class="stock-name">${r.n}</span><span class="stock-unit">por ${r.u}</span></td>
+      <td><span style="font-size:11px;color:var(--ink-soft)">${r.c}</span></td>
+      <td><input type="number" class="stock-input" value="${c}" onchange="updateField('${r.n}','costo',this.value)"></td>
+      <td><input type="number" class="stock-input" value="${v}" onchange="updateField('${r.n}','venta',this.value)"></td>
+      <td><span class="stock-margen-mini ${mgClass}">${mg?Math.round(mg)+"%":"—"}</span></td>
+      <td><input type="number" class="stock-input qty" value="${s.stock}" min="0" onchange="updateField('${r.n}','stock',this.value)"></td>
+      <td><input type="number" class="stock-input qty" value="${s.stockMin}" min="0" onchange="updateField('${r.n}','stockMin',this.value)"></td>
+      <td><span class="stock-status ${st}">${stLabel}</span></td>
+      <td><div class="stock-actions">
+        <button class="stock-act-btn" title="Reponer +20" onclick="repon('${r.n}',20)">+20</button>
+        <button class="stock-act-btn" title="Vaciar stock" onclick="updateField('${r.n}','stock',0)">∅</button>
+      </div></td>
+    </tr>`;
+  }).join("")||`<tr><td colspan="10" style="text-align:center;padding:1.5rem;color:var(--ink-faint)">Sin productos para mostrar</td></tr>`;
+}
+
+function toggleActive(n,active){
+  stockState[n].activo=active;
+  renderStockTable();renderStockSummary();
+}
+
+function toggleAll(checked){
+  filteredStock().forEach(r=>{stockState[r.n].activo=checked;});
+  renderStockTable();renderStockSummary();
+}
+
+function updateField(n,field,val){
+  const num=parseInt(val)||0;
+  if(field==="costo")costos[n]=num;
+  else if(field==="venta")pVentas[n]=num;
+  else if(field==="stock")stockState[n].stock=Math.max(0,num);
+  else if(field==="stockMin")stockState[n].stockMin=Math.max(0,num);
+  renderStockTable();renderStockSummary();
+  // also refresh other tabs if they exist
+  const mgEl=document.getElementById("tb-margen");if(mgEl&&typeof renderMargenTable==="function")renderMargenTable();
+  const mgCards=document.getElementById("cards-margen");if(mgCards&&typeof renderMargenCards==="function")renderMargenCards();
+}
+
+function repon(n,qty){
+  stockState[n].stock+=qty;
+  renderStockTable();renderStockSummary();
+}
+
+function bulkActivate(active){
+  filteredStock().forEach(r=>{stockState[r.n].activo=active;});
+  renderStockTable();renderStockSummary();
+}
+
+function bulkAdjustPrices(){
+  const pct=parseFloat(document.getElementById("bulk-price-pct").value)||0;
+  if(!confirm(`¿Aplicar ajuste de ${pct>=0?"+":""}${pct}% a ${filteredStock().length} productos?`))return;
+  filteredStock().forEach(r=>{
+    const v=pVentas[r.n]||0;
+    pVentas[r.n]=Math.round(v*(1+pct/100));
+  });
+  renderStockTable();renderStockSummary();
+  alert(`✓ Precios actualizados (${pct>=0?"+":""}${pct}%)`);
+}
+
+function bulkSetStockMin(){
+  const v=parseInt(document.getElementById("bulk-stock-min").value)||0;
+  filteredStock().forEach(r=>{stockState[r.n].stockMin=v;});
+  renderStockTable();renderStockSummary();
+}
+
+function bulkRestock(){
+  const v=parseInt(document.getElementById("bulk-restock").value)||0;
+  filteredStock().forEach(r=>{stockState[r.n].stock=v;});
+  renderStockTable();renderStockSummary();
+  alert(`✓ Stock repuesto a ${v} unidades`);
+}
+
+function exportCSV(){
+  const rows=filteredStock();
+  const headers=["Producto","Categoría","Unidad","Activo","Costo","Precio venta","Margen %","Stock","Stock mín","Estado","Proveedor"];
+  const csv=[headers.join(",")];
+  rows.forEach(r=>{
+    const s=stockState[r.n];
+    const mg=margen(costos[r.n],pVentas[r.n]);
+    csv.push([
+      `"${r.n}"`,r.c,r.u,s.activo?"Sí":"No",
+      costos[r.n]||0,pVentas[r.n]||0,mg?Math.round(mg):0,
+      s.stock,s.stockMin,stockStatusLabel(stockStatus(r.n)),
+      `"${proveedores[r.n]||""}"`
+    ].join(","));
+  });
+  const blob=new Blob([csv.join("\n")],{type:"text/csv;charset=utf-8;"});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");
+  a.href=url;a.download=`stock_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();URL.revokeObjectURL(url);
+}
+
+// ─── MULTI-TENANT SYSTEM ──────────────────────────────────
+// Each tenant has its own snapshot of costos, pVentas, stockState, zonas, proveedores
+let tenants={};// id -> tenantData
+let currentTenantId="default";
+let editingTenant=null;// for form
+
+function snapshotCurrentState(){
+  return{
+    costos:JSON.parse(JSON.stringify(costos)),
+    pVentas:JSON.parse(JSON.stringify(pVentas)),
+    stockState:JSON.parse(JSON.stringify(stockState)),
+    zonas:JSON.parse(JSON.stringify(zonas)),
+    proveedores:JSON.parse(JSON.stringify(proveedores)),
+    margenObj:margenObj,
+  };
+}
+
+function loadTenantState(t){
+  if(!t||!t.data)return;
+  costos=JSON.parse(JSON.stringify(t.data.costos));
+  pVentas=JSON.parse(JSON.stringify(t.data.pVentas));
+  stockState=JSON.parse(JSON.stringify(t.data.stockState));
+  zonas=JSON.parse(JSON.stringify(t.data.zonas));
+  proveedores=JSON.parse(JSON.stringify(t.data.proveedores));
+  margenObj=t.data.margenObj||40;
+}
+
+function initTenants(){
+  // Save the original "default" tenant from initial state
+  tenants["default"]={
+    id:"default",
+    nombre:"Verdulería Principal",
+    icono:"🥬",
+    zona:"CABA",
+    direccion:"Palermo, CABA",
+    tel:"+54 11 4192-0076",
+    diasEnvio:"Lun-Vie",
+    lat:-34.5870, lng:-58.4250,
+    creada:"2025-01-15",
+    data:snapshotCurrentState(),
+  };
+  // Add 2 example tenants with variations
+  const t2State=snapshotCurrentState();
+  Object.keys(t2State.pVentas).forEach(k=>{t2State.pVentas[k]=Math.round(t2State.pVentas[k]*1.10);});
+  Object.keys(t2State.stockState).forEach(k=>{t2State.stockState[k].stock=Math.floor(Math.random()*25)+1;});
+  tenants["norte"]={
+    id:"norte",nombre:"Sucursal Zona Norte",icono:"🌿",
+    zona:"Zona Norte",direccion:"San Isidro, GBA",
+    tel:"+54 11 5555-1234",diasEnvio:"Lun-Sab",
+    lat:-34.4710, lng:-58.5060,
+    creada:"2025-03-10",data:t2State,
+  };
+  const t3State=snapshotCurrentState();
+  Object.keys(t3State.pVentas).forEach(k=>{t3State.pVentas[k]=Math.round(t3State.pVentas[k]*1.25);});
+  Object.keys(t3State.stockState).forEach(k=>{t3State.stockState[k].stock=Math.floor(Math.random()*15)+3;});
+  tenants["organico"]={
+    id:"organico",nombre:"Verde Orgánico",icono:"🌱",
+    zona:"CABA Premium",direccion:"Recoleta, CABA",
+    tel:"+54 11 4444-9876",diasEnvio:"Lun-Vie",
+    lat:-34.5880, lng:-58.3960,
+    creada:"2025-04-22",data:t3State,
+  };
+}
+
+function switchTenant(id){
+  if(id===currentTenantId)return;
+  // Save current state before switching
+  tenants[currentTenantId].data=snapshotCurrentState();
+  // Load new tenant
+  const t=tenants[id];
+  if(!t){alert("Verdulería no encontrada");return;}
+  loadTenantState(t);
+  currentTenantId=id;
+  // Reset transient UI state
+  cart={};
+  storeQtys={};
+  D.forEach(r=>{storeQtys[r.n]=1;});
+  // Re-render everything visible EXCEPT ubicacion (we keep its map alive)
+  ["original","kg","margen","sugeridos","envio","estacional","proveedor","tienda","recetas","stock","dashboard"].forEach(id=>{
+    const p=document.getElementById("panel-"+id);
+    if(p)delete p.dataset.init;
+  });
+  // For ubicacion: rebuild markers and refresh list without destroying the map
+  if(mapInstance){
+    rebuildMapMarkers();
+    renderTiendaList();
+  }
+  // Re-render the currently visible tab (use data-tab-id, not index)
+  const activeTab=document.querySelector(".tab.on");
+  if(activeTab){
+    const tabId=activeTab.dataset.tabId;
+    if(tabId&&renderMap[tabId])renderMap[tabId]();
+  }
+  // If admin drawer is open, refresh it
+  if(document.getElementById("admin-drawer")?.classList.contains("open")){
+    renderAdminDrawer();
+  }
+  updateGlobalHeader();
+  saveToLocalStorage();
+}
+
+function updateGlobalHeader(){
+  const t=tenants[currentTenantId];
+  if(!t)return;
+  // Update top h1 with current tenant
+  const h1=document.querySelector("h1");
+  if(h1)h1.textContent=`${t.icono} ${t.nombre} · Panel de Gestión`;
+  const sub=document.querySelector(".subtitle");
+  if(sub)sub.textContent=`${t.zona} · ${t.direccion} · Gestioná tus verdulerías en "⚙ Admin"`;
+}
+
+// ── ADMIN (renders into the drawer, see renderAdminDrawer) ──
+
+function renderAdminContent(){
+  const cont=document.getElementById("admin-content");
+  const current=tenants[currentTenantId];
+  const tList=Object.values(tenants);
+  cont.innerHTML=`
+    <p style="font-size:12px;color:var(--ink-soft);margin-bottom:1.25rem">Gestioná todas tus verdulerías desde un solo lugar. Cada una tiene sus propios precios, stock y configuración.</p>
+
+    <div class="admin-header">
+      <div class="admin-current">
+        <strong>${current.icono} ${current.nombre}</strong>
+        <div class="meta">${current.zona} · ${current.direccion}</div>
+        <div class="meta">Activa desde: ${current.creada}</div>
+      </div>
+      <button class="form-btn primary" onclick="showNewTenantForm()" style="height:42px">+ Nueva verdulería</button>
+    </div>
+
+    <h3 style="font-size:13px;font-weight:700;margin-bottom:10px;color:var(--ink)">Tus verdulerías (${tList.length})</h3>
+    <div class="admin-tenants">
+      ${tList.map(t=>{
+        const productos=Object.keys(t.data.stockState||{}).length;
+        const activos=Object.values(t.data.stockState||{}).filter(s=>s.activo).length;
+        const stockTotal=Object.values(t.data.stockState||{}).reduce((a,s)=>a+(s.activo?s.stock:0),0);
+        return`<div class="tenant-card ${t.id===currentTenantId?"active":""}" onclick="switchTenant('${t.id}')">
+          <div class="tenant-icon">${t.icono}</div>
+          <div class="tenant-name">${t.nombre}</div>
+          <div class="tenant-zone">📍 ${t.zona}</div>
+          <div class="tenant-stats">
+            <span class="tenant-stat">${activos}/${productos} productos</span>
+            <span class="tenant-stat">${stockTotal} u. stock</span>
+          </div>
+          <div class="tenant-actions">
+            <button class="tenant-act-btn" onclick="event.stopPropagation();editTenantForm('${t.id}')">✎ Editar</button>
+            <button class="tenant-act-btn" onclick="event.stopPropagation();duplicateTenant('${t.id}')">⎘ Duplicar</button>
+            ${t.id!=="default"&&tList.length>1?`<button class="tenant-act-btn danger" onclick="event.stopPropagation();deleteTenant('${t.id}')">🗑</button>`:""}
+          </div>
+        </div>`;
+      }).join("")}
+    </div>
+
+    <div id="admin-form-container"></div>
+    <div id="admin-detail-container"></div>
+  `;
+  renderTenantDetail();
+}
+
+function renderTenantDetail(){
+  const cont=document.getElementById("admin-detail-container");
+  if(!cont)return;
+  const t=tenants[currentTenantId];
+  const productos=Object.keys(t.data.stockState).length;
+  const activos=Object.values(t.data.stockState).filter(s=>s.activo).length;
+  const sinStock=Object.entries(t.data.stockState).filter(([n,s])=>s.activo&&s.stock<=0).length;
+  const valorInv=Object.entries(t.data.stockState).reduce((a,[n,s])=>a+(s.activo?s.stock*(t.data.costos[n]||0):0),0);
+  cont.innerHTML=`
+    <div class="tenant-detail" style="margin-top:1rem">
+      <h3>${t.icono} Detalle de "${t.nombre}"</h3>
+      <div class="tenant-info-grid">
+        <div class="info-item"><div class="l">Productos</div><div class="v">${productos}</div></div>
+        <div class="info-item"><div class="l">Activos</div><div class="v" style="color:var(--success-fg)">${activos}</div></div>
+        <div class="info-item"><div class="l">Sin stock</div><div class="v" style="color:var(--danger)">${sinStock}</div></div>
+        <div class="info-item"><div class="l">Valor inventario</div><div class="v">${fmt(valorInv)||"$0"}</div></div>
+        <div class="info-item"><div class="l">Margen objetivo</div><div class="v">${t.data.margenObj||40}%</div></div>
+        <div class="info-item"><div class="l">Zonas envío</div><div class="v">${(t.data.zonas||[]).length}</div></div>
+      </div>
+      <p style="font-size:11px;color:var(--ink-soft);line-height:1.6">
+        Cuando seleccionás una verdulería, todas las pestañas (Tienda, Stock, Margen, Recetas, etc.) muestran sus datos específicos.
+        Los cambios que hagas se guardan automáticamente al cambiar de tenant.
+      </p>
+    </div>`;
+}
+
+function showNewTenantForm(){
+  editingTenant={id:"",nombre:"",icono:"🥬",zona:"",direccion:"",tel:"",diasEnvio:"Lun-Vie",isNew:true};
+  renderTenantForm();
+}
+
+function editTenantForm(id){
+  const t=tenants[id];
+  if(!t)return;
+  editingTenant={...t,isNew:false};
+  renderTenantForm();
+}
+
+function renderTenantForm(){
+  const cont=document.getElementById("admin-form-container");
+  if(!editingTenant){cont.innerHTML="";return;}
+  const e=editingTenant;
+  cont.innerHTML=`
+    <div class="tenant-form">
+      <h3>${e.isNew?"+ Nueva verdulería":"✎ Editando "+e.nombre}</h3>
+      <div class="form-grid">
+        <div class="form-field">
+          <label>Ícono (emoji)</label>
+          <input type="text" id="tf-icono" value="${e.icono||"🥬"}" maxlength="2">
+        </div>
+        <div class="form-field" style="grid-column:span 2">
+          <label>Nombre</label>
+          <input type="text" id="tf-nombre" value="${e.nombre||""}" placeholder="Ej: Verdulería del Barrio">
+        </div>
+        <div class="form-field">
+          <label>Zona</label>
+          <input type="text" id="tf-zona" value="${e.zona||""}" placeholder="CABA / GBA Norte...">
+        </div>
+        <div class="form-field" style="grid-column:span 2">
+          <label>Dirección</label>
+          <div style="display:flex;gap:6px">
+            <input type="text" id="tf-direccion" value="${e.direccion||""}" placeholder="Calle 123, Barrio, CABA" style="flex:1">
+            <button type="button" class="form-btn alt" onclick="geocodeAddress()" style="white-space:nowrap;font-size:11px;padding:0 10px">📍 Buscar en mapa</button>
+          </div>
+        </div>
+        <div class="form-field">
+          <label>Latitud</label>
+          <input type="number" step="0.0001" id="tf-lat" value="${e.lat!=null?e.lat:""}" placeholder="-34.6037">
+        </div>
+        <div class="form-field">
+          <label>Longitud</label>
+          <input type="number" step="0.0001" id="tf-lng" value="${e.lng!=null?e.lng:""}" placeholder="-58.3816">
+        </div>
+        <div class="form-field" style="display:flex;align-items:flex-end">
+          <div id="geocode-status" style="font-size:11px;color:var(--ink-soft);line-height:1.4">${e.lat!=null?'<span style="color:var(--success-fg)">✓ Ubicación cargada</span>':"<em>Aún no ubicada en el mapa</em>"}</div>
+        </div>
+        <div class="form-field">
+          <label>Teléfono</label>
+          <input type="text" id="tf-tel" value="${e.tel||""}" placeholder="+54 11 ...">
+        </div>
+        <div class="form-field">
+          <label>Días de envío</label>
+          <input type="text" id="tf-dias" value="${e.diasEnvio||""}" placeholder="Lun-Vie">
+        </div>
+        ${e.isNew?`
+        <div class="form-field" style="grid-column:span 2">
+          <label>Datos iniciales</label>
+          <select id="tf-source">
+            <option value="default">Copiar desde la verdulería actual</option>
+            <option value="empty">Empezar vacío (todos los precios en 0)</option>
+          </select>
+        </div>`:""}
+      </div>
+      <p style="font-size:11px;color:var(--ink-soft);margin-bottom:10px">💡 Tip: ingresá la dirección y hacé clic en "Buscar en mapa" para autocompletar las coordenadas. También podés ingresar las coordenadas manualmente o dejarlas vacías (no aparecerá en el mapa).</p>
+      <div class="form-actions">
+        <button class="form-btn primary" onclick="saveTenant()">${e.isNew?"Crear verdulería":"Guardar cambios"}</button>
+        <button class="form-btn alt" onclick="editingTenant=null;renderTenantForm()">Cancelar</button>
+      </div>
+    </div>`;
+}
+
+async function geocodeAddress(){
+  const addr=document.getElementById("tf-direccion").value.trim();
+  const zona=document.getElementById("tf-zona").value.trim();
+  if(!addr){alert("Ingresá una dirección primero");return;}
+  const status=document.getElementById("geocode-status");
+  if(status)status.innerHTML='<span style="color:var(--ink-soft)">⏳ Buscando...</span>';
+  const query=addr.toLowerCase().includes("argentina")?addr:`${addr}, ${zona?zona+", ":""}Buenos Aires, Argentina`;
+  try{
+    const r=await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`);
+    const data=await r.json();
+    if(!data.length){
+      if(status)status.innerHTML='<span style="color:var(--danger)">✗ No se encontró la dirección</span>';
+      return;
+    }
+    const result=data[0];
+    document.getElementById("tf-lat").value=parseFloat(result.lat).toFixed(6);
+    document.getElementById("tf-lng").value=parseFloat(result.lon).toFixed(6);
+    if(status)status.innerHTML=`<span style="color:var(--success-fg)">✓ Ubicación encontrada</span>`;
+  }catch(err){
+    if(status)status.innerHTML='<span style="color:var(--danger)">✗ Error de conexión</span>';
+  }
+}
+
+function saveTenant(){
+  const nombre=document.getElementById("tf-nombre").value.trim();
+  if(!nombre){alert("El nombre es obligatorio");return;}
+  const latVal=document.getElementById("tf-lat").value;
+  const lngVal=document.getElementById("tf-lng").value;
+  const data={
+    icono:document.getElementById("tf-icono").value.trim()||"🥬",
+    nombre,
+    zona:document.getElementById("tf-zona").value.trim(),
+    direccion:document.getElementById("tf-direccion").value.trim(),
+    tel:document.getElementById("tf-tel").value.trim(),
+    diasEnvio:document.getElementById("tf-dias").value.trim(),
+    lat:latVal?parseFloat(latVal):null,
+    lng:lngVal?parseFloat(lngVal):null,
+  };
+  if(editingTenant.isNew){
+    const id="tenant_"+Date.now();
+    const sourceEl=document.getElementById("tf-source");
+    const source=sourceEl?sourceEl.value:"default";
+    let snapshotData;
+    if(source==="default"){
+      tenants[currentTenantId].data=snapshotCurrentState();
+      snapshotData=JSON.parse(JSON.stringify(tenants[currentTenantId].data));
+    } else {
+      snapshotData=JSON.parse(JSON.stringify(tenants[currentTenantId].data));
+      Object.keys(snapshotData.costos).forEach(k=>{snapshotData.costos[k]=0;});
+      Object.keys(snapshotData.pVentas).forEach(k=>{snapshotData.pVentas[k]=0;});
+      Object.keys(snapshotData.stockState).forEach(k=>{
+        snapshotData.stockState[k]={activo:false,stock:0,stockMin:5};
+      });
+    }
+    tenants[id]={
+      id,...data,
+      creada:new Date().toISOString().slice(0,10),
+      data:snapshotData
+    };
+    editingTenant=null;
+    switchTenant(id);
+    renderAdminContent();
+    rebuildMapMarkers();
+    saveToLocalStorage();
+    alert(`✓ Verdulería "${nombre}" creada${data.lat!=null?" y agregada al mapa":""}`);
+  } else {
+    Object.assign(tenants[editingTenant.id],data);
+    editingTenant=null;
+    renderAdminContent();
+    rebuildMapMarkers();
+    saveToLocalStorage();
+    updateGlobalHeader();
+  }
+}
+
+function duplicateTenant(id){
+  const orig=tenants[id];
+  if(!orig)return;
+  const newId="tenant_"+Date.now();
+  if(id===currentTenantId){tenants[currentTenantId].data=snapshotCurrentState();}
+  tenants[newId]={
+    ...orig,id:newId,
+    nombre:orig.nombre+" (copia)",
+    creada:new Date().toISOString().slice(0,10),
+    data:JSON.parse(JSON.stringify(orig.data))
+  };
+  renderAdminContent();
+  rebuildMapMarkers();
+  saveToLocalStorage();
+  alert(`✓ Verdulería duplicada como "${tenants[newId].nombre}"`);
+}
+
+function deleteTenant(id){
+  const t=tenants[id];
+  if(!t)return;
+  if(!confirm(`¿Eliminar la verdulería "${t.nombre}"?\n\nEsta acción no se puede deshacer.`))return;
+  if(id===currentTenantId){
+    const other=Object.keys(tenants).find(k=>k!==id);
+    if(other)switchTenant(other);
+  }
+  delete tenants[id];
+  renderAdminContent();
+  rebuildMapMarkers();
+  saveToLocalStorage();
+}
+
+// ── TAB: MI VERDULERÍA ──
+function renderDashboard(){
+  const p=document.getElementById("panel-dashboard");
+  if(!p.dataset.init){
+    p.innerHTML=`<div id="dashboard-content"></div>`;
+    p.dataset.init="1";
+  }
+  renderDashboardContent();
+}
+
+let editingMyVerdu=false;
+
+function renderDashboardContent(){
+  const cont=document.getElementById("dashboard-content");
+  const t=tenants[currentTenantId];
+  if(!t){cont.innerHTML="<div style='padding:2rem;color:var(--ink-soft)'>No hay verdulería seleccionada</div>";return;}
+
+  // Stats del tenant actual
+  const totalProd=D.length;
+  const activos=D.filter(r=>stockState[r.n]&&stockState[r.n].activo).length;
+  const sinStock=D.filter(r=>stockState[r.n]&&stockState[r.n].activo&&stockState[r.n].stock<=0).length;
+  const stockBajo=D.filter(r=>{const s=stockState[r.n];return s&&s.activo&&s.stock>0&&s.stock<=s.stockMin;}).length;
+  const valorInv=D.reduce((a,r)=>a+((stockState[r.n]&&stockState[r.n].activo?stockState[r.n].stock:0)*(costos[r.n]||0)),0);
+  const valorVenta=D.reduce((a,r)=>a+((stockState[r.n]&&stockState[r.n].activo?stockState[r.n].stock:0)*(pVentas[r.n]||0)),0);
+  const gananciaPotencial=valorVenta-valorInv;
+  const margenes=D.filter(r=>stockState[r.n]&&stockState[r.n].activo).map(r=>margen(costos[r.n],pVentas[r.n])).filter(x=>x!=null);
+  const margenProm=margenes.length?margenes.reduce((a,b)=>a+b,0)/margenes.length:0;
+
+  // Alertas
+  const alerts=[];
+  D.forEach(r=>{
+    const s=stockState[r.n];
+    if(!s||!s.activo)return;
+    if(s.stock<=0)alerts.push({type:"crit",icon:"🚨",title:`${r.n}: sin stock`,meta:`Categoría ${r.c}`});
+    else if(s.stock<=s.stockMin)alerts.push({type:"warn",icon:"⚠",title:`${r.n}: stock bajo (${s.stock} u.)`,meta:`Mínimo: ${s.stockMin}`});
+    const mg=margen(costos[r.n],pVentas[r.n]);
+    if(mg!=null&&mg<15&&s.activo)alerts.push({type:"warn",icon:"💸",title:`${r.n}: margen muy bajo (${Math.round(mg)}%)`,meta:`Venta ${fmt(pVentas[r.n])}`});
+  });
+
+  // Top ganancia
+  const topGanancia=D.filter(r=>stockState[r.n]&&stockState[r.n].activo&&stockState[r.n].stock>0)
+    .map(r=>({n:r.n,ganancia:(stockState[r.n].stock||0)*((pVentas[r.n]||0)-(costos[r.n]||0))}))
+    .sort((a,b)=>b.ganancia-a.ganancia).slice(0,6);
+  const maxGan=Math.max(...topGanancia.map(x=>x.ganancia),1);
+
+  // Status donut
+  const statusCount={ok:0,low:0,out:0,off:0};
+  D.forEach(r=>{const st=stockStatus(r.n);statusCount[st]++;});
+  const totalStat=statusCount.ok+statusCount.low+statusCount.out+statusCount.off;
+  let cumAngle=0;
+  const donutSegs=[
+    {key:"ok",label:"Con stock",color:"var(--success)",count:statusCount.ok},
+    {key:"low",label:"Stock bajo",color:"var(--warn)",count:statusCount.low},
+    {key:"out",label:"Sin stock",color:"var(--danger)",count:statusCount.out},
+    {key:"off",label:"Inactivos",color:"var(--ink-soft)",count:statusCount.off},
+  ].map(s=>{
+    const angle=totalStat?(s.count/totalStat)*360:0;
+    const start=cumAngle;cumAngle+=angle;
+    return{...s,start,end:cumAngle,angle};
+  });
+  function arcPath(start,end,r,cx,cy){
+    if(end-start>=359.99)return`M ${cx-r} ${cy} A ${r} ${r} 0 1 1 ${cx+r} ${cy} A ${r} ${r} 0 1 1 ${cx-r} ${cy}`;
+    const sr=start*Math.PI/180,er=end*Math.PI/180;
+    const x1=cx+r*Math.cos(sr-Math.PI/2),y1=cy+r*Math.sin(sr-Math.PI/2);
+    const x2=cx+r*Math.cos(er-Math.PI/2),y2=cy+r*Math.sin(er-Math.PI/2);
+    const large=(end-start)>180?1:0;
+    return`M ${cx} ${cy} L ${x1} ${y1} A ${r} ${r} 0 ${large} 1 ${x2} ${y2} Z`;
+  }
+
+  cont.innerHTML=`
+    <!-- HERO HEADER -->
+    <div class="verdu-hero">
+      <div class="verdu-hero-icon">${t.icono}</div>
+      <div class="verdu-hero-info">
+        <h2>${t.nombre}</h2>
+        <div class="verdu-hero-meta">
+          <span>📍 ${t.zona||"Sin zona"}</span>
+          <span>🏠 ${t.direccion||"Sin dirección"}</span>
+          ${t.tel?`<span>📞 ${t.tel}</span>`:""}
+          <span>📦 ${t.diasEnvio||"Sin definir"}</span>
+        </div>
+        <div class="verdu-hero-since">Activa desde ${t.creada||"-"}</div>
+      </div>
+      <div class="verdu-hero-actions">
+        <button class="form-btn primary" onclick="toggleEditVerdu()">${editingMyVerdu?"✕ Cancelar":"✎ Editar info"}</button>
+      </div>
+    </div>
+
+    ${editingMyVerdu?renderEditMyVerduForm(t):""}
+
+    <!-- HEADLINE: margen como métrica protagonista -->
+    <div class="dash-headline">
+      <div class="dash-kpi dash-kpi--lead ${margenProm>=margenObj?"accent-green":margenProm>=20?"accent-amber":"accent-red"}">
+        <div class="dash-kpi-lbl">Margen promedio</div>
+        <div class="dash-kpi-val">${Math.round(margenProm)}%</div>
+        <div class="dash-kpi-sub">Objetivo ${margenObj}% · ${activos} productos activos</div>
+      </div>
+      <div class="dash-kpi accent-red">
+        <div class="dash-kpi-lbl">Alertas</div>
+        <div class="dash-kpi-val">${alerts.length}</div>
+        <div class="dash-kpi-sub">${sinStock} sin stock · ${stockBajo} bajos</div>
+      </div>
+      <div class="dash-kpi accent-green">
+        <div class="dash-kpi-lbl">Productos activos</div>
+        <div class="dash-kpi-val">${activos}<span style="font-size:14px;color:var(--ink-soft);margin-left:2px">/${totalProd}</span></div>
+        <div class="dash-kpi-sub">${Math.round(activos/totalProd*100)}% del catálogo</div>
+      </div>
+    </div>
+
+    <!-- SECONDARY STATS -->
+    <div class="dash-grid">
+      <div class="dash-kpi accent-blue">
+        <div class="dash-kpi-lbl">Valor inventario</div>
+        <div class="dash-kpi-val">${fmt(valorInv)||"$0"}</div>
+        <div class="dash-kpi-sub">A precio de costo</div>
+      </div>
+      <div class="dash-kpi accent-purple">
+        <div class="dash-kpi-lbl">Ganancia potencial</div>
+        <div class="dash-kpi-val">${fmt(gananciaPotencial)||"$0"}</div>
+        <div class="dash-kpi-sub">Si vendés todo el stock</div>
+      </div>
+      <div class="dash-kpi accent-blue">
+        <div class="dash-kpi-lbl">Zonas de envío</div>
+        <div class="dash-kpi-val">${(zonas||[]).length}</div>
+        <div class="dash-kpi-sub">Configurables en "Costo envío"</div>
+      </div>
+    </div>
+
+    <!-- 2 columnas: estado stock + top productos -->
+    <div class="dash-row">
+      <div class="dash-block">
+        <h3>🏆 Top productos por ganancia potencial</h3>
+        <div class="bar-chart">
+          ${topGanancia.map(x=>{
+            const pct=(x.ganancia/maxGan)*100;
+            return`<div class="bar-row">
+              <div class="bar-name">${EMOJIS[x.n]||"🌿"} ${x.n}</div>
+              <div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:var(--brand)"></div></div>
+              <div class="bar-val">${fmt(x.ganancia)}</div>
+            </div>`;
+          }).join("")||`<div style="color:var(--ink-faint);padding:1rem">Sin datos suficientes</div>`}
+        </div>
+      </div>
+      <div class="dash-block">
+        <h3>📦 Estado del stock</h3>
+        <div class="donut-wrap">
+          <svg class="donut-svg" viewBox="0 0 140 140">
+            ${donutSegs.filter(s=>s.count>0).map(s=>`<path d="${arcPath(s.start,s.end,55,70,70)}" fill="${s.color}"/>`).join("")}
+            <circle cx="70" cy="70" r="32" fill="#fff"/>
+            <text x="70" y="68" text-anchor="middle" font-size="20" font-weight="700" fill="var(--ink)">${totalProd}</text>
+            <text x="70" y="84" text-anchor="middle" font-size="9" fill="var(--ink-soft)">productos</text>
+          </svg>
+          <div class="donut-legend">
+            ${donutSegs.map(s=>`<div class="donut-leg-row">
+              <div class="donut-leg-dot" style="background:${s.color}"></div>
+              <span>${s.label}</span>
+              <span class="donut-leg-val">${s.count}</span>
+            </div>`).join("")}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Alertas y atajos -->
+    <div class="dash-row">
+      <div class="dash-block">
+        <h3>🚨 Alertas <span class="tag">${alerts.length}</span></h3>
+        <div class="alert-list">
+          ${alerts.slice(0,8).map(a=>`<div class="alert-item ${a.type}">
+            <div class="alert-icon">${a.icon}</div>
+            <div class="alert-body">
+              <div class="alert-title">${a.title}</div>
+              <div class="alert-meta">${a.meta||""}</div>
+            </div>
+          </div>`).join("")||`<div style="color:var(--success-fg);font-size:12px;padding:1rem;text-align:center">✓ Todo en orden, sin alertas</div>`}
+        </div>
+      </div>
+      <div class="dash-block">
+        <h3>⚡ Atajos rápidos</h3>
+        <div class="shortcuts">
+          <div class="shortcut" onclick="goToTab('stock')">
+            <div class="sc-icon">📦</div>
+            <div class="sc-text"><strong>Gestionar stock</strong><span>Reponer, ajustar precios</span></div>
+            <div class="sc-arrow">→</div>
+          </div>
+          <div class="shortcut" onclick="goToTab('tienda')">
+            <div class="sc-icon">🛒</div>
+            <div class="sc-text"><strong>Ver tienda</strong><span>Cómo la ven los clientes</span></div>
+            <div class="sc-arrow">→</div>
+          </div>
+          <div class="shortcut" onclick="goToTab('margen')">
+            <div class="sc-icon">💰</div>
+            <div class="sc-text"><strong>Revisar márgenes</strong><span>Ajustar rentabilidad</span></div>
+            <div class="sc-arrow">→</div>
+          </div>
+          <div class="shortcut" onclick="goToTab('envio')">
+            <div class="sc-icon">🚚</div>
+            <div class="sc-text"><strong>Zonas de envío</strong><span>Costos y mínimos</span></div>
+            <div class="sc-arrow">→</div>
+          </div>
+          <div class="shortcut" onclick="goToTab('admin')">
+            <div class="sc-icon">⚙</div>
+            <div class="sc-text"><strong>Cambiar verdulería</strong><span>Multi-tenant</span></div>
+            <div class="sc-arrow">→</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Datos guardados -->
+    <div class="dash-block" style="margin-bottom:1rem">
+      <h3>💾 Datos guardados <span class="tag">localStorage</span></h3>
+      <p style="font-size:12px;color:var(--ink-soft);line-height:1.6;margin-bottom:10px">
+        Todos tus datos (verdulerías, precios, stock, configuración) se guardan automáticamente en tu navegador.
+        Si limpiás los datos del sitio se perderán.
+      </p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="form-btn alt" onclick="forceSave()">💾 Guardar ahora</button>
+        <button class="form-btn alt" onclick="exportAllData()">⬇ Exportar respaldo (JSON)</button>
+        <button class="form-btn alt" onclick="document.getElementById('import-file').click()">⬆ Importar respaldo</button>
+        <input type="file" id="import-file" accept=".json" style="display:none" onchange="importAllData(event)">
+        <button class="form-btn alt" style="color:var(--danger);border-color:oklch(85% 0.05 25)" onclick="resetAllData()">🗑 Borrar todo</button>
+      </div>
+      <div style="font-size:11px;color:var(--ink-soft);margin-top:8px" id="save-status"></div>
+    </div>
+  `;
+  updateSaveStatus();
+}
+
+function renderEditMyVerduForm(t){
+  return`
+    <div class="tenant-form" style="margin-bottom:1rem">
+      <h3>✎ Editando información</h3>
+      <div class="form-grid">
+        <div class="form-field">
+          <label>Ícono</label>
+          <input type="text" id="mv-icono" value="${t.icono||"🥬"}" maxlength="2">
+        </div>
+        <div class="form-field" style="grid-column:span 2">
+          <label>Nombre</label>
+          <input type="text" id="mv-nombre" value="${t.nombre||""}">
+        </div>
+        <div class="form-field">
+          <label>Zona</label>
+          <input type="text" id="mv-zona" value="${t.zona||""}">
+        </div>
+        <div class="form-field" style="grid-column:span 2">
+          <label>Dirección</label>
+          <div style="display:flex;gap:6px">
+            <input type="text" id="mv-direccion" value="${t.direccion||""}" style="flex:1">
+            <button type="button" class="form-btn alt" onclick="geocodeMyAddress()" style="white-space:nowrap;font-size:11px;padding:0 10px">📍 Buscar</button>
+          </div>
+        </div>
+        <div class="form-field">
+          <label>Latitud</label>
+          <input type="number" step="0.0001" id="mv-lat" value="${t.lat!=null?t.lat:""}" placeholder="-34.6037">
+        </div>
+        <div class="form-field">
+          <label>Longitud</label>
+          <input type="number" step="0.0001" id="mv-lng" value="${t.lng!=null?t.lng:""}" placeholder="-58.3816">
+        </div>
+        <div class="form-field" style="display:flex;align-items:flex-end">
+          <div id="mv-geo-status" style="font-size:11px;color:var(--ink-soft)">${t.lat!=null?'<span style="color:var(--success-fg)">✓ En el mapa</span>':"<em>Sin ubicar</em>"}</div>
+        </div>
+        <div class="form-field">
+          <label>Teléfono</label>
+          <input type="text" id="mv-tel" value="${t.tel||""}">
+        </div>
+        <div class="form-field">
+          <label>Días de envío</label>
+          <input type="text" id="mv-dias" value="${t.diasEnvio||""}">
+        </div>
+      </div>
+      <div class="form-actions">
+        <button class="form-btn primary" onclick="saveMyVerdu()">Guardar cambios</button>
+        <button class="form-btn alt" onclick="toggleEditVerdu()">Cancelar</button>
+      </div>
+    </div>`;
+}
+
+async function geocodeMyAddress(){
+  const addr=document.getElementById("mv-direccion").value.trim();
+  const zona=document.getElementById("mv-zona").value.trim();
+  if(!addr){alert("Ingresá una dirección primero");return;}
+  const status=document.getElementById("mv-geo-status");
+  if(status)status.innerHTML='<span style="color:var(--ink-soft)">⏳ Buscando...</span>';
+  const query=addr.toLowerCase().includes("argentina")?addr:`${addr}, ${zona?zona+", ":""}Buenos Aires, Argentina`;
+  try{
+    const r=await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`);
+    const data=await r.json();
+    if(!data.length){if(status)status.innerHTML='<span style="color:var(--danger)">✗ No encontrada</span>';return;}
+    const result=data[0];
+    document.getElementById("mv-lat").value=parseFloat(result.lat).toFixed(6);
+    document.getElementById("mv-lng").value=parseFloat(result.lon).toFixed(6);
+    if(status)status.innerHTML='<span style="color:var(--success-fg)">✓ Encontrada</span>';
+  }catch(err){
+    if(status)status.innerHTML='<span style="color:var(--danger)">✗ Error</span>';
+  }
+}
+
+function toggleEditVerdu(){
+  editingMyVerdu=!editingMyVerdu;
+  renderDashboardContent();
+}
+
+function saveMyVerdu(){
+  const t=tenants[currentTenantId];
+  t.icono=document.getElementById("mv-icono").value.trim()||"🥬";
+  t.nombre=document.getElementById("mv-nombre").value.trim()||t.nombre;
+  t.zona=document.getElementById("mv-zona").value.trim();
+  t.direccion=document.getElementById("mv-direccion").value.trim();
+  t.tel=document.getElementById("mv-tel").value.trim();
+  t.diasEnvio=document.getElementById("mv-dias").value.trim();
+  const latVal=document.getElementById("mv-lat").value;
+  const lngVal=document.getElementById("mv-lng").value;
+  t.lat=latVal?parseFloat(latVal):null;
+  t.lng=lngVal?parseFloat(lngVal):null;
+  editingMyVerdu=false;
+  updateGlobalHeader();
+  rebuildMapMarkers();
+  saveToLocalStorage();
+  renderDashboardContent();
+}
+
+function goToTab(id){
+  // Special case: admin is a drawer, not a tab
+  if(id==="admin"){openAdmin();return;}
+  const tab=TABS.find(t=>t.id===id);
+  if(!tab)return;
+  // Switch group if needed
+  if(tab.group!==activeGroup){
+    activeGroup=tab.group;
+    document.querySelectorAll(".group-pill").forEach(p=>p.classList.toggle("on",p.dataset.group===activeGroup));
+    // Remember the desired tab so renderTabsForGroup picks it
+    document.body.dataset["activeIn_"+activeGroup]=id;
+    renderTabsForGroup();
+  } else {
+    // Click the tab within current group
+    const el=document.querySelector(`.tab[data-tab-id="${id}"]`);
+    if(el)el.click();
+  }
+}
+
+// ─── PERSISTENCIA EN LOCALSTORAGE ─────────────────────────
+const STORAGE_KEY="verduleria_app_v1";
+let saveTimer=null;
+let lastSaveTime=null;
+
+function saveToLocalStorage(){
+  try{
+    // Make sure current tenant has latest snapshot
+    if(tenants[currentTenantId]){
+      tenants[currentTenantId].data=snapshotCurrentState();
+    }
+    const payload={
+      version:1,
+      currentTenantId,
+      tenants,
+      savedAt:new Date().toISOString()
+    };
+    localStorage.setItem(STORAGE_KEY,JSON.stringify(payload));
+    lastSaveTime=new Date();
+    updateSaveStatus();
+    return true;
+  }catch(e){
+    console.error("Error guardando:",e);
+    return false;
+  }
+}
+
+function loadFromLocalStorage(){
+  try{
+    const raw=localStorage.getItem(STORAGE_KEY);
+    if(!raw)return false;
+    const data=JSON.parse(raw);
+    if(!data.tenants||!data.currentTenantId)return false;
+    tenants=data.tenants;
+    currentTenantId=data.currentTenantId;
+    if(!tenants[currentTenantId]){
+      currentTenantId=Object.keys(tenants)[0];
+    }
+    if(tenants[currentTenantId]){
+      loadTenantState(tenants[currentTenantId]);
+    }
+    return true;
+  }catch(e){
+    console.error("Error cargando:",e);
+    return false;
+  }
+}
+
+function autoSave(){
+  if(saveTimer)clearTimeout(saveTimer);
+  saveTimer=setTimeout(()=>saveToLocalStorage(),800);
+}
+
+function forceSave(){
+  if(saveToLocalStorage()){
+    alert("✓ Datos guardados en el navegador");
+  } else {
+    alert("✗ Error al guardar");
+  }
+}
+
+function updateSaveStatus(){
+  const el=document.getElementById("save-status");
+  if(!el)return;
+  if(lastSaveTime){
+    el.textContent=`Último guardado: ${lastSaveTime.toLocaleTimeString("es-AR")}`;
+  } else {
+    el.textContent="Aún no se guardó en esta sesión";
+  }
+}
+
+function exportAllData(){
+  // Save current state before exporting
+  if(tenants[currentTenantId]){
+    tenants[currentTenantId].data=snapshotCurrentState();
+  }
+  const payload={
+    version:1,
+    currentTenantId,
+    tenants,
+    exportedAt:new Date().toISOString()
+  };
+  const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");
+  a.href=url;
+  a.download=`verduleria_backup_${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function importAllData(event){
+  const file=event.target.files[0];
+  if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try{
+      const data=JSON.parse(e.target.result);
+      if(!data.tenants||!data.currentTenantId)throw new Error("Archivo inválido");
+      if(!confirm("¿Reemplazar todos los datos actuales con los del archivo?\n\nLos datos actuales se perderán."))return;
+      tenants=data.tenants;
+      currentTenantId=data.currentTenantId;
+      if(!tenants[currentTenantId])currentTenantId=Object.keys(tenants)[0];
+      loadTenantState(tenants[currentTenantId]);
+      saveToLocalStorage();
+      // Reset all panels
+      ["original","kg","margen","sugeridos","envio","estacional","proveedor","tienda","recetas","stock","dashboard","admin"].forEach(id=>{
+        const p=document.getElementById("panel-"+id);
+        if(p)delete p.dataset.init;
+      });
+      updateGlobalHeader();
+      renderDashboard();
+      alert("✓ Datos importados correctamente");
+    }catch(err){
+      alert("Error al importar: "+err.message);
+    }
+  };
+  reader.readAsText(file);
+  event.target.value="";
+}
+
+function resetAllData(){
+  if(!confirm("¿Borrar TODOS los datos guardados?\n\nEsto eliminará todas las verdulerías, precios y stock que hayas configurado. No se puede deshacer."))return;
+  if(!confirm("Estás seguro de esta acción permanente?"))return;
+  localStorage.removeItem(STORAGE_KEY);
+  location.reload();
+}
+
+// ─── INITIAL RENDER ──────────────────────────────────────
+const renderMap={
+  original:renderOriginal,kg:renderKg,margen:renderMargen,
+  sugeridos:renderSugeridos,envio:renderEnvio,
+  estacional:renderEstacional,proveedor:renderProveedor,
+  tienda:renderTienda,recetas:renderRecetas,ubicacion:renderUbicacion,
+  stock:renderStock,dashboard:renderDashboard
+};
+
+function renderTab(id){
+  if(renderMap[id])renderMap[id]();
+}
+
+// Initialize multi-tenant system: try loading from localStorage, otherwise init defaults
+const loaded=loadFromLocalStorage();
+if(!loaded){
+  initTenants();
+  saveToLocalStorage();
+}
+updateGlobalHeader();
+
+// Auto-save on any data mutation: wrap key functions
+const _origUpdateField=updateField;
+updateField=function(...args){_origUpdateField(...args);autoSave();};
+const _origToggleActive=toggleActive;
+toggleActive=function(...args){_origToggleActive(...args);autoSave();};
+const _origRepon=repon;
+repon=function(...args){_origRepon(...args);autoSave();};
+const _origToggleAll=toggleAll;
+toggleAll=function(...args){_origToggleAll(...args);autoSave();};
+
+// Also save before unload to ensure latest state persists
+window.addEventListener("beforeunload",()=>{saveToLocalStorage();});
+// Save every 30s as safety net
+setInterval(()=>saveToLocalStorage(),30000);
+
+// Initial render: build tabs of default group
+renderTabsForGroup();
+</script>
+</body>
+</html>
