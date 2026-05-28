@@ -193,14 +193,22 @@ input.cell-input:focus{outline:none;border-color:var(--brand)}
 .cart-total{display:flex;justify-content:space-between;font-size:16px;font-weight:700;margin-bottom:12px}
 .cart-zona{margin-bottom:10px}
 .cart-zona select{width:100%;height:32px;padding:0 8px;font-size:12px;border:1px solid var(--border-strong);border-radius:7px}
-.cart-envio-info{font-size:11px;padding:7px 10px;border-radius:6px;margin-bottom:10px;line-height:1.5}
+.cart-envio-info{font-size:11px;padding:7px 10px;border-radius:6px;margin-bottom:0;line-height:1.5}
 .checkout-btn{width:100%;height:40px;border:none;border-radius:8px;background:var(--brand);color:#fff;font-size:14px;font-weight:700;cursor:pointer}
 .checkout-btn:hover{background:var(--brand-hover)}
-/* Checkout step: form de datos del cliente */
-.cart-checkout{flex:1;overflow-y:auto;padding:14px 16px;display:none;flex-direction:column;gap:12px}
-.cart-drawer[data-step="checkout"] .cart-items{display:none}
-.cart-drawer[data-step="checkout"] .cart-foot{display:none}
-.cart-drawer[data-step="checkout"] .cart-checkout{display:flex}
+/* Cart drawer single-step layout */
+.cart-drawer .cart-items{flex:initial;max-height:none;overflow-y:visible;padding:12px 16px 4px}
+.cart-scroll{flex:1;overflow-y:auto;display:flex;flex-direction:column}
+.cart-config{padding:8px 16px 14px;display:flex;flex-direction:column;gap:11px}
+.cart-config .cart-subtotal{margin-bottom:0}
+.cart-config .cart-zona{margin-bottom:0}
+/* Entrega tabs (delivery / pickup) */
+.entrega-tabs{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:3px;background:var(--surface-2);border-radius:9px}
+.entrega-tab{height:34px;border:none;background:transparent;color:var(--ink-soft);font-size:12px;font-weight:600;border-radius:7px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;transition:background .15s,color .15s}
+.entrega-tab:hover{color:var(--ink)}
+.entrega-tab.on{background:var(--surface);color:var(--ink);box-shadow:var(--shadow-sm)}
+.entrega-section{display:flex;flex-direction:column;gap:11px}
+/* Form fields */
 .checkout-field{display:flex;flex-direction:column;gap:5px}
 .checkout-field label{font-size:11px;font-weight:600;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.04em}
 .checkout-field label .req{color:var(--danger);font-weight:700;text-transform:none;letter-spacing:0}
@@ -210,6 +218,25 @@ input.cell-input:focus{outline:none;border-color:var(--brand)}
 .checkout-field input.invalid,.checkout-field select.invalid{border-color:var(--danger);background:var(--danger-bg)}
 .checkout-error{font-size:12px;color:var(--danger-fg);background:var(--danger-bg);padding:8px 11px;border-radius:7px;display:none;line-height:1.5}
 .checkout-error.show{display:block}
+/* Dirección + GPS button */
+.addr-row{display:flex;gap:6px}
+.addr-row input{flex:1}
+.addr-locate{width:36px;height:36px;flex-shrink:0;border:1px solid var(--border-strong);border-radius:8px;background:var(--surface);font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.addr-locate:hover{background:var(--surface-2);border-color:var(--brand)}
+/* Mini map toggle */
+.map-toggle{align-self:flex-start;height:28px;padding:0 11px;font-size:11px;font-weight:600;border:1px solid var(--border-strong);background:var(--surface);color:var(--ink-soft);border-radius:7px;cursor:pointer;margin-top:2px}
+.map-toggle:hover{color:var(--ink);border-color:var(--brand)}
+.map-toggle.on{background:var(--brand-tint);color:var(--brand);border-color:var(--brand)}
+.cart-mini-map-wrap{display:none;flex-direction:column;gap:6px;margin-top:4px}
+.cart-mini-map-wrap.show{display:flex}
+#cart-mini-map{width:100%;height:160px;border-radius:8px;border:1px solid var(--border);background:var(--surface-2);overflow:hidden}
+.map-search-btn{align-self:flex-end;height:28px;padding:0 11px;font-size:11px;font-weight:600;border:1px solid var(--border-strong);background:var(--surface);color:var(--ink);border-radius:7px;cursor:pointer}
+.map-search-btn:hover{background:var(--brand-tint);border-color:var(--brand);color:var(--brand)}
+/* Pickup info */
+.pickup-info{padding:12px 14px;background:var(--brand-tint);border:1px solid var(--brand);border-radius:9px;font-size:12px;line-height:1.6;color:var(--ink)}
+.pickup-info strong{color:var(--brand);font-weight:700;display:block;font-size:13px;margin-bottom:4px}
+.pickup-info .pi-row{display:flex;gap:6px;color:var(--ink-soft);font-size:12px}
+.pickup-info .pi-row span{font-weight:600;color:var(--ink)}
 /* Sticky bottom cart bar */
 .cart-bar{position:fixed;left:50%;bottom:18px;transform:translate(-50%,140%);width:min(680px,calc(100vw - 32px));background:var(--ink);color:#fff;border-radius:14px;padding:12px 14px 12px 18px;display:flex;align-items:center;justify-content:space-between;gap:14px;box-shadow:0 8px 30px rgba(0,0,0,.28);z-index:90;transition:transform .28s cubic-bezier(.2,.8,.2,1);flex-wrap:wrap}
 .cart-bar.show{transform:translate(-50%,0)}
@@ -625,47 +652,68 @@ select.cell-sel{height:26px;padding:0 6px;font-size:11px;border:1px solid var(--
 
 <!-- CART GLOBAL DRAWER (visible desde Tienda, Combos receta, etc.) -->
 <div class="cart-overlay" id="cart-overlay" onclick="closeCart()"></div>
-<div class="cart-drawer" id="cart-drawer" data-step="cart">
+<div class="cart-drawer" id="cart-drawer">
   <div class="cart-head">
-    <button class="cart-back" id="cart-back-btn" onclick="showCartStep()" style="display:none">←</button>
-    <h2 id="cart-title">Tu carrito</h2>
+    <h2 id="cart-title">🛒 Tu pedido</h2>
     <button class="cart-close" onclick="closeCart()">✕</button>
   </div>
-  <div class="cart-items" id="cart-items"></div>
-  <div class="cart-foot">
-    <div class="cart-subtotal"><span>Subtotal</span><span id="cart-sub">$0</span></div>
-    <div class="cart-zona">
-      <select onchange="renderCartFoot()" id="cart-zona-sel"></select>
+  <div class="cart-scroll">
+    <div class="cart-items" id="cart-items"></div>
+    <div class="cart-config">
+      <div class="cart-subtotal"><span>Subtotal</span><span id="cart-sub">$0</span></div>
+
+      <div class="entrega-tabs" role="tablist">
+        <button type="button" class="entrega-tab" data-mode="delivery" onclick="setEntregaMode('delivery')">🛵 Delivery</button>
+        <button type="button" class="entrega-tab" data-mode="pickup" onclick="setEntregaMode('pickup')">🏪 Retiro en local</button>
+      </div>
+
+      <div class="entrega-section" id="entrega-delivery">
+        <div class="checkout-field">
+          <label>Dirección de entrega <span class="req">*</span></label>
+          <div class="addr-row">
+            <input type="text" id="co-direccion" placeholder="Calle, número, depto" autocomplete="street-address">
+            <button type="button" class="addr-locate" onclick="useCurrentLocationInCart()" title="Usar mi ubicación (GPS)">📍</button>
+          </div>
+          <button type="button" class="map-toggle" onclick="toggleCartMap()" id="map-toggle-btn">🗺 Ver en mapa</button>
+          <div class="cart-mini-map-wrap" id="cart-mini-map-wrap">
+            <div id="cart-mini-map"></div>
+            <button type="button" class="map-search-btn" onclick="geocodeCartAddress()">Buscar en mapa</button>
+          </div>
+        </div>
+        <div class="checkout-field">
+          <label>Zona de envío</label>
+          <select onchange="renderCartFoot()" id="cart-zona-sel"></select>
+        </div>
+        <div class="cart-envio-info" id="cart-envio-info"></div>
+      </div>
+
+      <div class="entrega-section" id="entrega-pickup" style="display:none">
+        <div class="pickup-info" id="pickup-info"></div>
+      </div>
+
+      <div class="checkout-field">
+        <label>Teléfono <span class="req">*</span></label>
+        <input type="tel" id="co-telefono" placeholder="+54 11 ..." autocomplete="tel">
+      </div>
+      <div class="checkout-field">
+        <label>Correo <span class="opt">(opcional)</span></label>
+        <input type="email" id="co-correo" placeholder="email@ejemplo.com" autocomplete="email">
+      </div>
+      <div class="checkout-field">
+        <label>Forma de pago <span class="req">*</span></label>
+        <select id="co-pago">
+          <option value="">Elegí cómo pagar...</option>
+          <option value="efectivo">💵 Efectivo al recibir</option>
+          <option value="mercadopago">💳 Mercado Pago</option>
+          <option value="transferencia">🏦 Transferencia</option>
+          <option value="tarjeta">💳 Tarjeta al recibir</option>
+        </select>
+      </div>
+      <div class="checkout-error" id="co-error"></div>
     </div>
-    <div class="cart-envio-info" id="cart-envio-info"></div>
-    <div class="cart-total"><span>Total</span><span id="cart-total-val">$0</span></div>
-    <button class="checkout-btn" onclick="showCheckoutStep()">Continuar ↗</button>
   </div>
-  <div class="cart-checkout" id="cart-checkout">
-    <div class="checkout-field">
-      <label>Dirección de entrega <span class="req">*</span></label>
-      <input type="text" id="co-direccion" placeholder="Calle, número, depto" autocomplete="street-address">
-    </div>
-    <div class="checkout-field">
-      <label>Teléfono <span class="req">*</span></label>
-      <input type="tel" id="co-telefono" placeholder="+54 11 ..." autocomplete="tel">
-    </div>
-    <div class="checkout-field">
-      <label>Correo <span class="opt">(opcional)</span></label>
-      <input type="email" id="co-correo" placeholder="email@ejemplo.com" autocomplete="email">
-    </div>
-    <div class="checkout-field">
-      <label>Forma de pago <span class="req">*</span></label>
-      <select id="co-pago">
-        <option value="">Elegí cómo pagar...</option>
-        <option value="efectivo">💵 Efectivo al recibir</option>
-        <option value="mercadopago">💳 Mercado Pago</option>
-        <option value="transferencia">🏦 Transferencia</option>
-        <option value="tarjeta">💳 Tarjeta al recibir</option>
-      </select>
-    </div>
-    <div class="checkout-error" id="co-error"></div>
-    <div class="cart-total"><span>Total a pagar</span><span id="co-total-val">$0</span></div>
+  <div class="cart-foot">
+    <div class="cart-total"><span>Total a pagar</span><span id="cart-total-val">$0</span></div>
     <button class="checkout-btn" onclick="submitCheckout()">Confirmar pedido ↗</button>
   </div>
 </div>
@@ -1545,6 +1593,9 @@ function renderPedidosList(){
     const fechaStr=f.toLocaleDateString("es-AR",{day:"2-digit",month:"short"})+", "+f.toLocaleTimeString("es-AR",{hour:"2-digit",minute:"2-digit"});
     const totalItems=p.items.reduce((a,i)=>a+i.qty,0);
     const statusLabel={pendiente:"Pendiente",preparando:"Preparando",entregado:"Entregado",cancelado:"Cancelado"}[p.estado]||p.estado;
+    const tipo=p.tipoEntrega||"delivery";
+    const tipoEmoji=tipo==="pickup"?"🏪":"🛵";
+    const tipoLabel=tipo==="pickup"?"Retiro":"Delivery";
     return`<div class="pedido-card ${isOpen?"open":""}">
       <div class="pedido-head" onclick="togglePedido('${p.id}')">
         <div class="pedido-meta">
@@ -1552,7 +1603,7 @@ function renderPedidosList(){
           <span class="pedido-info">
             <span>📅 ${fechaStr}</span>
             <span>🛒 ${p.items.length} producto${p.items.length===1?"":"s"} (${totalItems} u.)</span>
-            <span>📍 ${p.zona}</span>
+            <span>${tipoEmoji} ${tipoLabel}${tipo==="delivery"&&p.zona?" · "+p.zona:""}</span>
           </span>
         </div>
         <span class="pedido-status ${p.estado}">${statusLabel}</span>
@@ -1560,9 +1611,9 @@ function renderPedidosList(){
       </div>
       <div class="pedido-body">
         ${p.cliente?`<div class="pedido-cliente">
-          <div class="pedido-cliente-title">👤 Cliente</div>
+          <div class="pedido-cliente-title">👤 Cliente · ${tipoEmoji} ${tipoLabel}</div>
           <div class="pedido-cliente-grid">
-            <div><span>📍 Dirección</span><strong>${p.cliente.direccion||"—"}</strong></div>
+            ${tipo==="delivery"?`<div><span>📍 Dirección</span><strong>${p.cliente.direccion||"—"}</strong></div>`:""}
             <div><span>📞 Teléfono</span><strong>${p.cliente.telefono||"—"}</strong></div>
             ${p.cliente.correo?`<div><span>✉ Correo</span><strong>${p.cliente.correo}</strong></div>`:""}
             <div><span>💳 Forma de pago</span><strong>${(FORMA_PAGO_LABEL&&FORMA_PAGO_LABEL[p.cliente.formaDePago])||p.cliente.formaDePago||"—"}</strong></div>
@@ -1578,7 +1629,7 @@ function renderPedidosList(){
         </div>
         <div class="pedido-totals">
           <div class="ptr"><span>Subtotal</span><span>${fmt(p.subtotal)}</span></div>
-          <div class="ptr"><span>Envío ${p.envioGratis?"(gratis)":""}</span><span>${p.envioGratis?"$0":fmt(p.costoEnvio)}</span></div>
+          ${tipo==="pickup"?`<div class="ptr"><span>Retiro en local</span><span style="color:var(--success-fg);font-weight:600">Sin cargo</span></div>`:`<div class="ptr"><span>Envío ${p.envioGratis?"(gratis)":""}</span><span>${p.envioGratis?"$0":fmt(p.costoEnvio)}</span></div>`}
           <div class="ptr total"><span>Total</span><span>${fmt(p.total)}</span></div>
         </div>
         <div class="pedido-actions">
@@ -1796,9 +1847,15 @@ function populateCartZonas(){
   if(prev&&zonas[prev])sel.value=prev;
 }
 
+let entregaMode="delivery";
+let cartMiniMap=null;
+let cartMiniMarker=null;
+let cartMiniMapVisible=false;
+
 function openCart(){
   populateCartZonas();
-  showCartStep();
+  prefillCheckoutForm();
+  setEntregaMode(entregaMode||"delivery",true);
   document.getElementById("cart-drawer").classList.add("open");
   document.getElementById("cart-overlay").classList.add("open");
   renderCartItems();
@@ -1807,48 +1864,120 @@ function openCart(){
 function closeCart(){
   document.getElementById("cart-drawer")?.classList.remove("open");
   document.getElementById("cart-overlay")?.classList.remove("open");
-  // reset al step "cart" para la próxima vez
-  showCartStep();
-}
-
-function showCartStep(){
-  const dr=document.getElementById("cart-drawer");
-  if(!dr)return;
-  dr.dataset.step="cart";
-  const title=document.getElementById("cart-title");
-  if(title)title.textContent="Tu carrito";
-  const back=document.getElementById("cart-back-btn");
-  if(back)back.style.display="none";
   const err=document.getElementById("co-error");
   if(err)err.classList.remove("show");
 }
 
-function showCheckoutStep(){
-  const items=Object.entries(cart).filter(([,q])=>q>0);
-  if(!items.length){alert("Tu carrito está vacío");return;}
-  const dr=document.getElementById("cart-drawer");
-  if(!dr)return;
-  dr.dataset.step="checkout";
-  const title=document.getElementById("cart-title");
-  if(title)title.textContent="Datos del pedido";
-  const back=document.getElementById("cart-back-btn");
-  if(back)back.style.display="flex";
-  // Pre-rellenar con datos guardados (reuso del último pedido)
+function prefillCheckoutForm(){
   const saved=JSON.parse(localStorage.getItem("verduleria_cliente_data")||"{}");
   const set=(id,v)=>{const e=document.getElementById(id);if(e&&!e.value)e.value=v||"";};
-  set("co-direccion",saved.direccion);
+  // Dirección: prioridad userLocation (Mi ubicación) > saved
+  const dirSaved=(userLocation&&userLocation.label)||saved.direccion||"";
+  set("co-direccion",dirSaved);
   set("co-telefono",saved.telefono);
   set("co-correo",saved.correo);
   set("co-pago",saved.formaDePago);
-  // Sincronizar total a pagar
-  const subtotal=Object.entries(cart).reduce((acc,[n,q])=>acc+(pVentas[n]||0)*q,0);
-  const selEl=document.getElementById("cart-zona-sel");
-  const zi=selEl?parseInt(selEl.value)||0:0;
-  const z=zonas[zi]||zonas[0];
-  const gratis=subtotal>=z.freeMin;
-  const total=subtotal+(gratis?0:z.costoFijo);
-  const totEl=document.getElementById("co-total-val");
-  if(totEl)totEl.textContent=fmt(total)||"$0";
+}
+
+function setEntregaMode(mode,force){
+  if(!force&&entregaMode===mode)return;
+  entregaMode=mode;
+  document.querySelectorAll(".entrega-tab").forEach(b=>{
+    b.classList.toggle("on",b.dataset.mode===mode);
+  });
+  const del=document.getElementById("entrega-delivery");
+  const pick=document.getElementById("entrega-pickup");
+  if(del)del.style.display=mode==="delivery"?"flex":"none";
+  if(pick)pick.style.display=mode==="pickup"?"flex":"none";
+  if(mode==="pickup")renderPickupInfo();
+  renderCartFoot();
+}
+
+function renderPickupInfo(){
+  const el=document.getElementById("pickup-info");
+  if(!el)return;
+  const t=(typeof tenants!=="undefined")&&tenants[currentTenantId];
+  if(!t){el.innerHTML="";return;}
+  el.innerHTML=`
+    <strong>${t.icono||"🏪"} ${t.nombre}</strong>
+    <div class="pi-row"><span>📍</span><div>${t.direccion||"Sin dirección"}${t.zona?" · "+t.zona:""}</div></div>
+    ${t.tel?`<div class="pi-row"><span>📞</span><div>${t.tel}</div></div>`:""}
+    ${t.diasEnvio?`<div class="pi-row"><span>🕒</span><div>Atención: ${t.diasEnvio}</div></div>`:""}
+    <div class="pi-row" style="margin-top:6px;color:var(--success-fg)"><span>✓</span><div><strong style="color:var(--success-fg);font-size:12px;font-weight:700">Sin costo de envío</strong></div></div>`;
+}
+
+function toggleCartMap(){
+  cartMiniMapVisible=!cartMiniMapVisible;
+  const wrap=document.getElementById("cart-mini-map-wrap");
+  const btn=document.getElementById("map-toggle-btn");
+  if(!wrap||!btn)return;
+  wrap.classList.toggle("show",cartMiniMapVisible);
+  btn.classList.toggle("on",cartMiniMapVisible);
+  btn.textContent=cartMiniMapVisible?"🗺 Ocultar mapa":"🗺 Ver en mapa";
+  if(cartMiniMapVisible){
+    setTimeout(()=>{initCartMiniMap();updateCartMiniMap();},80);
+  }
+}
+
+function initCartMiniMap(){
+  if(cartMiniMap||typeof L==="undefined")return;
+  const el=document.getElementById("cart-mini-map");
+  if(!el)return;
+  const center=userLocation?[userLocation.lat,userLocation.lng]:[-34.6037,-58.3816];
+  cartMiniMap=L.map(el,{zoomControl:false,attributionControl:false}).setView(center,userLocation?14:11);
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19}).addTo(cartMiniMap);
+  L.control.zoom({position:"topright"}).addTo(cartMiniMap);
+  cartMiniMap.on("click",e=>{
+    setCartLocation(e.latlng.lat,e.latlng.lng,"Punto seleccionado en el mapa");
+  });
+}
+
+function updateCartMiniMap(){
+  if(!cartMiniMap||!userLocation)return;
+  if(cartMiniMarker)cartMiniMap.removeLayer(cartMiniMarker);
+  const icon=L.divIcon({
+    className:"user-marker",
+    html:`<div style="width:20px;height:20px;background:var(--info);border:3px solid #fff;border-radius:50%;box-shadow:0 2px 6px rgba(0,0,0,.4)"></div>`,
+    iconSize:[20,20],iconAnchor:[10,10]
+  });
+  cartMiniMarker=L.marker([userLocation.lat,userLocation.lng],{icon}).addTo(cartMiniMap);
+  cartMiniMap.setView([userLocation.lat,userLocation.lng],14);
+  setTimeout(()=>cartMiniMap.invalidateSize(),50);
+}
+
+function setCartLocation(lat,lng,label){
+  // sync con Mi ubicación (también actualiza el mapa grande)
+  if(typeof setUserLocation==="function"){
+    setUserLocation(lat,lng,label);
+  } else {
+    userLocation={lat,lng,label};
+  }
+  const inp=document.getElementById("co-direccion");
+  if(inp)inp.value=label||`${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+  updateCartMiniMap();
+}
+
+async function geocodeCartAddress(){
+  const inp=document.getElementById("co-direccion");
+  const q=(inp?.value||"").trim();
+  if(!q){inp?.classList.add("invalid");return;}
+  inp?.classList.remove("invalid");
+  const query=q.toLowerCase().includes("argentina")?q:`${q}, Buenos Aires, Argentina`;
+  try{
+    const r=await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`);
+    const data=await r.json();
+    if(!data.length){alert("No se encontró esa dirección. Probá con más detalle.");return;}
+    const result=data[0];
+    setCartLocation(parseFloat(result.lat),parseFloat(result.lon),result.display_name.split(",").slice(0,3).join(","));
+  }catch(e){alert("Error al buscar la dirección: "+e.message);}
+}
+
+function useCurrentLocationInCart(){
+  if(!navigator.geolocation){alert("Tu navegador no soporta geolocalización");return;}
+  navigator.geolocation.getCurrentPosition(
+    pos=>setCartLocation(pos.coords.latitude,pos.coords.longitude,"Mi ubicación actual (GPS)"),
+    err=>alert("No se pudo obtener tu ubicación: "+err.message)
+  );
 }
 
 function renderCartItems(){
@@ -1889,21 +2018,33 @@ function cartRemove(nombre){cartChangeQty(nombre,-(cart[nombre]||0));}
 
 function renderCartFoot(){
   const subtotal=Object.entries(cart).reduce((acc,[n,q])=>acc+(pVentas[n]||0)*q,0);
-  const selEl=document.getElementById("cart-zona-sel");
-  const zi=selEl?parseInt(selEl.value):0;
-  const z=zonas[zi]||zonas[0];
-  const gratis=subtotal>=z.freeMin;
-  const costoEnvio=gratis?0:z.costoFijo;
+  let costoEnvio=0,gratis=true,envioText="",envioColor="var(--surface-2)";
+  if(entregaMode==="delivery"){
+    const selEl=document.getElementById("cart-zona-sel");
+    const zi=selEl?parseInt(selEl.value):0;
+    const z=zonas[zi]||zonas[0];
+    gratis=subtotal>=z.freeMin;
+    costoEnvio=gratis?0:z.costoFijo;
+    const faltaStr=gratis?"":`Agregá ${fmt(z.freeMin-subtotal)} más para envío gratis`;
+    envioColor=gratis?"var(--success-bg)":"var(--danger-bg)";
+    envioText=gratis?"✓ Envío GRATIS incluido":`Costo de envío: ${fmt(z.costoFijo)}. ${faltaStr}`;
+  }
   const total=subtotal+costoEnvio;
-  const faltaStr=gratis?"":`Agregá ${fmt(z.freeMin-subtotal)} más para envío gratis`;
-  const envioColor=gratis?"var(--success-bg)":"var(--danger-bg)";
-  const envioText=gratis?"✓ Envío GRATIS incluido":`Costo de envío: ${fmt(z.costoFijo)}. ${faltaStr}`;
   const subEl=document.getElementById("cart-sub");
   const totEl=document.getElementById("cart-total-val");
   const envEl=document.getElementById("cart-envio-info");
   if(subEl)subEl.textContent=fmt(subtotal)||"$0";
   if(totEl)totEl.textContent=fmt(total)||"$0";
-  if(envEl){envEl.style.background=envioColor;envEl.style.color=gratis?"var(--success-fg)":"var(--danger-fg)";envEl.textContent=envioText;}
+  if(envEl){
+    if(entregaMode==="delivery"){
+      envEl.style.display="block";
+      envEl.style.background=envioColor;
+      envEl.style.color=gratis?"var(--success-fg)":"var(--danger-fg)";
+      envEl.textContent=envioText;
+    } else {
+      envEl.style.display="none";
+    }
+  }
 }
 
 const FORMA_PAGO_LABEL={
@@ -1916,18 +2057,18 @@ const FORMA_PAGO_LABEL={
 function submitCheckout(){
   const items=Object.entries(cart).filter(([,q])=>q>0);
   if(!items.length){alert("Tu carrito está vacío");return;}
-  // Leer datos del form
-  const direccion=(document.getElementById("co-direccion")?.value||"").trim();
   const telefono=(document.getElementById("co-telefono")?.value||"").trim();
   const correo=(document.getElementById("co-correo")?.value||"").trim();
   const formaDePago=document.getElementById("co-pago")?.value||"";
-  // Validar
+  const direccion=entregaMode==="delivery"?(document.getElementById("co-direccion")?.value||"").trim():"";
   const errors=[];
   const markInvalid=(id,bad)=>{
     const el=document.getElementById(id);
     if(el)el.classList.toggle("invalid",bad);
   };
-  if(direccion.length<5){errors.push("Ingresá una dirección de entrega válida");markInvalid("co-direccion",true);}else markInvalid("co-direccion",false);
+  if(entregaMode==="delivery"){
+    if(direccion.length<5){errors.push("Ingresá una dirección de entrega válida");markInvalid("co-direccion",true);}else markInvalid("co-direccion",false);
+  } else markInvalid("co-direccion",false);
   const telDigits=telefono.replace(/\D/g,"");
   if(telDigits.length<6){errors.push("Ingresá un teléfono válido");markInvalid("co-telefono",true);}else markInvalid("co-telefono",false);
   if(correo&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo)){errors.push("El correo no parece válido");markInvalid("co-correo",true);}else markInvalid("co-correo",false);
@@ -1938,38 +2079,44 @@ function submitCheckout(){
     return;
   }
   if(errEl)errEl.classList.remove("show");
-  // Resolver totales
   const subtotal=Object.entries(cart).reduce((acc,[n,q])=>acc+(pVentas[n]||0)*q,0);
-  const selEl=document.getElementById("cart-zona-sel");
-  const zi=selEl?parseInt(selEl.value)||0:0;
-  const z=zonas[zi]||zonas[0];
-  const gratis=subtotal>=z.freeMin;
-  const costoEnvio=gratis?0:z.costoFijo;
+  let zonaNombre="",costoEnvio=0,gratis=true;
+  if(entregaMode==="delivery"){
+    const selEl=document.getElementById("cart-zona-sel");
+    const zi=selEl?parseInt(selEl.value)||0:0;
+    const z=zonas[zi]||zonas[0];
+    gratis=subtotal>=z.freeMin;
+    costoEnvio=gratis?0:z.costoFijo;
+    zonaNombre=z.nombre;
+  } else {
+    const t=tenants[currentTenantId];
+    zonaNombre=t?`Retiro en ${t.nombre}`:"Retiro en local";
+  }
   const total=subtotal+costoEnvio;
   const pedido={
     id:"ORD-"+Date.now().toString(36).toUpperCase(),
     fecha:new Date().toISOString(),
     items:items.map(([n,q])=>({
-      nombre:n,
-      qty:q,
+      nombre:n,qty:q,
       precioUnit:pVentas[n]||0,
       subtotal:(pVentas[n]||0)*q,
       unidad:(D.find(x=>x.n===n)||{}).u||"",
       emoji:EMOJIS[n]||"🌿"
     })),
     subtotal,
-    zona:z.nombre,
+    zona:zonaNombre,
     costoEnvio,
     envioGratis:gratis,
     total,
-    cliente:{direccion,telefono,correo,formaDePago},
+    tipoEntrega:entregaMode,
+    cliente:{direccion,telefono,correo,formaDePago,coords:entregaMode==="delivery"&&userLocation?{lat:userLocation.lat,lng:userLocation.lng}:null},
     estado:"pendiente"
   };
   pedidos.unshift(pedido);
-  // Guardar datos del cliente para reusar la próxima vez (no sensible)
   localStorage.setItem("verduleria_cliente_data",JSON.stringify({direccion,telefono,correo,formaDePago}));
   saveToLocalStorage();
-  alert(`✓ Pedido #${pedido.id} recibido\n\nProductos: ${items.length}\nTotal: ${fmt(total)}\nPago: ${FORMA_PAGO_LABEL[formaDePago]||formaDePago}\n\nGestionalo desde la tab 🧾 Pedidos.`);
+  const entregaTxt=entregaMode==="delivery"?"Delivery":"Retiro en local";
+  alert(`✓ Pedido #${pedido.id} recibido\n\nProductos: ${items.length}\nTotal: ${fmt(total)}\nEntrega: ${entregaTxt}\nPago: ${FORMA_PAGO_LABEL[formaDePago]||formaDePago}\n\nGestionalo desde la tab 🧾 Pedidos.`);
   cart={};
   updateCartBadge();
   if(typeof updateCartBar==="function")updateCartBar();
