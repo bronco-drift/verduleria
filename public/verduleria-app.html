@@ -149,6 +149,15 @@ h1{font-size:22px;font-weight:700;margin-bottom:.25rem;color:var(--ink);letter-s
 .admin-trigger{height:36px;padding:0 16px;background:var(--brand);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;white-space:nowrap;flex-shrink:0}
 .admin-trigger:hover{background:var(--brand-hover)}
 .topbar-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+/* Sub-header: nombre del local actual (cambia por tenant) */
+.store-banner{display:flex;align-items:center;gap:12px;padding:10px 14px;margin-bottom:1rem;background:var(--surface);border:1px solid var(--border);border-radius:10px;flex-wrap:wrap}
+.store-banner-icon{font-size:24px;line-height:1;width:42px;height:42px;display:flex;align-items:center;justify-content:center;background:var(--brand-tint);border-radius:9px;flex-shrink:0}
+.store-banner-info{flex:1;min-width:200px;display:flex;flex-direction:column;gap:1px}
+.store-banner-name{font-size:14px;font-weight:700;color:var(--ink);letter-spacing:-0.01em}
+.store-banner-meta{font-size:11px;color:var(--ink-soft);line-height:1.4}
+.store-banner-status{font-size:10px;font-weight:700;padding:3px 9px;border-radius:999px;letter-spacing:.04em;white-space:nowrap;text-transform:uppercase}
+.store-banner-status.on{background:var(--success-bg);color:var(--success-fg)}
+.store-banner-status.off{background:var(--warn-bg);color:var(--warn-fg)}
 .info-trigger{height:36px;padding:0 14px;background:var(--surface);color:var(--ink);border:1px solid var(--border-strong);border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;white-space:nowrap;flex-shrink:0}
 .info-trigger:hover{background:var(--bg);border-color:var(--brand);color:var(--brand)}
 /* Info drawer */
@@ -868,6 +877,8 @@ select.cell-sel{height:26px;padding:0 6px;font-size:11px;border:1px solid var(--
     <button class="admin-trigger" onclick="openAdmin()">⚙ Admin</button>
   </div>
 </div>
+
+<div class="store-banner" id="store-banner"></div>
 
 <div class="group-pills" id="group-pills"></div>
 <div class="tabs" id="tabbar"></div>
@@ -3895,18 +3906,29 @@ function switchTenant(id){
 function updateGlobalHeader(){
   const t=tenants[currentTenantId];
   if(!t)return;
+  // Topbar queda fija como marca paraguas verduras.ar
   const h1=document.querySelector(".topbar-title h1");
-  if(h1)h1.textContent=`${t.icono} ${t.nombre}`;
+  if(h1)h1.textContent="🥬 verduras.ar";
   const sub=document.querySelector(".topbar-title .subtitle");
-  if(sub){
+  if(sub)sub.textContent="Frutas, verduras y almacén con envío a domicilio";
+  // Sub-header: muestra el local actual
+  const banner=document.getElementById("store-banner");
+  if(banner){
     const parts=[];
     if(t.zona)parts.push(t.zona);
     if(t.direccion)parts.push(t.direccion);
     if(t.diasEnvio)parts.push(t.diasEnvio);
-    sub.textContent=parts.join(" · ")||"Frutas, verduras y almacén con envío a domicilio";
+    const disp=typeof isLocalDisponible==="function"?isLocalDisponible(t):true;
+    const statusLabel=disp?"Abierto":(typeof isLocalActivo==="function"&&!isLocalActivo(t)?"Cerrado":"Sin entrega");
+    banner.innerHTML=`
+      <div class="store-banner-icon">${t.icono||"🥬"}</div>
+      <div class="store-banner-info">
+        <div class="store-banner-name">${t.nombre}</div>
+        <div class="store-banner-meta">${parts.join(" · ")||"Sin información del local"}</div>
+      </div>
+      <span class="store-banner-status ${disp?"on":"off"}">${disp?"🟢":"🚫"} ${statusLabel}</span>`;
   }
   if(typeof updateSiteFooter==="function")updateSiteFooter();
-  // Refrescar Info drawer si está abierto
   const ind=document.getElementById("info-drawer");
   if(ind&&ind.classList.contains("open"))renderInfoBody();
 }
