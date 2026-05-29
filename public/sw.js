@@ -2,7 +2,7 @@
 const CACHE = "verduras-ar-v1";
 const SHELL = [
   "/",
-  "/verduleria-app.html",
+  "/index.html",
   "/manifest.webmanifest",
   "/favicon.svg",
   "/icon-512.svg",
