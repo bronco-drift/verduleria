@@ -6,5 +6,35 @@
     </linearGradient>
   </defs>
   <rect width="512" height="512" fill="url(#bg)" rx="96"/>
-  <text x="256" y="365" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif" font-size="296" font-weight="800" text-anchor="middle" fill="white" letter-spacing="-12">v.</text>
+  <!-- Stem (cream/light green) -->
+  <path d="M 230 322 L 230 412 Q 230 436 256 438 Q 282 436 282 412 L 282 322 Z"
+        fill="oklch(80% 0.05 110)" stroke="oklch(58% 0.08 110)" stroke-width="5"/>
+  <!-- Stem highlight -->
+  <line x1="252" y1="340" x2="252" y2="420" stroke="oklch(90% 0.03 110)" stroke-width="3" stroke-linecap="round" opacity="0.7"/>
+  <!-- Broccoli head: back layer (darker bumps for depth) -->
+  <g fill="oklch(40% 0.14 145)">
+    <circle cx="165" cy="195" r="56"/>
+    <circle cx="222" cy="135" r="64"/>
+    <circle cx="295" cy="120" r="72"/>
+    <circle cx="365" cy="170" r="62"/>
+    <circle cx="372" cy="245" r="52"/>
+    <circle cx="148" cy="262" r="52"/>
+  </g>
+  <!-- Front layer (brighter green bumps) -->
+  <g fill="oklch(58% 0.16 145)">
+    <circle cx="200" cy="205" r="52"/>
+    <circle cx="262" cy="170" r="58"/>
+    <circle cx="324" cy="200" r="52"/>
+    <circle cx="220" cy="265" r="48"/>
+    <circle cx="292" cy="265" r="48"/>
+    <circle cx="256" cy="225" r="54"/>
+  </g>
+  <!-- Tiny highlights for texture -->
+  <g fill="oklch(75% 0.12 145)" opacity="0.6">
+    <circle cx="240" cy="195" r="8"/>
+    <circle cx="285" cy="180" r="7"/>
+    <circle cx="208" cy="220" r="6"/>
+    <circle cx="305" cy="225" r="7"/>
+    <circle cx="262" cy="250" r="6"/>
+  </g>
 </svg>
