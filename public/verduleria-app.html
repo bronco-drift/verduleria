@@ -58,6 +58,58 @@ h1{font-size:22px;font-weight:700;margin-bottom:.25rem;color:var(--ink);letter-s
 .topbar-title .subtitle{margin-bottom:0}
 .admin-trigger{height:36px;padding:0 16px;background:var(--brand);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;white-space:nowrap;flex-shrink:0}
 .admin-trigger:hover{background:var(--brand-hover)}
+.topbar-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.info-trigger{height:36px;padding:0 14px;background:var(--surface);color:var(--ink);border:1px solid var(--border-strong);border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;white-space:nowrap;flex-shrink:0}
+.info-trigger:hover{background:var(--bg);border-color:var(--brand);color:var(--brand)}
+/* Info drawer */
+.info-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:9998;display:none}
+.info-overlay.open{display:block}
+.info-drawer{position:fixed;top:0;right:0;width:min(560px,95vw);height:100vh;background:var(--bg);z-index:9999;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .25s ease;box-shadow:-6px 0 30px rgba(0,0,0,.18)}
+.info-drawer.open{transform:translateX(0)}
+.info-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;background:var(--brand);color:#fff;gap:8px}
+.info-head h2{font-size:16px;font-weight:700;flex:1}
+.info-head .cart-close{color:#fff;background:rgba(255,255,255,.15)}
+.info-head .cart-close:hover{background:rgba(255,255,255,.25)}
+.info-body{flex:1;overflow-y:auto;padding:18px}
+.info-tenant-card{padding:16px;background:var(--surface);border:1px solid var(--border);border-radius:12px;margin-bottom:18px}
+.info-tenant-head{display:flex;align-items:center;gap:14px;margin-bottom:12px}
+.info-tenant-icon{font-size:32px;line-height:1;width:56px;height:56px;display:flex;align-items:center;justify-content:center;background:var(--brand-tint);border-radius:12px;flex-shrink:0}
+.info-tenant-name{flex:1}
+.info-tenant-name h3{font-size:17px;font-weight:700;color:var(--ink);margin:0 0 3px;letter-spacing:-0.01em}
+.info-tenant-name .meta{font-size:12px;color:var(--ink-soft)}
+.info-contact-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px;font-size:12px}
+.info-contact-row > div{display:flex;flex-direction:column;gap:2px;padding:8px 10px;background:var(--bg);border-radius:7px}
+.info-contact-row > div span{font-size:10px;color:var(--ink-mute);text-transform:uppercase;letter-spacing:.04em;font-weight:600}
+.info-contact-row > div strong{color:var(--ink);font-weight:600;font-size:12px}
+.info-section{background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:10px;overflow:hidden}
+.info-section-head{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;cursor:pointer;user-select:none}
+.info-section-head h4{font-size:13px;font-weight:700;color:var(--ink);margin:0;display:flex;align-items:center;gap:8px}
+.info-section-head .info-chev{font-size:13px;color:var(--ink-soft);transition:transform .2s}
+.info-section.open .info-chev{transform:rotate(180deg)}
+.info-section-body{display:none;padding:0 16px 14px;color:var(--ink-soft);font-size:12px;line-height:1.6}
+.info-section.open .info-section-body{display:block}
+.info-zona-list{display:flex;flex-direction:column;gap:6px;margin-top:4px}
+.info-zona-row{display:flex;justify-content:space-between;align-items:center;padding:8px 11px;background:var(--bg);border-radius:7px;font-size:12px}
+.info-zona-row .nz{font-weight:600;color:var(--ink)}
+.info-zona-row .meta{color:var(--ink-soft);font-size:11px;text-align:right}
+.info-faq-list{display:flex;flex-direction:column;gap:4px}
+.info-faq-item{padding:10px 12px;background:var(--bg);border-radius:7px}
+.info-faq-item .q{font-weight:600;color:var(--ink);font-size:12px;margin-bottom:3px}
+.info-faq-item .a{color:var(--ink-soft);font-size:12px;line-height:1.55}
+.info-steps{display:flex;flex-direction:column;gap:8px;counter-reset:step}
+.info-step{display:flex;gap:10px;padding:8px 0;counter-increment:step}
+.info-step::before{content:counter(step);width:24px;height:24px;background:var(--brand);color:#fff;border-radius:50%;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.info-step strong{color:var(--ink);font-weight:600;display:block;margin-bottom:2px;font-size:12px}
+.info-step span{color:var(--ink-soft);font-size:12px;line-height:1.5}
+
+/* Site footer */
+.site-footer{margin-top:2rem;padding:1.5rem;background:var(--surface);border:1px solid var(--border);border-radius:12px;color:var(--ink-soft);font-size:12px}
+.footer-cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:22px;margin-bottom:1.25rem}
+.footer-col h4{font-size:11px;font-weight:700;color:var(--ink);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px}
+.footer-col a,.footer-col .fl{display:block;color:var(--ink-soft);text-decoration:none;font-size:12px;line-height:1.9;cursor:pointer}
+.footer-col a:hover,.footer-col .fl:hover{color:var(--brand)}
+.footer-col .fl-meta{font-size:11px;color:var(--ink-mute);line-height:1.6}
+.footer-bottom{padding-top:1rem;border-top:1px solid var(--border);font-size:11px;color:var(--ink-mute);display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
 /* Group pills */
 .group-pills{display:flex;gap:6px;margin-bottom:.75rem;flex-wrap:wrap;border-bottom:1px solid var(--border);padding-bottom:.75rem}
 .group-pill{padding:8px 16px;font-size:13px;font-weight:600;color:var(--ink-soft);cursor:pointer;border:1px solid transparent;border-radius:8px;background:transparent;display:flex;align-items:center;gap:7px;transition:all .15s}
@@ -687,10 +739,13 @@ select.cell-sel{height:26px;padding:0 6px;font-size:11px;border:1px solid var(--
 <body>
 <div class="topbar">
   <div class="topbar-title">
-    <h1>🥦 Verdulería Online · Panel de Gestión</h1>
-    <p class="subtitle">Herramienta de análisis de precios, márgenes y logística</p>
+    <h1>🥬 Verdulería Online</h1>
+    <p class="subtitle">Frutas, verduras y almacén con envío a domicilio</p>
   </div>
-  <button class="admin-trigger" onclick="openAdmin()">⚙ Admin</button>
+  <div class="topbar-actions">
+    <button class="info-trigger" onclick="openInfo()">ℹ Info</button>
+    <button class="admin-trigger" onclick="openAdmin()">⚙ Admin</button>
+  </div>
 </div>
 
 <div class="group-pills" id="group-pills"></div>
@@ -707,6 +762,16 @@ select.cell-sel{height:26px;padding:0 6px;font-size:11px;border:1px solid var(--
     <button class="admin-close" onclick="closeAdmin()">✕</button>
   </div>
   <div class="admin-drawer-body" id="admin-drawer-body"></div>
+</div>
+
+<!-- INFO DRAWER (FAQ, zonas, contacto, cómo comprar) -->
+<div class="info-overlay" id="info-overlay" onclick="closeInfo()"></div>
+<div class="info-drawer" id="info-drawer">
+  <div class="info-head">
+    <h2>ℹ Información</h2>
+    <button class="cart-close" onclick="closeInfo()">✕</button>
+  </div>
+  <div class="info-body" id="info-body"></div>
 </div>
 
 <!-- CART GLOBAL DRAWER (visible desde Tienda, Combos receta, etc.) -->
@@ -997,7 +1062,7 @@ const GROUPS=[
   {id:"publico", label:"Público", icon:"👥"},
   {id:"referencia", label:"Referencia", icon:"📊"},
 ];
-let activeGroup="gestion";
+let activeGroup="publico";
 
 const tabbar=document.getElementById("tabbar");
 const panelsEl=document.getElementById("panels");
@@ -3651,11 +3716,20 @@ function switchTenant(id){
 function updateGlobalHeader(){
   const t=tenants[currentTenantId];
   if(!t)return;
-  // Update top h1 with current tenant
-  const h1=document.querySelector("h1");
-  if(h1)h1.textContent=`${t.icono} ${t.nombre} · Panel de Gestión`;
-  const sub=document.querySelector(".subtitle");
-  if(sub)sub.textContent=`${t.zona} · ${t.direccion} · Gestioná tus verdulerías en "⚙ Admin"`;
+  const h1=document.querySelector(".topbar-title h1");
+  if(h1)h1.textContent=`${t.icono} ${t.nombre}`;
+  const sub=document.querySelector(".topbar-title .subtitle");
+  if(sub){
+    const parts=[];
+    if(t.zona)parts.push(t.zona);
+    if(t.direccion)parts.push(t.direccion);
+    if(t.diasEnvio)parts.push(t.diasEnvio);
+    sub.textContent=parts.join(" · ")||"Frutas, verduras y almacén con envío a domicilio";
+  }
+  if(typeof updateSiteFooter==="function")updateSiteFooter();
+  // Refrescar Info drawer si está abierto
+  const ind=document.getElementById("info-drawer");
+  if(ind&&ind.classList.contains("open"))renderInfoBody();
 }
 
 // ── ADMIN (renders into the drawer, see renderAdminDrawer) ──
@@ -4658,6 +4732,174 @@ setInterval(()=>saveToLocalStorage(),30000);
 
 // Initial render: build tabs of default group
 renderTabsForGroup();
+renderSiteFooter();
+
+// ─── INFO DRAWER + FOOTER ─────────────────────────────────
+function openInfo(sectionId){
+  renderInfoBody();
+  document.getElementById("info-overlay").classList.add("open");
+  document.getElementById("info-drawer").classList.add("open");
+  if(sectionId){
+    setTimeout(()=>{
+      const el=document.getElementById("info-sec-"+sectionId);
+      if(el){
+        el.classList.add("open");
+        el.scrollIntoView({behavior:"smooth",block:"start"});
+      }
+    },200);
+  }
+}
+function closeInfo(){
+  document.getElementById("info-overlay")?.classList.remove("open");
+  document.getElementById("info-drawer")?.classList.remove("open");
+}
+function toggleInfoSection(id){
+  document.getElementById(id)?.classList.toggle("open");
+}
+
+function renderInfoBody(){
+  const el=document.getElementById("info-body");
+  if(!el)return;
+  const t=tenants[currentTenantId]||{};
+  const zonasHTML=(zonas||[]).map(z=>`
+    <div class="info-zona-row">
+      <div>
+        <div class="nz">${z.nombre}</div>
+        <div class="meta">Mín envío gratis: ${fmt(z.freeMin)}</div>
+      </div>
+      <div class="meta">
+        ${fmt(z.costoFijo)}<br>
+        ${z.tiempoMin}–${z.tiempoMax} min
+      </div>
+    </div>`).join("")||`<div style="color:var(--ink-mute);font-size:12px">Sin zonas configuradas.</div>`;
+  const FAQ=[
+    {q:"¿Cuál es el monto mínimo de pedido?",a:`Cada zona tiene su mínimo para envío gratis. Si no llegás, se cobra el costo fijo de la zona (entre $${(zonas[0]?.costoFijo||1500).toLocaleString("es-AR")} y $${(zonas[zonas.length-1]?.costoFijo||5000).toLocaleString("es-AR")}).`},
+    {q:"¿En cuánto tiempo me llega el pedido?",a:"Entre 30 y 180 minutos según tu zona. El detalle exacto está en la sección Zonas de envío."},
+    {q:"¿Cómo pago?",a:"Aceptamos efectivo al recibir, transferencia, Mercado Pago y tarjeta al recibir. Elegís la forma al confirmar el pedido."},
+    {q:"¿Puedo retirar en el local?",a:"Sí, en el carrito elegí \"🏪 Retiro en local\" antes de confirmar. El retiro no tiene costo de envío."},
+    {q:"¿Puedo cancelar un pedido?",a:"Sí, mientras esté en estado Pendiente o Preparando podés cancelarlo desde la tab Pedidos."},
+    {q:"¿Los precios son por kilo o por unidad?",a:"Cada producto muestra su unidad al lado del precio (kg, unidad, atado, 200g, etc). Calculamos el total automático según la cantidad que elijas."},
+  ];
+  const faqHTML=FAQ.map(f=>`<div class="info-faq-item"><div class="q">${f.q}</div><div class="a">${f.a}</div></div>`).join("");
+  el.innerHTML=`
+    <div class="info-tenant-card">
+      <div class="info-tenant-head">
+        <div class="info-tenant-icon">${t.icono||"🥬"}</div>
+        <div class="info-tenant-name">
+          <h3>${t.nombre||"Verdulería"}</h3>
+          <div class="meta">${t.zona||""}${t.direccion?" · "+t.direccion:""}</div>
+        </div>
+      </div>
+      <div class="info-contact-row">
+        ${t.tel?`<div><span>Teléfono</span><strong>${t.tel}</strong></div>`:""}
+        ${t.diasEnvio?`<div><span>Atención</span><strong>${t.diasEnvio}</strong></div>`:""}
+        <div><span>Zonas activas</span><strong>${(zonas||[]).length}</strong></div>
+        <div><span>Productos</span><strong>${D.filter(r=>stockState[r.n]&&stockState[r.n].activo).length}</strong></div>
+      </div>
+    </div>
+
+    <div class="info-section open" id="info-sec-como">
+      <div class="info-section-head" onclick="toggleInfoSection('info-sec-como')">
+        <h4>🛒 Cómo comprar</h4>
+        <div class="info-chev">▾</div>
+      </div>
+      <div class="info-section-body">
+        <div class="info-steps">
+          <div class="info-step"><div><strong>Elegí tus productos</strong><span>Navegá la tienda y agregá lo que necesitás al carrito. Podés filtrar por categoría o buscar por nombre.</span></div></div>
+          <div class="info-step"><div><strong>Sumá combos por receta (opcional)</strong><span>En la tab Combos receta seleccionás una receta y cantidad de personas, y armamos el combo automáticamente.</span></div></div>
+          <div class="info-step"><div><strong>Abrí el carrito</strong><span>Revisá el subtotal y elegí si querés delivery a tu casa o retiro en el local.</span></div></div>
+          <div class="info-step"><div><strong>Completá tus datos</strong><span>Dirección (si es delivery), teléfono, correo opcional y forma de pago.</span></div></div>
+          <div class="info-step"><div><strong>Confirmá el pedido</strong><span>Te aparece un código de pedido (ORD-…). Podés seguir su estado desde la tab Pedidos.</span></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="info-section" id="info-sec-zonas">
+      <div class="info-section-head" onclick="toggleInfoSection('info-sec-zonas')">
+        <h4>🛵 Zonas de envío</h4>
+        <div class="info-chev">▾</div>
+      </div>
+      <div class="info-section-body">
+        <div class="info-zona-list">${zonasHTML}</div>
+        <p style="margin-top:10px;font-size:11px;color:var(--ink-mute)">Si tu pedido supera el mínimo de tu zona, el envío es gratis. Si no, se suma el costo fijo. El retiro en local no tiene costo.</p>
+      </div>
+    </div>
+
+    <div class="info-section" id="info-sec-faq">
+      <div class="info-section-head" onclick="toggleInfoSection('info-sec-faq')">
+        <h4>❓ Preguntas frecuentes</h4>
+        <div class="info-chev">▾</div>
+      </div>
+      <div class="info-section-body">
+        <div class="info-faq-list">${faqHTML}</div>
+      </div>
+    </div>
+
+    <div class="info-section" id="info-sec-contacto">
+      <div class="info-section-head" onclick="toggleInfoSection('info-sec-contacto')">
+        <h4>📞 Contacto</h4>
+        <div class="info-chev">▾</div>
+      </div>
+      <div class="info-section-body">
+        ${t.tel?`<p><strong style="color:var(--ink)">Teléfono / WhatsApp:</strong> ${t.tel}</p>`:""}
+        ${t.direccion?`<p style="margin-top:6px"><strong style="color:var(--ink)">Local:</strong> ${t.direccion}</p>`:""}
+        ${t.diasEnvio?`<p style="margin-top:6px"><strong style="color:var(--ink)">Horario:</strong> ${t.diasEnvio}</p>`:""}
+        <p style="margin-top:10px;color:var(--ink-mute);font-size:11px">¿Dudas que no están en el FAQ? Escribinos por WhatsApp.</p>
+      </div>
+    </div>
+  `;
+}
+
+function renderSiteFooter(){
+  // Inyecta el footer al final del body si todavía no existe
+  if(document.querySelector(".site-footer"))return;
+  const t=tenants[currentTenantId]||{};
+  const footer=document.createElement("footer");
+  footer.className="site-footer";
+  document.body.appendChild(footer);
+  updateSiteFooter();
+}
+
+function updateSiteFooter(){
+  const footer=document.querySelector(".site-footer");
+  if(!footer)return;
+  const t=tenants[currentTenantId]||{};
+  const year=new Date().getFullYear();
+  footer.innerHTML=`
+    <div class="footer-cols">
+      <div class="footer-col">
+        <h4>Tienda</h4>
+        <a class="fl" onclick="goToTab('tienda')">Catálogo</a>
+        <a class="fl" onclick="goToTab('recetas')">Combos por receta</a>
+        <a class="fl" onclick="goToTab('ubicacion')">Mi ubicación</a>
+        <a class="fl" onclick="goToTab('pedidos')">Mis pedidos</a>
+      </div>
+      <div class="footer-col">
+        <h4>Ayuda</h4>
+        <a class="fl" onclick="openInfo('como')">Cómo comprar</a>
+        <a class="fl" onclick="openInfo('zonas')">Zonas de envío</a>
+        <a class="fl" onclick="openInfo('faq')">Preguntas frecuentes</a>
+        <a class="fl" onclick="openInfo('contacto')">Contacto</a>
+      </div>
+      <div class="footer-col">
+        <h4>${t.icono||"🥬"} ${t.nombre||"Verdulería"}</h4>
+        <div class="fl-meta">${t.direccion||""}</div>
+        <div class="fl-meta">${t.zona||""}</div>
+        ${t.tel?`<div class="fl-meta" style="margin-top:6px">${t.tel}</div>`:""}
+        ${t.diasEnvio?`<div class="fl-meta">${t.diasEnvio}</div>`:""}
+      </div>
+      <div class="footer-col">
+        <h4>Seguinos</h4>
+        <a class="fl" onclick="alert('Conectá tu Instagram desde Admin')">📷 Instagram</a>
+        <a class="fl" onclick="alert('Conectá tu Facebook desde Admin')">📘 Facebook</a>
+        <a class="fl" onclick="alert('Conectá tu WhatsApp desde Admin')">💬 WhatsApp</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© ${year} · ${t.nombre||"Verdulería Online"} · Hecho con 🥦</span>
+      <span>Activa desde ${t.creada||"—"}</span>
+    </div>`;
+}
 </script>
 </body>
 </html>
