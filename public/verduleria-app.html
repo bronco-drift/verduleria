@@ -343,6 +343,22 @@ input.cell-input:focus{outline:none;border-color:var(--brand)}
 .layout-mock--menu .lm-row::before{content:"";width:18px;height:3px;background:var(--ink-soft);opacity:0.3;border-radius:2px}
 .layout-mock--menu .lm-row .lm-block{flex:1;height:10px}
 
+/* Toggles de opciones de entrega (admin) */
+.entrega-config{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:14px 16px}
+.entrega-config-title{font-size:13px;font-weight:700;color:var(--ink);margin-bottom:4px}
+.entrega-config-desc{font-size:11px;color:var(--ink-soft);line-height:1.55;margin-bottom:12px}
+.entrega-config-rows{display:flex;flex-direction:column;gap:8px}
+.entrega-toggle{display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--surface);border:1px solid var(--border);border-radius:9px;cursor:pointer;transition:border-color .15s}
+.entrega-toggle:hover{border-color:var(--border-strong)}
+.entrega-toggle .et-info{flex:1;display:flex;flex-direction:column;gap:2px}
+.entrega-toggle .et-info strong{font-size:13px;font-weight:600;color:var(--ink)}
+.entrega-toggle .et-info span{font-size:11px;color:var(--ink-soft);line-height:1.4}
+.entrega-toggle input[type=checkbox]{position:absolute;opacity:0;pointer-events:none}
+.entrega-toggle .et-switch{width:38px;height:22px;background:var(--surface-2);border-radius:999px;position:relative;transition:background .2s;flex-shrink:0}
+.entrega-toggle .et-switch::after{content:"";position:absolute;top:2px;left:2px;width:18px;height:18px;background:var(--surface);border-radius:50%;box-shadow:0 1px 3px rgba(0,0,0,.2);transition:transform .2s}
+.entrega-toggle input:checked + .et-switch{background:var(--brand)}
+.entrega-toggle input:checked + .et-switch::after{transform:translateX(16px)}
+
 /* Pickup info */
 .pickup-info{padding:12px 14px;background:var(--brand-tint);border:1px solid var(--brand);border-radius:9px;font-size:12px;line-height:1.6;color:var(--ink)}
 .pickup-info strong{color:var(--brand);font-weight:700;display:block;font-size:13px;margin-bottom:4px}
@@ -2057,7 +2073,8 @@ let cartMiniMapVisible=false;
 function openCart(){
   populateCartZonas();
   prefillCheckoutForm();
-  setEntregaMode(entregaMode||"delivery",true);
+  const cfg=getEntregaConfig(tenants[currentTenantId]);
+  setEntregaMode(resolveCartModeForConfig(cfg),true);
   document.getElementById("cart-drawer").classList.add("open");
   document.getElementById("cart-overlay").classList.add("open");
   renderCartItems();
@@ -2081,9 +2098,40 @@ function prefillCheckoutForm(){
   set("co-pago",saved.formaDePago);
 }
 
+function getEntregaConfig(t){
+  const c=(t&&t.entregaConfig)?t.entregaConfig:{delivery:true,pickup:true};
+  // forzar al menos uno habilitado
+  if(!c.delivery&&!c.pickup)return{delivery:true,pickup:true};
+  return c;
+}
+
+function resolveCartModeForConfig(cfg){
+  // Si el modo actual no está disponible, fallback al disponible
+  if(entregaMode==="delivery"&&!cfg.delivery)return"pickup";
+  if(entregaMode==="pickup"&&!cfg.pickup)return"delivery";
+  return entregaMode||"delivery";
+}
+
+function applyEntregaTabsVisibility(){
+  const cfg=getEntregaConfig(tenants[currentTenantId]);
+  const tabs=document.querySelectorAll(".entrega-tab");
+  let visible=0;
+  tabs.forEach(b=>{
+    const m=b.dataset.mode;
+    const ok=cfg[m];
+    b.style.display=ok?"flex":"none";
+    if(ok)visible++;
+  });
+  const tabsWrap=document.querySelector(".entrega-tabs");
+  if(tabsWrap)tabsWrap.style.display=visible>1?"grid":"none";
+}
+
 function setEntregaMode(mode,force){
+  const cfg=getEntregaConfig(tenants[currentTenantId]);
+  if(!cfg[mode])mode=cfg.delivery?"delivery":"pickup";
   if(!force&&entregaMode===mode)return;
   entregaMode=mode;
+  applyEntregaTabsVisibility();
   document.querySelectorAll(".entrega-tab").forEach(b=>{
     b.classList.toggle("on",b.dataset.mode===mode);
   });
@@ -3646,6 +3694,7 @@ function initTenants(){
     lat:-34.5870, lng:-58.4250,
     creada:"2025-01-15",
     style:{theme:"verde-fresco",layout:"grilla"},
+    entregaConfig:{delivery:true,pickup:true},
     data:snapshotCurrentState(),
   };
   // Add 2 example tenants with variations
@@ -3659,6 +3708,7 @@ function initTenants(){
     lat:-34.4710, lng:-58.5060,
     creada:"2025-03-10",
     style:{theme:"mercado-barrio",layout:"catalogo-grande"},
+    entregaConfig:{delivery:true,pickup:false},
     data:t2State,
   };
   const t3State=snapshotCurrentState();
@@ -3671,6 +3721,7 @@ function initTenants(){
     lat:-34.5880, lng:-58.3960,
     creada:"2025-04-22",
     style:{theme:"organico-premium",layout:"menu-categoria"},
+    entregaConfig:{delivery:false,pickup:true},
     data:t3State,
   };
 }
@@ -3876,11 +3927,60 @@ function renderTenantDetail(){
         <div class="info-item"><div class="l">Margen objetivo</div><div class="v">${t.data.margenObj||40}%</div></div>
         <div class="info-item"><div class="l">Zonas envío</div><div class="v">${(t.data.zonas||[]).length}</div></div>
       </div>
-      <p style="font-size:11px;color:var(--ink-soft);line-height:1.6">
+      <p style="font-size:11px;color:var(--ink-soft);line-height:1.6;margin-bottom:14px">
         Cuando seleccionás una verdulería, todas las pestañas (Tienda, Stock, Margen, Recetas, etc.) muestran sus datos específicos.
         Los cambios que hagas se guardan automáticamente al cambiar de tenant.
       </p>
+      ${renderEntregaConfigHTML(t)}
     </div>`;
+}
+
+function renderEntregaConfigHTML(t){
+  const cfg=getEntregaConfig(t);
+  return `
+    <div class="entrega-config">
+      <div class="entrega-config-title">🛵 Opciones de entrega</div>
+      <p class="entrega-config-desc">Activá qué opciones ofrece esta verdulería. Si dejás solo una, el carrito la aplica directo sin mostrar el toggle.</p>
+      <div class="entrega-config-rows">
+        <label class="entrega-toggle">
+          <div class="et-info">
+            <strong>🛵 Delivery</strong>
+            <span>Envío a domicilio según zona</span>
+          </div>
+          <input type="checkbox" ${cfg.delivery?"checked":""} onchange="setTenantEntrega('delivery',this.checked)">
+          <span class="et-switch"></span>
+        </label>
+        <label class="entrega-toggle">
+          <div class="et-info">
+            <strong>🏪 Retiro en local</strong>
+            <span>El cliente busca el pedido en la verdulería</span>
+          </div>
+          <input type="checkbox" ${cfg.pickup?"checked":""} onchange="setTenantEntrega('pickup',this.checked)">
+          <span class="et-switch"></span>
+        </label>
+      </div>
+    </div>`;
+}
+
+function setTenantEntrega(key,enabled){
+  const t=tenants[currentTenantId];
+  if(!t)return;
+  if(!t.entregaConfig)t.entregaConfig={delivery:true,pickup:true};
+  t.entregaConfig[key]=!!enabled;
+  // forzar al menos uno habilitado
+  if(!t.entregaConfig.delivery&&!t.entregaConfig.pickup){
+    t.entregaConfig[key]=true;
+    alert("Tenés que dejar al menos una opción de entrega habilitada.");
+    renderTenantDetail();
+    return;
+  }
+  // refrescar drawer cart si está abierto
+  const dr=document.getElementById("cart-drawer");
+  if(dr&&dr.classList.contains("open")){
+    const cfg=getEntregaConfig(t);
+    setEntregaMode(resolveCartModeForConfig(cfg),true);
+  }
+  autoSave();
 }
 
 // ── EDITOR DE ESTILO DE PINES ──
