@@ -1,9 +1,98 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es-AR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Verdulería Online · Panel de Gestión</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>verduras.ar — Frutas, verduras y almacén con envío a domicilio</title>
+<meta name="description" content="Comprá frutas, verduras y almacén online en verduras.ar. Encontrá la verdulería más cercana, comparalas con la competencia y elegí delivery o retiro en local. Pedidos por WhatsApp, Mercado Pago, efectivo o transferencia.">
+<meta name="keywords" content="verdulería online, frutas y verduras delivery, verduras a domicilio, almacén online, verduras CABA, verduras GBA, verduras Argentina, frutas online, verduras orgánicas, bolsón de verduras, mercado online">
+<meta name="author" content="verduras.ar">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="format-detection" content="telephone=yes,address=yes,email=yes">
+<link rel="canonical" href="https://verduras.ar/">
+
+<!-- PWA -->
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="theme-color" content="#2e5f7a" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0f1419" media="(prefers-color-scheme: dark)">
+<meta name="color-scheme" content="light dark">
+<meta name="application-name" content="verduras.ar">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="verduras.ar">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="msapplication-TileColor" content="#2e5f7a">
+<meta name="msapplication-tap-highlight" content="no">
+
+<!-- Iconos -->
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="apple-touch-icon" href="/icon-512.svg">
+<link rel="mask-icon" href="/favicon.svg" color="#2e5f7a">
+
+<!-- Open Graph (Facebook, WhatsApp, LinkedIn) -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="verduras.ar">
+<meta property="og:title" content="verduras.ar — Frutas, verduras y almacén con envío">
+<meta property="og:description" content="Comprá frutas, verduras y almacén online. Encontrá la verdulería más cercana, elegí delivery o retiro y pagá como prefieras.">
+<meta property="og:url" content="https://verduras.ar/">
+<meta property="og:image" content="https://verduras.ar/icon-512.svg">
+<meta property="og:image:alt" content="Logo de verduras.ar">
+<meta property="og:locale" content="es_AR">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="verduras.ar — Frutas y verduras con envío">
+<meta name="twitter:description" content="Comprá online en la verdulería más cercana. Delivery o retiro, múltiples formas de pago.">
+<meta name="twitter:image" content="https://verduras.ar/icon-512.svg">
+
+<!-- Hint a buscadores: SPA -->
+<meta name="fragment" content="!">
+
+<!-- Datos estructurados (LocalBusiness + WebSite) -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": "https://verduras.ar/#website",
+      "url": "https://verduras.ar/",
+      "name": "verduras.ar",
+      "description": "Verdulerías online de Argentina con envío a domicilio",
+      "inLanguage": "es-AR",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://verduras.ar/?q={search_term_string}",
+        "query-input": "required name=search_term_string"
+      }
+    },
+    {
+      "@type": "Organization",
+      "@id": "https://verduras.ar/#organization",
+      "name": "verduras.ar",
+      "url": "https://verduras.ar/",
+      "logo": "https://verduras.ar/icon-512.svg",
+      "areaServed": { "@type": "Country", "name": "Argentina" }
+    },
+    {
+      "@type": "Store",
+      "name": "Verdulería online",
+      "image": "https://verduras.ar/icon-512.svg",
+      "url": "https://verduras.ar/",
+      "priceRange": "$$",
+      "address": {
+        "@type": "PostalAddress",
+        "addressCountry": "AR",
+        "addressRegion": "Buenos Aires"
+      },
+      "paymentAccepted": "Efectivo, Mercado Pago, Transferencia, Tarjeta",
+      "currenciesAccepted": "ARS"
+    }
+  ]
+}
+</script>
+
+<!-- Leaflet (mapa) -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
@@ -770,7 +859,7 @@ select.cell-sel{height:26px;padding:0 6px;font-size:11px;border:1px solid var(--
 <body>
 <div class="topbar">
   <div class="topbar-title">
-    <h1>🥬 Verdulería Online</h1>
+    <h1>🥬 verduras.ar</h1>
     <p class="subtitle">Frutas, verduras y almacén con envío a domicilio</p>
   </div>
   <div class="topbar-actions">
@@ -4962,6 +5051,15 @@ setInterval(()=>saveToLocalStorage(),30000);
 renderTabsForGroup();
 renderSiteFooter();
 
+// ─── PWA: Service Worker registration ─────────────────────
+if("serviceWorker" in navigator){
+  window.addEventListener("load",()=>{
+    navigator.serviceWorker.register("/sw.js").catch(err=>{
+      console.warn("SW registration failed",err);
+    });
+  });
+}
+
 // ─── INFO DRAWER + FOOTER ─────────────────────────────────
 function openInfo(sectionId){
   renderInfoBody();
@@ -5124,7 +5222,7 @@ function updateSiteFooter(){
       </div>
     </div>
     <div class="footer-bottom">
-      <span>© ${year} · ${t.nombre||"Verdulería Online"} · Hecho con 🥦</span>
+      <span>© ${year} · verduras.ar · ${t.nombre||"Verdulería"} · Hecho con 🥦</span>
       <span>Activa desde ${t.creada||"—"}</span>
     </div>`;
 }

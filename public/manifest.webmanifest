@@ -1,0 +1,46 @@
+{
+  "name": "verduras.ar — Frutas y verduras con envío",
+  "short_name": "verduras.ar",
+  "description": "Frutas, verduras y almacén con envío a domicilio en CABA, GBA y todo el país. Encontrá la verdulería más cercana, comprá online y elegí delivery o retiro en local.",
+  "start_url": "/",
+  "scope": "/",
+  "id": "/",
+  "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone", "browser"],
+  "orientation": "portrait",
+  "background_color": "#f5f0e6",
+  "theme_color": "#2e5f7a",
+  "lang": "es-AR",
+  "dir": "ltr",
+  "categories": ["shopping", "food", "lifestyle"],
+  "icons": [
+    {
+      "src": "/icon-512.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-maskable.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Ver tienda",
+      "short_name": "Tienda",
+      "description": "Catálogo de frutas y verduras",
+      "url": "/",
+      "icons": [{ "src": "/icon-512.svg", "sizes": "any", "type": "image/svg+xml" }]
+    },
+    {
+      "name": "Mis pedidos",
+      "short_name": "Pedidos",
+      "description": "Ver el estado de mis pedidos",
+      "url": "/",
+      "icons": [{ "src": "/icon-512.svg", "sizes": "any", "type": "image/svg+xml" }]
+    }
+  ]
+}
