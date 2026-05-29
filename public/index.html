@@ -1220,27 +1220,27 @@ function getSortState(tid){
 
 // ─── TAB SYSTEM ──────────────────────────────────────────
 const TABS=[
-  // GESTIÓN
-  {id:"dashboard",label:"🏪 Mi verdulería", group:"gestion"},
-  {id:"stock",label:"📦 Precios y Stock", group:"gestion"},
-  {id:"margen",label:"💰 Margen bruto", group:"gestion"},
-  {id:"sugeridos",label:"🎯 Precios sugeridos", group:"gestion"},
-  {id:"envio",label:"🚚 Costo de envío", group:"gestion"},
-  {id:"estacional",label:"📅 Estacionalidad", group:"gestion"},
-  {id:"proveedor",label:"📋 Proveedores", group:"gestion"},
-  {id:"pedidos",label:"🧾 Pedidos", group:"gestion"},
-  // PÚBLICO (cara al cliente)
+  // PÚBLICO (cara al cliente — landing del sitio)
   {id:"tienda",label:"🛒 Tienda", group:"publico"},
   {id:"recetas",label:"👨‍🍳 Combos receta", group:"publico"},
   {id:"ubicacion",label:"📍 Mi ubicación", group:"publico"},
+  // GESTIÓN (ordenadas por frecuencia de uso del dueño)
+  {id:"pedidos",label:"🧾 Pedidos", group:"gestion"},
+  {id:"dashboard",label:"🏪 Mi verdulería", group:"gestion"},
+  {id:"stock",label:"📦 Precios y Stock", group:"gestion"},
+  {id:"margen",label:"💰 Margen bruto", group:"gestion"},
+  {id:"envio",label:"🚚 Costo de envío", group:"gestion"},
+  {id:"sugeridos",label:"🎯 Precios sugeridos", group:"gestion"},
+  {id:"proveedor",label:"📋 Proveedores", group:"gestion"},
+  {id:"estacional",label:"📅 Estacionalidad", group:"gestion"},
   // REFERENCIA (competencia)
   {id:"original",label:"📊 Precios competencia", group:"referencia"},
   {id:"kg",label:"⚖ Por kg", group:"referencia"},
 ];
 
 const GROUPS=[
-  {id:"gestion", label:"Gestión", icon:"⚙"},
   {id:"publico", label:"Público", icon:"👥"},
+  {id:"gestion", label:"Gestión", icon:"⚙"},
   {id:"referencia", label:"Referencia", icon:"📊"},
 ];
 let activeGroup="publico";
