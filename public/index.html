@@ -160,18 +160,26 @@ h1{font-size:22px;font-weight:700;margin-bottom:.25rem;color:var(--ink);letter-s
 .store-banner-status{font-size:10px;font-weight:700;padding:3px 9px;border-radius:999px;letter-spacing:.04em;white-space:nowrap;text-transform:uppercase}
 .store-banner-status.on{background:var(--success-bg);color:var(--success-fg)}
 .store-banner-status.off{background:var(--warn-bg);color:var(--warn-fg)}
-.info-trigger{height:36px;padding:0 14px;background:var(--surface);color:var(--ink);border:1px solid var(--border-strong);border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;white-space:nowrap;flex-shrink:0}
-.info-trigger:hover{background:var(--bg);border-color:var(--brand);color:var(--brand)}
+.info-trigger,.view-trigger{height:36px;padding:0 14px;background:var(--surface);color:var(--ink);border:1px solid var(--border-strong);border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;white-space:nowrap;flex-shrink:0}
+.info-trigger:hover,.view-trigger:hover{background:var(--bg);border-color:var(--brand);color:var(--brand)}
+.view-trigger.on{background:var(--brand);color:#fff;border-color:var(--brand)}
+.view-trigger.on:hover{background:var(--brand-hover);color:#fff}
 .ta-icon{font-size:14px;line-height:1}
 .ta-label{font-size:13px}
 /* Mobile: icon-only buttons, subtitle hidden, h1 still readable */
 @media(max-width:640px){
   .topbar{gap:8px}
   .topbar-title .subtitle{display:none}
-  .info-trigger,.admin-trigger{padding:0;width:36px;justify-content:center;gap:0}
+  .info-trigger,.admin-trigger,.view-trigger{padding:0;width:36px;justify-content:center;gap:0}
   .ta-label{display:none}
   .ta-icon{font-size:16px}
 }
+/* Vista final: oculta toda la maquinaria de admin */
+body.vista-final .group-pills{display:none}
+body.vista-final .store-banner{display:none}
+body.vista-final .admin-trigger{display:none}
+body.vista-final .topbar-title .subtitle{display:block;font-weight:600;color:var(--ink)}
+@media(max-width:640px){body.vista-final .topbar-title .subtitle{display:block}}
 /* Info drawer */
 .info-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:9998;display:none}
 .info-overlay.open{display:block}
@@ -930,6 +938,7 @@ select.cell-sel{height:26px;padding:0 6px;font-size:11px;border:1px solid var(--
     <p class="subtitle">Frutas, verduras y almacén con envío a domicilio</p>
   </div>
   <div class="topbar-actions">
+    <button class="view-trigger" onclick="toggleVistaFinal()" aria-label="Vista de cliente final"><span class="ta-icon">👁</span><span class="ta-label">Vista</span></button>
     <button class="info-trigger" onclick="openInfo()" aria-label="Información"><span class="ta-icon">ℹ</span><span class="ta-label">Info</span></button>
     <button class="admin-trigger" onclick="openAdmin()" aria-label="Administración"><span class="ta-icon">⚙</span><span class="ta-label">Admin</span></button>
   </div>
@@ -4241,6 +4250,19 @@ function switchTenant(id){
   saveToLocalStorage();
 }
 
+let vistaFinal=false;
+
+function toggleVistaFinal(){
+  vistaFinal=!vistaFinal;
+  document.body.classList.toggle("vista-final",vistaFinal);
+  document.querySelector(".view-trigger")?.classList.toggle("on",vistaFinal);
+  // Si entraste a vista final desde un grupo no-público, forzar Público
+  if(vistaFinal&&activeGroup!=="publico"){
+    switchGroup("publico");
+  }
+  updateGlobalHeader();
+}
+
 function updateGlobalHeader(){
   const t=tenants[currentTenantId];
   if(!t)return;
@@ -4248,7 +4270,16 @@ function updateGlobalHeader(){
   const h1=document.querySelector(".topbar-title h1");
   if(h1)h1.textContent="🥦 verduras.ar";
   const sub=document.querySelector(".topbar-title .subtitle");
-  if(sub)sub.textContent="Frutas, verduras y almacén con envío a domicilio";
+  if(sub){
+    if(vistaFinal){
+      // En vista final el subtítulo muestra el local actual
+      const parts=[`${t.icono||"🥬"} ${t.nombre||"Verdulería"}`];
+      if(t.zona)parts.push(t.zona);
+      sub.textContent=parts.join(" · ");
+    } else {
+      sub.textContent="Frutas, verduras y almacén con envío a domicilio";
+    }
+  }
   // Sub-header: muestra el local actual
   const banner=document.getElementById("store-banner");
   if(banner){
