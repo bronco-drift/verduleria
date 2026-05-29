@@ -142,13 +142,15 @@ body{font-family:system-ui,sans-serif;background:var(--bg);color:var(--ink);font
 h1{font-size:22px;font-weight:700;margin-bottom:.25rem;color:var(--ink);letter-spacing:-0.015em}
 .subtitle{font-size:13px;color:var(--ink-soft);margin-bottom:1.25rem}
 /* Topbar with admin button on right */
-.topbar{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:1.25rem;flex-wrap:wrap}
-.topbar-title{flex:1;min-width:240px}
+.topbar{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:1.25rem;flex-wrap:nowrap}
+.topbar-title{flex:1;min-width:0}
+.topbar-title h1{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.topbar-title .subtitle{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .topbar-title h1{margin-bottom:.25rem}
 .topbar-title .subtitle{margin-bottom:0}
 .admin-trigger{height:36px;padding:0 16px;background:var(--brand);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;white-space:nowrap;flex-shrink:0}
 .admin-trigger:hover{background:var(--brand-hover)}
-.topbar-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.topbar-actions{display:flex;gap:8px;align-items:center;flex-shrink:0}
 /* Sub-header: nombre del local actual (cambia por tenant) */
 .store-banner{display:flex;align-items:center;gap:12px;padding:10px 14px;margin-bottom:1rem;background:var(--surface);border:1px solid var(--border);border-radius:10px;flex-wrap:wrap}
 .store-banner-icon{font-size:24px;line-height:1;width:42px;height:42px;display:flex;align-items:center;justify-content:center;background:var(--brand-tint);border-radius:9px;flex-shrink:0}
@@ -160,6 +162,16 @@ h1{font-size:22px;font-weight:700;margin-bottom:.25rem;color:var(--ink);letter-s
 .store-banner-status.off{background:var(--warn-bg);color:var(--warn-fg)}
 .info-trigger{height:36px;padding:0 14px;background:var(--surface);color:var(--ink);border:1px solid var(--border-strong);border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;white-space:nowrap;flex-shrink:0}
 .info-trigger:hover{background:var(--bg);border-color:var(--brand);color:var(--brand)}
+.ta-icon{font-size:14px;line-height:1}
+.ta-label{font-size:13px}
+/* Mobile: icon-only buttons, subtitle hidden, h1 still readable */
+@media(max-width:640px){
+  .topbar{gap:8px}
+  .topbar-title .subtitle{display:none}
+  .info-trigger,.admin-trigger{padding:0;width:36px;justify-content:center;gap:0}
+  .ta-label{display:none}
+  .ta-icon{font-size:16px}
+}
 /* Info drawer */
 .info-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:9998;display:none}
 .info-overlay.open{display:block}
@@ -903,8 +915,8 @@ select.cell-sel{height:26px;padding:0 6px;font-size:11px;border:1px solid var(--
     <p class="subtitle">Frutas, verduras y almacén con envío a domicilio</p>
   </div>
   <div class="topbar-actions">
-    <button class="info-trigger" onclick="openInfo()">ℹ Info</button>
-    <button class="admin-trigger" onclick="openAdmin()">⚙ Admin</button>
+    <button class="info-trigger" onclick="openInfo()" aria-label="Información"><span class="ta-icon">ℹ</span><span class="ta-label">Info</span></button>
+    <button class="admin-trigger" onclick="openAdmin()" aria-label="Administración"><span class="ta-icon">⚙</span><span class="ta-label">Admin</span></button>
   </div>
 </div>
 
