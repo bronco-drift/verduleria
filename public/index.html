@@ -399,6 +399,19 @@ input.cell-input:focus{outline:none;border-color:var(--brand)}
 .map-search-btn{align-self:flex-end;height:28px;padding:0 11px;font-size:11px;font-weight:600;border:1px solid var(--border-strong);background:var(--surface);color:var(--ink);border-radius:7px;cursor:pointer}
 .map-search-btn:hover{background:var(--brand-tint);border-color:var(--brand);color:var(--brand)}
 /* Store layouts (alterna desde el editor de estilo del tenant) */
+.store-grid.store-mini{grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px}
+@media(max-width:640px){.store-grid.store-mini{grid-template-columns:repeat(3,1fr);gap:6px}}
+.store-grid.store-mini .prod-card{padding:8px;gap:5px;border-radius:9px}
+.store-grid.store-mini .prod-icon{height:56px;font-size:30px;border-radius:6px}
+.store-grid.store-mini .prod-icon-emoji{font-size:30px}
+.store-grid.store-mini .prod-name{font-size:11px;line-height:1.2;font-weight:600;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.store-grid.store-mini .prod-unit{font-size:9px;color:var(--ink-mute)}
+.store-grid.store-mini .prod-price{font-size:13px;font-weight:700;letter-spacing:-0.01em}
+.store-grid.store-mini .prod-comp{display:none}
+.store-grid.store-mini .qty-row{gap:3px;margin-top:auto}
+.store-grid.store-mini .qty-btn{width:22px;height:22px;font-size:12px;border-radius:5px}
+.store-grid.store-mini .qty-num{font-size:11px}
+.store-grid.store-mini .add-btn{height:28px;font-size:10px;padding:0;font-weight:600;border-radius:6px}
 .store-grid.store-list{display:flex;flex-direction:column;gap:8px}
 .store-grid.store-list .prod-card{display:grid;grid-template-columns:56px 1fr auto;gap:12px;padding:10px 12px;align-items:center}
 .store-grid.store-list .prod-icon{width:56px;height:56px;font-size:28px;background:var(--bg);border-radius:8px;display:flex;align-items:center;justify-content:center}
@@ -446,6 +459,8 @@ input.cell-input:focus{outline:none;border-color:var(--brand)}
 .swatch{width:18px;height:18px;border-radius:5px;border:1px solid rgba(0,0,0,0.1);flex-shrink:0}
 .layout-mock{width:100%;height:48px;background:var(--surface-2);border-radius:6px;margin-top:8px;display:flex;padding:5px;gap:3px}
 .layout-mock--grid{display:grid;grid-template-columns:repeat(3,1fr);gap:3px}
+.layout-mock--mini{display:grid;grid-template-columns:repeat(3,1fr);gap:2px}
+.layout-mock--mini .lm-block{height:10px}
 .layout-mock--list{flex-direction:column;gap:3px}
 .layout-mock--catalog{display:grid;grid-template-columns:repeat(2,1fr);gap:4px}
 .layout-mock--menu{flex-direction:column;gap:3px}
@@ -2243,10 +2258,11 @@ function renderStoreGrid(){
   const style=getTenantStyle(tenants[currentTenantId]);
   const layout=style.layout||"grilla";
   // Reset clases de layout y aplicar la nueva
-  grid.classList.remove("store-list","store-catalog","store-menu");
+  grid.classList.remove("store-list","store-catalog","store-menu","store-mini");
   if(layout==="lista-compacta")grid.classList.add("store-list");
   else if(layout==="catalogo-grande")grid.classList.add("store-catalog");
   else if(layout==="menu-categoria")grid.classList.add("store-menu");
+  else if(layout==="grilla-compacta")grid.classList.add("store-mini");
 
   if(!rows.length){
     grid.innerHTML=`<div style="color:var(--ink-faint);font-size:13px;padding:1rem">Sin productos</div>`;
@@ -4061,6 +4077,7 @@ const THEMES={
 };
 const LAYOUTS={
   "grilla":{label:"Grilla",desc:"Cards verticales auto-fill"},
+  "grilla-compacta":{label:"Grilla compacta",desc:"Cards mini · 3 por fila en mobile"},
   "lista-compacta":{label:"Lista compacta",desc:"Una columna, ideal pedidos rápidos"},
   "catalogo-grande":{label:"Catálogo grande",desc:"Cards prominentes con foto destacada"},
   "menu-categoria":{label:"Menú por categoría",desc:"Agrupa por categoría con scroll horizontal"}
@@ -4322,6 +4339,7 @@ function renderAdminStyle(){
     </div>`).join("");
   const layoutMocks={
     "grilla":`<div class="layout-mock layout-mock--grid"><div class="lm-block"></div><div class="lm-block"></div><div class="lm-block"></div><div class="lm-block"></div><div class="lm-block"></div><div class="lm-block"></div></div>`,
+    "grilla-compacta":`<div class="layout-mock layout-mock--mini"><div class="lm-block"></div><div class="lm-block"></div><div class="lm-block"></div><div class="lm-block"></div><div class="lm-block"></div><div class="lm-block"></div><div class="lm-block"></div><div class="lm-block"></div><div class="lm-block"></div></div>`,
     "lista-compacta":`<div class="layout-mock layout-mock--list"><div class="lm-block"></div><div class="lm-block"></div><div class="lm-block"></div><div class="lm-block"></div></div>`,
     "catalogo-grande":`<div class="layout-mock layout-mock--catalog"><div class="lm-block"></div><div class="lm-block"></div></div>`,
     "menu-categoria":`<div class="layout-mock layout-mock--menu"><div class="lm-row"><div class="lm-block"></div></div><div class="lm-row"><div class="lm-block"></div></div><div class="lm-row"><div class="lm-block"></div></div></div>`
