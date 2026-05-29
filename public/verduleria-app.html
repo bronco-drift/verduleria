@@ -305,7 +305,10 @@ input.cell-input:focus{outline:none;border-color:var(--brand)}
 .store-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:1.5rem;padding-bottom:90px}
 .prod-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:8px;transition:box-shadow .15s}
 .prod-card:hover{box-shadow:0 2px 12px rgba(0,0,0,.08)}
-.prod-icon{width:100%;height:72px;display:flex;align-items:center;justify-content:center;font-size:42px;background:var(--bg);border-radius:8px}
+.prod-icon{width:100%;height:72px;display:flex;align-items:center;justify-content:center;font-size:42px;background:var(--bg);border-radius:8px;position:relative;overflow:hidden}
+.prod-icon-photo{position:absolute;inset:0;background-size:cover;background-position:center;opacity:.35;transition:opacity .2s}
+.prod-card:hover .prod-icon-photo{opacity:.5}
+.prod-icon-emoji{position:relative;z-index:1;filter:drop-shadow(0 1px 2px rgba(0,0,0,.25))}
 .prod-name{font-size:13px;font-weight:600;color:var(--ink);line-height:1.3}
 .prod-unit{font-size:11px;color:var(--ink-mute)}
 .prod-price{font-size:17px;font-weight:700;color:var(--ink);letter-spacing:-0.01em}
@@ -442,6 +445,33 @@ input.cell-input:focus{outline:none;border-color:var(--brand)}
 .layout-mock--menu .lm-row::before{content:"";width:18px;height:3px;background:var(--ink-soft);opacity:0.3;border-radius:2px}
 .layout-mock--menu .lm-row .lm-block{flex:1;height:10px}
 
+/* Product editor drawer */
+.prod-edit-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:9998;display:none}
+.prod-edit-overlay.open{display:block}
+.prod-edit-drawer{position:fixed;top:0;right:0;width:min(440px,100vw);height:100vh;height:100dvh;background:var(--bg);z-index:9999;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .25s ease;box-shadow:-6px 0 30px rgba(0,0,0,.18);padding-right:env(safe-area-inset-right,0px)}
+.prod-edit-drawer.open{transform:translateX(0)}
+.prod-edit-head{display:flex;align-items:center;justify-content:space-between;padding:calc(16px + env(safe-area-inset-top,0px)) 16px 16px;background:var(--brand);color:#fff;gap:8px}
+.prod-edit-head h2{font-size:15px;font-weight:700;flex:1;letter-spacing:-0.01em}
+.prod-edit-head .cart-close{color:#fff;background:rgba(255,255,255,.15)}
+.prod-edit-head .cart-close:hover{background:rgba(255,255,255,.25)}
+.prod-edit-body{flex:1;overflow-y:auto;padding:16px}
+.prod-edit-preview{display:flex;align-items:center;gap:12px;padding:14px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:14px}
+.prod-edit-preview .prod-icon{width:84px;height:84px;flex-shrink:0;font-size:48px}
+.prod-edit-preview .prod-icon-emoji{font-size:48px}
+.prod-edit-preview .pep-info{flex:1;min-width:0}
+.prod-edit-preview .pep-info strong{display:block;font-size:14px;color:var(--ink);font-weight:700;margin-bottom:2px}
+.prod-edit-preview .pep-info span{font-size:11px;color:var(--ink-soft)}
+.pe-field{display:flex;flex-direction:column;gap:5px;margin-bottom:12px}
+.pe-field label{font-size:11px;font-weight:600;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.04em}
+.pe-field input,.pe-field select,.pe-field textarea{width:100%;height:36px;padding:0 12px;font-size:13px;border:1px solid var(--border-strong);border-radius:8px;background:var(--surface);color:var(--ink);font-family:inherit}
+.pe-field input:focus,.pe-field select:focus,.pe-field textarea:focus{outline:none;border-color:var(--brand)}
+.pe-field .pe-hint{font-size:10px;color:var(--ink-mute);line-height:1.4;margin-top:2px}
+.pe-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.pe-foot{display:flex;gap:8px;padding:14px 16px calc(14px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--border);background:var(--surface)}
+.pe-foot button{flex:1;height:40px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:1px solid var(--border-strong);background:var(--surface);color:var(--ink)}
+.pe-foot button.primary{background:var(--brand);color:#fff;border-color:var(--brand)}
+.pe-foot button.primary:hover{background:var(--brand-hover)}
+.pe-foot button:not(.primary):hover{background:var(--bg)}
 /* Banner local cerrado en tienda */
 .store-blocked-banner{display:flex;flex-direction:column;gap:4px;background:var(--warn-bg);border:1px solid var(--warn);border-radius:10px;padding:12px 16px;margin-bottom:1rem}
 .store-blocked-banner strong{font-size:14px;color:var(--warn-fg);font-weight:700}
@@ -896,6 +926,20 @@ select.cell-sel{height:26px;padding:0 6px;font-size:11px;border:1px solid var(--
   <div class="admin-drawer-body" id="admin-drawer-body"></div>
 </div>
 
+<!-- PRODUCT EDITOR DRAWER -->
+<div class="prod-edit-overlay" id="prod-edit-overlay" onclick="closeProductEditor()"></div>
+<div class="prod-edit-drawer" id="prod-edit-drawer">
+  <div class="prod-edit-head">
+    <h2 id="pe-title">Editar producto</h2>
+    <button class="cart-close" onclick="closeProductEditor()">✕</button>
+  </div>
+  <div class="prod-edit-body" id="pe-body"></div>
+  <div class="pe-foot">
+    <button onclick="closeProductEditor()">Cancelar</button>
+    <button class="primary" onclick="saveProductEdit()">Guardar cambios</button>
+  </div>
+</div>
+
 <!-- INFO DRAWER (FAQ, zonas, contacto, cómo comprar) -->
 <div class="info-overlay" id="info-overlay" onclick="closeInfo()"></div>
 <div class="info-drawer" id="info-drawer">
@@ -1132,6 +1176,11 @@ let margenObj = 40;
 let pedidos = [];
 let pedidosFilter = "todos";
 let pedidosOpen = new Set();
+
+// Fotos personalizadas por producto (URLs) — editables desde Precios y Stock
+let fotos = {};
+// Seed: foto de acelga para probar el patrón
+fotos["Acelga"] = "https://images.unsplash.com/photo-1576181256399-834e3b3a49bf?w=400&auto=format&fit=crop&q=70";
 
 // ─── HELPERS ─────────────────────────────────────────────
 function fmt(v){return v!=null?"$"+Math.round(v).toLocaleString("es-AR"):null}
@@ -2094,10 +2143,13 @@ function buildStoreCardHTML(r,layout){
   const safeId=r.n.replace(/\s/g,'_');
   const addBtn=`<button class="add-btn ${inCart?"added":""}" id="abtn-${safeId}" onclick="addToCart('${r.n}')" ${dis} style="${disStyle}">${sinStock?"Sin stock":inCart?`✓ (${cart[r.n]})`:"Agregar"}</button>`;
   const qtyRow=`<div class="qty-row"><button class="qty-btn" onclick="changeQty('${r.n}',-1)" ${dis}>−</button><div class="qty-num" id="qty-${safeId}">${qty}</div><button class="qty-btn" onclick="changeQty('${r.n}',1)" ${dis}>+</button></div>`;
+  const photo=fotos[r.n]||"";
+  const photoBg=photo?`<div class="prod-icon-photo" style="background-image:url('${photo}')"></div>`:"";
+  const iconHTML=`<div class="prod-icon">${photoBg}<span class="prod-icon-emoji">${EMOJIS[r.n]||"🌿"}</span></div>`;
   if(layout==="lista-compacta"){
     return`<div class="prod-card" id="pcard-${safeId}" style="position:relative;${sinStock?"opacity:.55":""}">
       ${stockBadge}
-      <div class="prod-icon">${EMOJIS[r.n]||"🌿"}</div>
+      ${iconHTML}
       <div class="prod-info">
         <div class="prod-name">${r.n}</div>
         <div class="prod-unit">por ${r.u}</div>
@@ -2111,7 +2163,7 @@ function buildStoreCardHTML(r,layout){
   }
   return`<div class="prod-card" id="pcard-${safeId}" style="position:relative;${sinStock?"opacity:.55":""}">
     ${stockBadge}
-    <div class="prod-icon">${EMOJIS[r.n]||"🌿"}</div>
+    ${iconHTML}
     <div>
       <div class="prod-name">${r.n}</div>
       <div class="prod-unit">por ${r.u}</div>
@@ -3573,6 +3625,7 @@ function renderStockTable(){
       <td><input type="number" class="stock-input qty" value="${s.stockMin}" min="0" onchange="updateField('${r.n}','stockMin',this.value)"></td>
       <td><span class="stock-status ${st}">${stLabel}</span></td>
       <td><div class="stock-actions">
+        <button class="stock-act-btn" title="Editar detalles" onclick="openProductEditor('${r.n}')">✎</button>
         <button class="stock-act-btn" title="Reponer +20" onclick="repon('${r.n}',20)">+20</button>
         <button class="stock-act-btn" title="Vaciar stock" onclick="updateField('${r.n}','stock',0)">∅</button>
       </div></td>
@@ -3600,6 +3653,123 @@ function updateField(n,field,val){
   // also refresh other tabs if they exist
   const mgEl=document.getElementById("tb-margen");if(mgEl&&typeof renderMargenTable==="function")renderMargenTable();
   const mgCards=document.getElementById("cards-margen");if(mgCards&&typeof renderMargenCards==="function")renderMargenCards();
+}
+
+// ─── PRODUCT EDITOR ──────────────────────────────────────
+let editingProduct=null;
+
+function openProductEditor(nombre){
+  const r=D.find(x=>x.n===nombre);
+  if(!r)return;
+  editingProduct=nombre;
+  const s=stockState[nombre]||{activo:true,stock:0,stockMin:5};
+  const costo=costos[nombre]||0;
+  const venta=pVentas[nombre]||0;
+  const photo=fotos[nombre]||"";
+  const emoji=EMOJIS[nombre]||"🌿";
+  const prov=proveedores[nombre]||"Mercado Central";
+  const provOptions=PROVEEDORES_LIST.map(p=>`<option ${p===prov?"selected":""}>${p}</option>`).join("");
+  document.getElementById("pe-title").textContent=`Editar · ${nombre}`;
+  document.getElementById("pe-body").innerHTML=`
+    <div class="prod-edit-preview" id="pe-preview">
+      <div class="prod-icon">
+        ${photo?`<div class="prod-icon-photo" id="pe-preview-photo" style="background-image:url('${photo}')"></div>`:`<div class="prod-icon-photo" id="pe-preview-photo" style="display:none"></div>`}
+        <span class="prod-icon-emoji" id="pe-preview-emoji">${emoji}</span>
+      </div>
+      <div class="pep-info">
+        <strong>${nombre}</strong>
+        <span>${r.c} · por ${r.u}</span>
+      </div>
+    </div>
+
+    <div class="pe-field">
+      <label>URL de foto <span style="font-weight:500;text-transform:none;color:var(--ink-faint)">(opcional, se ve atenuada detrás del emoji)</span></label>
+      <input type="url" id="pe-photo" value="${photo.replace(/"/g,"&quot;")}" placeholder="https://..." oninput="updatePeIconPreview()">
+      <div class="pe-hint">Probá con Unsplash, Wikimedia Commons o una foto propia. La foto se muestra al 35% de opacidad detrás del emoji.</div>
+    </div>
+
+    <div class="pe-row">
+      <div class="pe-field">
+        <label>Costo</label>
+        <input type="number" id="pe-costo" value="${costo}" min="0">
+      </div>
+      <div class="pe-field">
+        <label>Precio venta</label>
+        <input type="number" id="pe-venta" value="${venta}" min="0">
+      </div>
+    </div>
+
+    <div class="pe-row">
+      <div class="pe-field">
+        <label>Stock</label>
+        <input type="number" id="pe-stock" value="${s.stock}" min="0">
+      </div>
+      <div class="pe-field">
+        <label>Stock mínimo</label>
+        <input type="number" id="pe-stockmin" value="${s.stockMin}" min="0">
+      </div>
+    </div>
+
+    <div class="pe-field">
+      <label>Proveedor</label>
+      <select id="pe-proveedor">${provOptions}</select>
+    </div>
+
+    <div class="pe-field">
+      <label>Activo en tienda</label>
+      <label class="entrega-toggle" style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-top:2px">
+        <div class="et-info">
+          <strong>${s.activo?"Visible":"Oculto"}</strong>
+          <span>${s.activo?"Los clientes pueden comprarlo desde la tienda.":"No aparece en la tienda."}</span>
+        </div>
+        <input type="checkbox" id="pe-activo" ${s.activo?"checked":""}>
+        <span class="et-switch"></span>
+      </label>
+    </div>
+  `;
+  document.getElementById("prod-edit-overlay").classList.add("open");
+  document.getElementById("prod-edit-drawer").classList.add("open");
+}
+
+function updatePeIconPreview(){
+  const photo=(document.getElementById("pe-photo")?.value||"").trim();
+  const div=document.getElementById("pe-preview-photo");
+  if(!div)return;
+  if(photo){div.style.backgroundImage=`url('${photo}')`;div.style.display="block";}
+  else {div.style.backgroundImage="";div.style.display="none";}
+}
+
+function closeProductEditor(){
+  document.getElementById("prod-edit-overlay")?.classList.remove("open");
+  document.getElementById("prod-edit-drawer")?.classList.remove("open");
+  editingProduct=null;
+}
+
+function saveProductEdit(){
+  const n=editingProduct;
+  if(!n)return;
+  const photo=(document.getElementById("pe-photo")?.value||"").trim();
+  const costo=parseInt(document.getElementById("pe-costo")?.value)||0;
+  const venta=parseInt(document.getElementById("pe-venta")?.value)||0;
+  const stock=Math.max(0,parseInt(document.getElementById("pe-stock")?.value)||0);
+  const stockMin=Math.max(0,parseInt(document.getElementById("pe-stockmin")?.value)||0);
+  const prov=document.getElementById("pe-proveedor")?.value||"";
+  const activo=document.getElementById("pe-activo")?.checked||false;
+  if(photo)fotos[n]=photo; else delete fotos[n];
+  costos[n]=costo;
+  pVentas[n]=venta;
+  if(stockState[n]){stockState[n].stock=stock;stockState[n].stockMin=stockMin;stockState[n].activo=activo;}
+  else stockState[n]={activo,stock,stockMin};
+  if(prov)proveedores[n]=prov;
+  saveToLocalStorage();
+  // Refrescar tablas y tienda
+  if(typeof renderStockTable==="function")renderStockTable();
+  if(typeof renderStockSummary==="function")renderStockSummary();
+  if(typeof renderStoreGrid==="function"){
+    const tp=document.getElementById("panel-tienda");
+    if(tp&&tp.dataset.init)renderStoreGrid();
+  }
+  closeProductEditor();
 }
 
 function repon(n,qty){
@@ -3788,6 +3958,7 @@ function snapshotCurrentState(){
     proveedores:JSON.parse(JSON.stringify(proveedores)),
     margenObj:margenObj,
     pedidos:JSON.parse(JSON.stringify(pedidos)),
+    fotos:JSON.parse(JSON.stringify(fotos)),
   };
 }
 
@@ -3801,6 +3972,8 @@ function loadTenantState(t){
   margenObj=t.data.margenObj||40;
   pedidos=JSON.parse(JSON.stringify(t.data.pedidos||[]));
   pedidosOpen=new Set();
+  fotos=JSON.parse(JSON.stringify(t.data.fotos||{}));
+  if(!("Acelga" in fotos))fotos["Acelga"]="https://images.unsplash.com/photo-1576181256399-834e3b3a49bf?w=400&auto=format&fit=crop&q=70";
   // Merge: productos nuevos en D que no estaban en el snapshot
   D.forEach(r=>{
     if(!(r.n in costos))costos[r.n]=r.costo;
