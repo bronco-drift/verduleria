@@ -343,6 +343,21 @@ input.cell-input:focus{outline:none;border-color:var(--brand)}
 .layout-mock--menu .lm-row::before{content:"";width:18px;height:3px;background:var(--ink-soft);opacity:0.3;border-radius:2px}
 .layout-mock--menu .lm-row .lm-block{flex:1;height:10px}
 
+/* Banner local cerrado en tienda */
+.store-blocked-banner{display:flex;flex-direction:column;gap:4px;background:var(--warn-bg);border:1px solid var(--warn);border-radius:10px;padding:12px 16px;margin-bottom:1rem}
+.store-blocked-banner strong{font-size:14px;color:var(--warn-fg);font-weight:700}
+.store-blocked-banner span{font-size:12px;color:var(--warn-fg);line-height:1.5}
+.store-blocked-banner em{font-style:normal;font-weight:600}
+/* Warning en config */
+.entrega-warning{margin-top:12px;padding:10px 12px;background:var(--warn-bg);color:var(--warn-fg);border:1px solid var(--warn);border-radius:8px;font-size:12px;line-height:1.5}
+/* Toggle local activo en dashboard */
+.local-status{display:flex;align-items:center;gap:14px;padding:12px 16px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:14px}
+.local-status.inactivo{background:var(--warn-bg);border-color:var(--warn)}
+.local-status-info{flex:1;display:flex;flex-direction:column;gap:2px}
+.local-status-info strong{font-size:13px;font-weight:700;color:var(--ink)}
+.local-status.inactivo .local-status-info strong{color:var(--warn-fg)}
+.local-status-info span{font-size:11px;color:var(--ink-soft);line-height:1.5}
+.local-status.inactivo .local-status-info span{color:var(--warn-fg)}
 /* Toggles de opciones de entrega (admin) */
 .entrega-config{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:14px 16px}
 .entrega-config-title{font-size:13px;font-weight:700;color:var(--ink);margin-bottom:4px}
@@ -1509,7 +1524,9 @@ function renderEnvio(){
   const p=document.getElementById("panel-envio");
   if(!p.dataset.init){
     p.innerHTML=`
-      <p style="margin-bottom:1rem;font-size:13px;color:var(--ink-soft)">Configurá cada zona de entrega. El sistema calcula el punto de break-even para ofrecer envío gratis.</p>
+      <div id="entrega-config-host"></div>
+      <h3 style="font-size:13px;font-weight:700;margin:1.25rem 0 .5rem;color:var(--ink)">Zonas de entrega</h3>
+      <p style="margin-bottom:1rem;font-size:12px;color:var(--ink-soft)">Configurá cada zona. El sistema calcula el punto de break-even para ofrecer envío gratis.</p>
       <div class="zona-grid" id="zona-grid"></div>
       <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;margin-top:4px">
         <h3 style="font-size:13px;font-weight:600;margin-bottom:10px">Simulador de pedido</h3>
@@ -1523,6 +1540,8 @@ function renderEnvio(){
       </div>`;
     p.dataset.init="1";
   }
+  const host=document.getElementById("entrega-config-host");
+  if(host)host.innerHTML=renderEntregaConfigHTML(tenants[currentTenantId]);
   renderZonas();
   renderSimulador();
 }
@@ -1919,6 +1938,7 @@ function renderTienda(){
     });
   }
   renderStoreGrid();
+  renderStoreBlockedBanner();
   updateCartBadge();
   updateCartBar();
 }
@@ -2074,7 +2094,10 @@ function openCart(){
   populateCartZonas();
   prefillCheckoutForm();
   const cfg=getEntregaConfig(tenants[currentTenantId]);
-  setEntregaMode(resolveCartModeForConfig(cfg),true);
+  if(cfg.delivery||cfg.pickup){
+    setEntregaMode(resolveCartModeForConfig(cfg),true);
+  }
+  updateCheckoutGate();
   document.getElementById("cart-drawer").classList.add("open");
   document.getElementById("cart-overlay").classList.add("open");
   renderCartItems();
@@ -2099,10 +2122,18 @@ function prefillCheckoutForm(){
 }
 
 function getEntregaConfig(t){
-  const c=(t&&t.entregaConfig)?t.entregaConfig:{delivery:true,pickup:true};
-  // forzar al menos uno habilitado
-  if(!c.delivery&&!c.pickup)return{delivery:true,pickup:true};
-  return c;
+  return (t&&t.entregaConfig)?t.entregaConfig:{delivery:true,pickup:true};
+}
+function isLocalActivo(t){
+  if(!t)return false;
+  return t.activo!==false;
+}
+function tieneEntregaHabilitada(t){
+  const c=getEntregaConfig(t);
+  return !!(c.delivery||c.pickup);
+}
+function isLocalDisponible(t){
+  return isLocalActivo(t)&&tieneEntregaHabilitada(t);
 }
 
 function resolveCartModeForConfig(cfg){
@@ -2307,6 +2338,10 @@ const FORMA_PAGO_LABEL={
 function submitCheckout(){
   const items=Object.entries(cart).filter(([,q])=>q>0);
   if(!items.length){alert("Tu carrito está vacío");return;}
+  if(!isLocalDisponible(tenants[currentTenantId])){
+    alert("Este local no está aceptando pedidos en este momento.");
+    return;
+  }
   const telefono=(document.getElementById("co-telefono")?.value||"").trim();
   const correo=(document.getElementById("co-correo")?.value||"").trim();
   const formaDePago=document.getElementById("co-pago")?.value||"";
@@ -3695,6 +3730,7 @@ function initTenants(){
     creada:"2025-01-15",
     style:{theme:"verde-fresco",layout:"grilla"},
     entregaConfig:{delivery:true,pickup:true},
+    activo:true,
     data:snapshotCurrentState(),
   };
   // Add 2 example tenants with variations
@@ -3709,6 +3745,7 @@ function initTenants(){
     creada:"2025-03-10",
     style:{theme:"mercado-barrio",layout:"catalogo-grande"},
     entregaConfig:{delivery:true,pickup:false},
+    activo:true,
     data:t2State,
   };
   const t3State=snapshotCurrentState();
@@ -3722,6 +3759,7 @@ function initTenants(){
     creada:"2025-04-22",
     style:{theme:"organico-premium",layout:"menu-categoria"},
     entregaConfig:{delivery:false,pickup:true},
+    activo:true,
     data:t3State,
   };
 }
@@ -3927,20 +3965,20 @@ function renderTenantDetail(){
         <div class="info-item"><div class="l">Margen objetivo</div><div class="v">${t.data.margenObj||40}%</div></div>
         <div class="info-item"><div class="l">Zonas envío</div><div class="v">${(t.data.zonas||[]).length}</div></div>
       </div>
-      <p style="font-size:11px;color:var(--ink-soft);line-height:1.6;margin-bottom:14px">
+      <p style="font-size:11px;color:var(--ink-soft);line-height:1.6">
         Cuando seleccionás una verdulería, todas las pestañas (Tienda, Stock, Margen, Recetas, etc.) muestran sus datos específicos.
-        Los cambios que hagas se guardan automáticamente al cambiar de tenant.
+        Las opciones de entrega se configuran en la tab <strong>🚚 Costo de envío</strong>.
       </p>
-      ${renderEntregaConfigHTML(t)}
     </div>`;
 }
 
 function renderEntregaConfigHTML(t){
   const cfg=getEntregaConfig(t);
+  const ambosFalse=!cfg.delivery&&!cfg.pickup;
   return `
     <div class="entrega-config">
       <div class="entrega-config-title">🛵 Opciones de entrega</div>
-      <p class="entrega-config-desc">Activá qué opciones ofrece esta verdulería. Si dejás solo una, el carrito la aplica directo sin mostrar el toggle.</p>
+      <p class="entrega-config-desc">Activá qué opciones ofrece esta verdulería. Si dejás solo una, el carrito la aplica directo sin mostrar el toggle. Si las desactivás ambas, el local queda deshabilitado para vender.</p>
       <div class="entrega-config-rows">
         <label class="entrega-toggle">
           <div class="et-info">
@@ -3959,6 +3997,7 @@ function renderEntregaConfigHTML(t){
           <span class="et-switch"></span>
         </label>
       </div>
+      ${ambosFalse?`<div class="entrega-warning">⚠ Sin opciones de entrega activas, este local no acepta pedidos. La tienda muestra un aviso a los clientes y el carrito queda bloqueado.</div>`:""}
     </div>`;
 }
 
@@ -3967,20 +4006,88 @@ function setTenantEntrega(key,enabled){
   if(!t)return;
   if(!t.entregaConfig)t.entregaConfig={delivery:true,pickup:true};
   t.entregaConfig[key]=!!enabled;
-  // forzar al menos uno habilitado
-  if(!t.entregaConfig.delivery&&!t.entregaConfig.pickup){
-    t.entregaConfig[key]=true;
-    alert("Tenés que dejar al menos una opción de entrega habilitada.");
-    renderTenantDetail();
-    return;
-  }
-  // refrescar drawer cart si está abierto
+  // refrescar UI del editor (en panel envio)
+  const host=document.getElementById("entrega-config-host");
+  if(host)host.innerHTML=renderEntregaConfigHTML(t);
+  // refrescar carrito si está abierto
   const dr=document.getElementById("cart-drawer");
   if(dr&&dr.classList.contains("open")){
     const cfg=getEntregaConfig(t);
-    setEntregaMode(resolveCartModeForConfig(cfg),true);
+    if(cfg.delivery||cfg.pickup){
+      setEntregaMode(resolveCartModeForConfig(cfg),true);
+    }
+    updateCheckoutGate();
+  }
+  // refrescar dashboard si está visible
+  if(typeof renderDashboardContent==="function"){
+    const dp=document.getElementById("dashboard-content");
+    if(dp&&dp.innerHTML)renderDashboardContent();
+  }
+  // refrescar tienda (banner local cerrado)
+  if(typeof renderStoreGrid==="function"){
+    const tp=document.getElementById("panel-tienda");
+    if(tp&&tp.dataset.init){renderStoreBlockedBanner();renderStoreGrid();}
   }
   autoSave();
+}
+
+function setTenantActivo(enabled){
+  const t=tenants[currentTenantId];
+  if(!t)return;
+  t.activo=!!enabled;
+  if(typeof renderDashboardContent==="function"){
+    const dp=document.getElementById("dashboard-content");
+    if(dp&&dp.innerHTML)renderDashboardContent();
+  }
+  if(typeof renderStoreGrid==="function"){
+    const tp=document.getElementById("panel-tienda");
+    if(tp&&tp.dataset.init){renderStoreBlockedBanner();renderStoreGrid();}
+  }
+  // bloquear/desbloquear checkout
+  updateCheckoutGate();
+  autoSave();
+}
+
+function updateCheckoutGate(){
+  const btn=document.querySelector("#cart-drawer .checkout-btn");
+  if(!btn)return;
+  const t=tenants[currentTenantId];
+  if(isLocalDisponible(t)){
+    btn.disabled=false;
+    btn.textContent="Confirmar pedido ↗";
+    btn.style.background="";
+    btn.style.cursor="";
+  } else {
+    btn.disabled=true;
+    btn.textContent="Local no disponible";
+    btn.style.background="var(--ink-mute)";
+    btn.style.cursor="not-allowed";
+  }
+}
+
+function renderStoreBlockedBanner(){
+  const panel=document.getElementById("panel-tienda");
+  if(!panel)return;
+  let banner=document.getElementById("store-blocked-banner");
+  const t=tenants[currentTenantId];
+  if(isLocalDisponible(t)){
+    if(banner)banner.remove();
+    return;
+  }
+  if(!banner){
+    banner=document.createElement("div");
+    banner.id="store-blocked-banner";
+    banner.className="store-blocked-banner";
+    // insertar después del header de la tienda
+    const header=panel.querySelector(".store-header");
+    if(header)header.after(banner);
+    else panel.prepend(banner);
+  }
+  if(!isLocalActivo(t)){
+    banner.innerHTML=`<strong>🚫 Local cerrado</strong><span>Esta verdulería no está aceptando pedidos por ahora. Volvé pronto.</span>`;
+  } else if(!tieneEntregaHabilitada(t)){
+    banner.innerHTML=`<strong>📭 Sin opciones de entrega</strong><span>Por ahora este local no acepta delivery ni retiro. Configurá una opción en <em>Costo de envío</em> para volver a vender.</span>`;
+  }
 }
 
 // ── EDITOR DE ESTILO DE PINES ──
@@ -4384,7 +4491,28 @@ function renderDashboardContent(){
     return`M ${cx} ${cy} L ${x1} ${y1} A ${r} ${r} 0 ${large} 1 ${x2} ${y2} Z`;
   }
 
+  const activo=isLocalActivo(t);
+  const tieneEntrega=tieneEntregaHabilitada(t);
+  const disponible=isLocalDisponible(t);
+  let statusTexto,statusSub;
+  if(!activo){statusTexto="Local cerrado";statusSub="Reactivá para volver a recibir pedidos.";}
+  else if(!tieneEntrega){statusTexto="Activo pero sin opciones de entrega";statusSub="Habilitá delivery o retiro en \"🚚 Costo de envío\".";}
+  else {statusTexto="Local abierto y recibiendo pedidos";statusSub="Los clientes pueden comprar normalmente.";}
+
   cont.innerHTML=`
+    <!-- STATUS DEL LOCAL -->
+    <div class="local-status ${disponible?"":"inactivo"}">
+      <div class="local-status-info">
+        <strong>${disponible?"🟢":"🚫"} ${statusTexto}</strong>
+        <span>${statusSub}</span>
+      </div>
+      <label class="entrega-toggle" style="background:transparent;border:none;padding:0;cursor:pointer">
+        <span style="font-size:11px;font-weight:700;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.04em">${activo?"Activo":"Inactivo"}</span>
+        <input type="checkbox" ${activo?"checked":""} onchange="setTenantActivo(this.checked)">
+        <span class="et-switch"></span>
+      </label>
+    </div>
+
     <!-- HERO HEADER -->
     <div class="verdu-hero">
       <div class="verdu-hero-icon">${t.icono}</div>
