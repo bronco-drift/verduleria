@@ -1179,8 +1179,34 @@ let pedidosOpen = new Set();
 
 // Fotos personalizadas por producto (URLs) — editables desde Precios y Stock
 let fotos = {};
-// Seed: foto de acelga para probar el patrón
-fotos["Acelga"] = "https://images.unsplash.com/photo-1576181256399-834e3b3a49bf?w=400&auto=format&fit=crop&q=70";
+// Seed: 20 URLs reales (Unsplash). Si alguna no coincide con el producto,
+// editala desde Precios y Stock → ✎ Editar.
+const FOTOS_DEFAULT = {
+  // Verduras
+  "Acelga":"https://images.unsplash.com/photo-1635774855536-9728f2610245?w=400&q=60",
+  "Apio":"https://images.unsplash.com/photo-1606820854416-439b3305ff39?w=400&q=60",
+  "Batata":"https://images.unsplash.com/photo-1572276596237-5db2c3e16c5d?w=400&q=60",
+  "Berenjena":"https://images.unsplash.com/photo-1567375698348-5d9d5ae99de0?w=400&q=60",
+  "Brócoli":"https://images.unsplash.com/photo-1459411552884-841db9b3cc2a?w=400&q=60",
+  "Cebolla":"https://images.unsplash.com/photo-1620574387735-3624d75b2dbc?w=400&q=60",
+  "Choclo":"https://images.unsplash.com/photo-1601493700631-2b16ec4b4716?w=400&q=60",
+  "Espinaca":"https://images.unsplash.com/photo-1576045057995-568f588f82fb?w=400&q=60",
+  "Lechuga":"https://images.unsplash.com/photo-1622206151226-18ca2c9ab4a1?w=400&q=60",
+  "Papa":"https://images.unsplash.com/photo-1518977676601-b53f82aba655?w=400&q=60",
+  "Tomate cherry":"https://images.unsplash.com/photo-1582284540020-8acbe03f4924?w=400&q=60",
+  "Zanahoria":"https://images.unsplash.com/photo-1598170845058-32b9d6a5da37?w=400&q=60",
+  "Zapallito":"https://images.unsplash.com/photo-1583687355032-89b902b7335f?w=400&q=60",
+  // Frutas
+  "Banana":"https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?w=400&q=60",
+  "Limón":"https://images.unsplash.com/photo-1587735243615-c03f25aaff15?w=400&q=60",
+  "Manzana roja":"https://images.unsplash.com/photo-1568702846914-96b305d2aaeb?w=400&q=60",
+  "Naranja ombligo":"https://images.unsplash.com/photo-1582979512210-99b6a53386f9?w=400&q=60",
+  "Palta Hass":"https://images.unsplash.com/photo-1601039641847-7857b994d704?w=400&q=60",
+  // Hongos
+  "Champiñones":"https://images.unsplash.com/photo-1504545102780-26774c1bb073?w=400&q=60",
+  // Almacén
+  "Huevos":"https://images.unsplash.com/photo-1582722872445-44dc5f7e3c8f?w=400&q=60",
+};
 
 // ─── HELPERS ─────────────────────────────────────────────
 function fmt(v){return v!=null?"$"+Math.round(v).toLocaleString("es-AR"):null}
@@ -2143,7 +2169,8 @@ function buildStoreCardHTML(r,layout){
   const safeId=r.n.replace(/\s/g,'_');
   const addBtn=`<button class="add-btn ${inCart?"added":""}" id="abtn-${safeId}" onclick="addToCart('${r.n}')" ${dis} style="${disStyle}">${sinStock?"Sin stock":inCart?`✓ (${cart[r.n]})`:"Agregar"}</button>`;
   const qtyRow=`<div class="qty-row"><button class="qty-btn" onclick="changeQty('${r.n}',-1)" ${dis}>−</button><div class="qty-num" id="qty-${safeId}">${qty}</div><button class="qty-btn" onclick="changeQty('${r.n}',1)" ${dis}>+</button></div>`;
-  const photo=fotos[r.n]||"";
+  const showFotos=mostrarFotosEnabled(tenants[currentTenantId]);
+  const photo=showFotos?(fotos[r.n]||""):"";
   const photoBg=photo?`<div class="prod-icon-photo" style="background-image:url('${photo}')"></div>`:"";
   const iconHTML=`<div class="prod-icon">${photoBg}<span class="prod-icon-emoji">${EMOJIS[r.n]||"🌿"}</span></div>`;
   if(layout==="lista-compacta"){
@@ -3927,7 +3954,11 @@ const LAYOUTS={
   "menu-categoria":{label:"Menú por categoría",desc:"Agrupa por categoría con scroll horizontal"}
 };
 function getTenantStyle(t){
-  return (t&&t.style)?t.style:{theme:"verde-fresco",layout:"grilla"};
+  return (t&&t.style)?t.style:{theme:"verde-fresco",layout:"grilla",mostrarFotos:true};
+}
+function mostrarFotosEnabled(t){
+  const s=getTenantStyle(t);
+  return s.mostrarFotos!==false;// default true si no está seteado
 }
 function applyTenantStyle(t){
   const style=getTenantStyle(t);
@@ -3973,7 +4004,10 @@ function loadTenantState(t){
   pedidos=JSON.parse(JSON.stringify(t.data.pedidos||[]));
   pedidosOpen=new Set();
   fotos=JSON.parse(JSON.stringify(t.data.fotos||{}));
-  if(!("Acelga" in fotos))fotos["Acelga"]="https://images.unsplash.com/photo-1576181256399-834e3b3a49bf?w=400&auto=format&fit=crop&q=70";
+  // Mergear defaults para los 20 productos que no tengan foto custom
+  Object.keys(FOTOS_DEFAULT).forEach(n=>{
+    if(!(n in fotos))fotos[n]=FOTOS_DEFAULT[n];
+  });
   // Merge: productos nuevos en D que no estaban en el snapshot
   D.forEach(r=>{
     if(!(r.n in costos))costos[r.n]=r.costo;
@@ -4197,8 +4231,28 @@ function renderAdminStyle(){
         <div class="style-grid">${themeCards}</div>
         <div class="style-sub" style="margin-top:18px">📐 Layout de la tienda</div>
         <div class="style-grid">${layoutCards}</div>
+        <div class="style-sub" style="margin-top:18px">📸 Fotos de productos</div>
+        <label class="entrega-toggle" style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:10px 14px">
+          <div class="et-info">
+            <strong>${mostrarFotosEnabled(t)?"Mostrar fotos":"Solo emojis"}</strong>
+            <span>${mostrarFotosEnabled(t)?"Las cards usan la foto del producto atenuada detrás del emoji.":"Las cards muestran solo el emoji con fondo plano (no carga ninguna foto)."}</span>
+          </div>
+          <input type="checkbox" ${mostrarFotosEnabled(t)?"checked":""} onchange="setTenantShowFotos(this.checked)">
+          <span class="et-switch"></span>
+        </label>
       </div>
     </div>`;
+}
+
+function setTenantShowFotos(enabled){
+  const t=tenants[currentTenantId];
+  if(!t)return;
+  if(!t.style)t.style={theme:"verde-fresco",layout:"grilla",mostrarFotos:true};
+  t.style.mostrarFotos=!!enabled;
+  renderAdminStyle();
+  const tp=document.getElementById("panel-tienda");
+  if(tp&&tp.dataset.init&&typeof renderStoreGrid==="function")renderStoreGrid();
+  autoSave();
 }
 
 function toggleAdminStyle(){
