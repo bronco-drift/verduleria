@@ -4250,10 +4250,12 @@ function switchTenant(id){
   saveToLocalStorage();
 }
 
-let vistaFinal=false;
+// Default: vista pública. Si el dueño desactiva, se persiste en localStorage.
+let vistaFinal=localStorage.getItem("verduleria_vista_final")!=="0";
 
 function toggleVistaFinal(){
   vistaFinal=!vistaFinal;
+  localStorage.setItem("verduleria_vista_final",vistaFinal?"1":"0");
   document.body.classList.toggle("vista-final",vistaFinal);
   document.querySelector(".view-trigger")?.classList.toggle("on",vistaFinal);
   // Si entraste a vista final desde un grupo no-público, forzar Público
@@ -4261,6 +4263,13 @@ function toggleVistaFinal(){
     switchGroup("publico");
   }
   updateGlobalHeader();
+}
+
+function initVistaFinal(){
+  if(vistaFinal){
+    document.body.classList.add("vista-final");
+    document.querySelector(".view-trigger")?.classList.add("on");
+  }
 }
 
 function updateGlobalHeader(){
@@ -5463,6 +5472,8 @@ setInterval(()=>saveToLocalStorage(),30000);
 // Initial render: build tabs of default group
 renderTabsForGroup();
 renderSiteFooter();
+initVistaFinal();
+updateGlobalHeader();
 
 // ─── PWA: Service Worker registration ─────────────────────
 if("serviceWorker" in navigator){
