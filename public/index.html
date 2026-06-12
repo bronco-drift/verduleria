@@ -508,6 +508,9 @@ html[data-theme="lumina"] .prod-dot{display:inline-block}
 #prod-view-content{display:flex;flex-direction:column;overflow-y:auto}
 .pv-photo{width:100%;height:210px;flex-shrink:0;background-color:var(--bg);background-size:cover;background-position:center;display:flex;align-items:center;justify-content:center;position:relative}
 .pv-emoji{font-size:84px;line-height:1;filter:drop-shadow(0 2px 4px rgba(0,0,0,.15))}
+.pv-collage{position:absolute;inset:0;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:2px}
+.pv-collage>div{background-size:cover;background-position:center}
+.pv-collage-emoji{position:relative;z-index:1;font-size:56px;line-height:1;filter:drop-shadow(0 2px 6px rgba(0,0,0,.45))}
 .pv-close{position:absolute;top:10px;right:10px;width:32px;height:32px;border:none;border-radius:50%;background:rgba(0,0,0,.45);color:#fff;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
 .pv-close:hover{background:rgba(0,0,0,.65)}
 .pv-stock-tag{position:absolute;bottom:10px;left:10px;font-size:10px;font-weight:700;padding:4px 10px;border-radius:999px;letter-spacing:.03em}
@@ -2285,8 +2288,8 @@ const COMBOS_TIENDA=[
     items:[{n:"Papa",qty:1},{n:"Tomate redondo",qty:1},{n:"Lechuga",qty:1},{n:"Zanahoria",qty:1},{n:"Banana",qty:1}]
   },
   {
-    id:"receta-wok",emoji:"🥢",nombre:"Combo Receta: Wok de verduras",
-    desc:"Todo para el wok (2 personas) + receta en Combos receta",
+    id:"receta-wok",emoji:"🥢",nombre:"Combo Wok de verduras",
+    desc:"La receta completa para 2 personas",
     descuento:5,
     items:[{n:"Zanahoria",qty:1},{n:"Morrón rojo",qty:1},{n:"Morrón verde",qty:1},{n:"Zapallito",qty:1},{n:"Champiñones",qty:1}]
   }
@@ -2434,18 +2437,20 @@ function renderStoreGrid(){
 }
 
 function buildComboCardHTML(combo,layout){
+  // Misma estructura que buildStoreCardHTML para que la card sea gemela
   const info=comboInfo(combo);
-  const resumen=combo.items.map(i=>`${i.qty}× ${i.n}`).join(" · ");
   const dis=info.disponible?"":"disabled";
   const disStyle=info.disponible?"":"background:var(--ink-mute);cursor:not-allowed";
+  const iconHTML=`<div class="prod-icon" role="button" title="Ver ${combo.nombre}" onclick="openComboView('${combo.id}')"><span class="prod-icon-emoji">${combo.emoji}</span></div>`;
+  const ahorroLabel=info.disponible?`<span style="color:var(--success-fg);font-weight:600">✓ Ahorrás ${fmt(info.ahorro)}</span>`:`<span style="color:var(--danger)">Componentes sin stock</span>`;
   if(layout==="lista-compacta"){
     return`<div class="prod-card combo-card" style="position:relative;${info.disponible?"":"opacity:.55"}">
-      <div class="combo-badge">COMBO −${combo.descuento}%</div>
-      <div class="prod-icon"><span class="prod-icon-emoji">${combo.emoji}</span></div>
+      <div class="combo-badge">−${combo.descuento}%</div>
+      ${iconHTML}
       <div class="prod-info">
         <div class="prod-name">${combo.nombre}</div>
-        <div class="prod-unit">${combo.desc}</div>
-        <div class="prod-comp combo-items">${resumen}</div>
+        <div class="prod-unit">${combo.items.length} productos</div>
+        <div class="prod-comp">${ahorroLabel}</div>
       </div>
       <div class="prod-actions">
         <div class="prod-price">${fmt(info.final)}</div>
@@ -2455,15 +2460,15 @@ function buildComboCardHTML(combo,layout){
   }
   return`<div class="prod-card combo-card" style="position:relative;${info.disponible?"":"opacity:.55"}">
     <div class="combo-badge">COMBO −${combo.descuento}%</div>
-    <div class="prod-icon"><span class="prod-icon-emoji">${combo.emoji}</span></div>
+    ${iconHTML}
     <div>
       <div class="prod-name">${combo.nombre}</div>
-      <div class="prod-unit">${combo.desc}</div>
+      <div class="prod-unit">${combo.items.length} productos</div>
     </div>
     <div class="prod-price">${fmt(info.final)} <span class="combo-tachado">${fmt(info.bruto)}</span></div>
-    <div class="prod-comp combo-items">${resumen}</div>
+    <div class="prod-comp">${ahorroLabel}</div>
     <button class="add-btn" onclick="agregarComboTienda('${combo.id}')" ${dis} style="${disStyle}">
-      ${info.disponible?`Agregar combo · ahorrás ${fmt(info.ahorro)}`:"No disponible"}
+      ${info.disponible?"Agregar al carrito":"No disponible"}
     </button>
   </div>`;
 }
@@ -4074,6 +4079,59 @@ function pvAddToCart(){
   if(!viewingProduct)return;
   addToCart(viewingProduct);
   closeProductView();
+}
+
+function openComboView(id){
+  const combo=COMBOS_TIENDA.find(c=>c.id===id);
+  if(!combo)return;
+  viewingProduct=null;
+  const info=comboInfo(combo);
+  const cont=document.getElementById("prod-view-content");
+  if(!cont)return;
+  // Hero: collage 2x2 con las fotos de los primeros 4 componentes
+  const itemFotos=combo.items.map(i=>fotos[i.n]).filter(Boolean).slice(0,4);
+  const heroInner=itemFotos.length>=4
+    ?`<div class="pv-collage">${itemFotos.map(u=>`<div style="background-image:url('${u}')"></div>`).join("")}</div><span class="pv-collage-emoji">${combo.emoji}</span>`
+    :`<span class="pv-emoji">${combo.emoji}</span>`;
+  const stockTag=info.disponible
+    ?`<span class="pv-stock-tag" style="background:var(--success-bg);color:var(--success-fg)">✓ Disponible</span>`
+    :`<span class="pv-stock-tag" style="background:var(--danger-bg);color:var(--danger-fg)">COMPONENTES SIN STOCK</span>`;
+  const itemsHTML=combo.items.map(i=>{
+    const s=stockState[i.n];
+    const falta=!s||!s.activo||s.stock<i.qty;
+    const sub=(pVentas[i.n]||0)*i.qty;
+    return`<div class="pedido-item-row" style="${falta?"opacity:.5":""}">
+      <span class="pedido-item-emoji">${EMOJIS[i.n]||"🌿"}</span>
+      <span class="pedido-item-name">${i.n}${falta?' <span style="color:var(--danger);font-size:10px">sin stock</span>':""}</span>
+      <span class="pedido-item-qty">× ${i.qty}</span>
+      <span class="pedido-item-price">${fmt(sub)}</span>
+    </div>`;
+  }).join("");
+  cont.innerHTML=`
+    <div class="pv-photo">
+      ${heroInner}
+      ${stockTag}
+      <button class="pv-close" onclick="closeProductView()" aria-label="Cerrar">✕</button>
+    </div>
+    <div class="pv-body">
+      <div class="pv-name">${combo.emoji} ${combo.nombre}</div>
+      <div class="pv-meta">${combo.desc} · ${combo.items.length} productos</div>
+      <div class="pv-price">${fmt(info.final)} <span class="combo-tachado" style="font-size:14px">${fmt(info.bruto)}</span></div>
+      ${info.disponible?`<div class="pv-comp"><span style="color:var(--success-fg);font-weight:600">✓ Ahorrás ${fmt(info.ahorro)} (${combo.descuento}% off)</span></div>`:""}
+      <div class="pedido-items" style="margin-top:8px">${itemsHTML}</div>
+      <div class="pedido-totals">
+        <div class="ptr"><span>Suelto</span><span>${fmt(info.bruto)}</span></div>
+        <div class="ptr"><span>Descuento combo (${combo.descuento}%)</span><span style="color:var(--success-fg)">−${fmt(info.ahorro)}</span></div>
+        <div class="ptr total"><span>Total combo</span><span>${fmt(info.final)}</span></div>
+      </div>
+      <div class="pv-actions">
+        <button class="add-btn" onclick="agregarComboTienda('${combo.id}');closeProductView()" ${info.disponible?"":"disabled"} style="${info.disponible?"":"background:var(--ink-mute);cursor:not-allowed"}">
+          ${info.disponible?"Agregar combo al carrito":"No disponible"}
+        </button>
+      </div>
+    </div>`;
+  document.getElementById("prod-view-overlay").classList.add("open");
+  document.getElementById("prod-view-modal").classList.add("open");
 }
 
 // ─── PRODUCT EDITOR ──────────────────────────────────────
