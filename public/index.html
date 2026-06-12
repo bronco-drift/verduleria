@@ -492,6 +492,29 @@ html[data-theme="lumina"] .prod-dot{display:inline-block}
 .layout-mock--menu .lm-row::before{content:"";width:18px;height:3px;background:var(--ink-soft);opacity:0.3;border-radius:2px}
 .layout-mock--menu .lm-row .lm-block{flex:1;height:10px}
 
+/* Product view modal (detalle cliente) */
+.store-grid .prod-icon{cursor:pointer}
+.prod-view-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9998;display:none}
+.prod-view-overlay.open{display:block}
+.prod-view-modal{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%) scale(.96);width:min(400px,92vw);max-height:min(680px,90dvh);background:var(--surface);border:1px solid var(--border);border-radius:16px;z-index:9999;display:flex;flex-direction:column;overflow:hidden;opacity:0;pointer-events:none;transition:opacity .2s ease,transform .2s ease;box-shadow:0 20px 60px rgba(0,0,0,.25)}
+.prod-view-modal.open{opacity:1;pointer-events:auto;transform:translate(-50%,-50%) scale(1)}
+#prod-view-content{display:flex;flex-direction:column;overflow-y:auto}
+.pv-photo{width:100%;height:210px;flex-shrink:0;background-color:var(--bg);background-size:cover;background-position:center;display:flex;align-items:center;justify-content:center;position:relative}
+.pv-emoji{font-size:84px;line-height:1;filter:drop-shadow(0 2px 4px rgba(0,0,0,.15))}
+.pv-close{position:absolute;top:10px;right:10px;width:32px;height:32px;border:none;border-radius:50%;background:rgba(0,0,0,.45);color:#fff;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.pv-close:hover{background:rgba(0,0,0,.65)}
+.pv-stock-tag{position:absolute;bottom:10px;left:10px;font-size:10px;font-weight:700;padding:4px 10px;border-radius:999px;letter-spacing:.03em}
+.pv-body{padding:16px 18px calc(18px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:8px}
+.pv-name{font-size:18px;font-weight:700;color:var(--ink);letter-spacing:-0.015em;display:flex;align-items:center}
+.pv-meta{font-size:12px;color:var(--ink-soft)}
+.pv-price{font-size:24px;font-weight:800;color:var(--ink);letter-spacing:-0.02em;margin-top:2px}
+.pv-comp{font-size:12px;color:var(--ink-soft)}
+.pv-temp{font-size:11px;color:var(--ink-mute);line-height:1.5;padding:8px 11px;background:var(--bg);border-radius:8px;margin-top:4px}
+.pv-actions{display:flex;gap:10px;align-items:center;margin-top:10px}
+.pv-actions .qty-row{flex:0 0 auto;display:flex;align-items:center;gap:6px}
+.pv-actions .qty-btn{width:32px;height:32px;font-size:16px}
+.pv-actions .qty-num{min-width:28px;text-align:center;font-size:14px;font-weight:700}
+.pv-actions .add-btn{flex:1;height:40px;font-size:13px;margin:0}
 /* Product editor drawer */
 .prod-edit-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:9998;display:none}
 .prod-edit-overlay.open{display:block}
@@ -972,6 +995,12 @@ select.cell-sel{height:26px;padding:0 6px;font-size:11px;border:1px solid var(--
     <button class="admin-close" onclick="closeAdmin()">✕</button>
   </div>
   <div class="admin-drawer-body" id="admin-drawer-body"></div>
+</div>
+
+<!-- PRODUCT VIEW MODAL (detalle para el cliente: foto + info + agregar) -->
+<div class="prod-view-overlay" id="prod-view-overlay" onclick="closeProductView()"></div>
+<div class="prod-view-modal" id="prod-view-modal" role="dialog" aria-modal="true">
+  <div id="prod-view-content"></div>
 </div>
 
 <!-- PRODUCT EDITOR DRAWER -->
@@ -2321,7 +2350,7 @@ function buildStoreCardHTML(r,layout){
   const showFotos=mostrarFotosEnabled(tenants[currentTenantId]);
   const photo=showFotos?(fotos[r.n]||""):"";
   const photoBg=photo?`<div class="prod-icon-photo" style="background-image:url('${photo}')"></div>`:"";
-  const iconHTML=`<div class="prod-icon">${photoBg}<span class="prod-icon-emoji">${EMOJIS[r.n]||"🌿"}</span></div>`;
+  const iconHTML=`<div class="prod-icon" role="button" title="Ver ${r.n}" onclick="openProductView('${r.n}')">${photoBg}<span class="prod-icon-emoji">${EMOJIS[r.n]||"🌿"}</span></div>`;
   if(layout==="lista-compacta"){
     return`<div class="prod-card" id="pcard-${safeId}" style="position:relative;${sinStock?"opacity:.55":""}">
       ${stockBadge}
@@ -3829,6 +3858,86 @@ function updateField(n,field,val){
   // also refresh other tabs if they exist
   const mgEl=document.getElementById("tb-margen");if(mgEl&&typeof renderMargenTable==="function")renderMargenTable();
   const mgCards=document.getElementById("cards-margen");if(mgCards&&typeof renderMargenCards==="function")renderMargenCards();
+}
+
+// ─── PRODUCT VIEW (detalle para el cliente) ──────────────
+let viewingProduct=null;
+
+function openProductView(nombre){
+  const r=D.find(x=>x.n===nombre);
+  if(!r)return;
+  viewingProduct=nombre;
+  renderProductView();
+  document.getElementById("prod-view-overlay").classList.add("open");
+  document.getElementById("prod-view-modal").classList.add("open");
+}
+
+function closeProductView(){
+  document.getElementById("prod-view-overlay")?.classList.remove("open");
+  document.getElementById("prod-view-modal")?.classList.remove("open");
+  viewingProduct=null;
+}
+
+function renderProductView(){
+  const nombre=viewingProduct;
+  const cont=document.getElementById("prod-view-content");
+  if(!nombre||!cont)return;
+  const r=D.find(x=>x.n===nombre);
+  if(!r)return;
+  const v=pVentas[nombre]||0;
+  const compSt=stats(r.p);
+  // En el modal la foto se muestra siempre que exista (el toggle mostrarFotos
+  // solo afecta las cards; el modal es justamente "ver la imagen si lo desea")
+  const photo=fotos[nombre]||"";
+  const emoji=EMOJIS[nombre]||"🌿";
+  const s=stockState[nombre];
+  const sinStock=s&&s.stock<=0;
+  const stockBajo=s&&s.stock>0&&s.stock<=s.stockMin;
+  const qty=storeQtys[nombre]||1;
+  const inCart=cart[nombre]>0;
+  const compLabel=compSt.mn&&v?v<=compSt.mn?`<span style="color:var(--success-fg);font-weight:600">✓ Mejor precio del mercado</span>`:v>=compSt.mx?`<span style="color:var(--danger)">Más caro del mercado</span>`:`Competencia: ${fmt(compSt.mn)}–${fmt(compSt.mx)}`:"";
+  const meses=estacionalidad[nombre]||MESES_ALL;
+  const tempStr=meses.length===12?"🌱 Disponible todo el año":"📅 Temporada: "+meses.map(m=>MESES_NAMES[m]).join(" · ");
+  const stockTag=sinStock
+    ?`<span class="pv-stock-tag" style="background:var(--danger-bg);color:var(--danger-fg)">SIN STOCK</span>`
+    :stockBajo?`<span class="pv-stock-tag" style="background:var(--warn-bg);color:var(--warn-fg)">⚠ Quedan ${s.stock}</span>`
+    :`<span class="pv-stock-tag" style="background:var(--success-bg);color:var(--success-fg)">✓ Disponible</span>`;
+  const dis=sinStock?"disabled":"";
+  cont.innerHTML=`
+    <div class="pv-photo" style="${photo?`background-image:url('${photo}')`:""}">
+      ${photo?"":`<span class="pv-emoji">${emoji}</span>`}
+      ${stockTag}
+      <button class="pv-close" onclick="closeProductView()" aria-label="Cerrar">✕</button>
+    </div>
+    <div class="pv-body">
+      <div class="pv-name"><span class="prod-dot" data-cat="${r.c}"></span>${emoji} ${nombre}</div>
+      <div class="pv-meta">${r.c} · se vende por ${r.u}</div>
+      <div class="pv-price">${fmt(v)}</div>
+      ${compLabel?`<div class="pv-comp">${compLabel}</div>`:""}
+      <div class="pv-temp">${tempStr}</div>
+      <div class="pv-actions">
+        <div class="qty-row">
+          <button class="qty-btn" onclick="pvChangeQty(-1)" ${dis}>−</button>
+          <div class="qty-num">${qty}</div>
+          <button class="qty-btn" onclick="pvChangeQty(1)" ${dis}>+</button>
+        </div>
+        <button class="add-btn ${inCart?"added":""}" onclick="pvAddToCart()" ${dis} style="${sinStock?"background:var(--ink-mute);cursor:not-allowed":""}">
+          ${sinStock?"Sin stock":inCart?`✓ En carrito (${cart[nombre]}) · agregar más`:"Agregar al carrito"}
+        </button>
+      </div>
+    </div>`;
+}
+
+function pvChangeQty(delta){
+  if(!viewingProduct)return;
+  storeQtys[viewingProduct]=Math.max(1,(storeQtys[viewingProduct]||1)+delta);
+  renderProductView();
+}
+
+function pvAddToCart(){
+  if(!viewingProduct)return;
+  addToCart(viewingProduct);
+  closeProductView();
 }
 
 // ─── PRODUCT EDITOR ──────────────────────────────────────
