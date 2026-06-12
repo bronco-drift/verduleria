@@ -1100,70 +1100,71 @@ select.cell-sel{height:26px;padding:0 6px;font-size:11px;border:1px solid var(--
 const MESES_NAMES=["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"];
 const MESES_ALL=[0,1,2,3,4,5,6,7,8,9,10,11];
 
-// p: [Barata, Verde, Click, Nico, Ecofruta, Verduonline] - precios normalizados a la unidad de venta
+// p: [Barata, Verde, Click, Nico, MegaVerde, Verduonline] - precios normalizados a la unidad de venta
+// Última verificación contra los sitios: 2026-05-29 (Click y Nico no verificables)
 const D=[
-  {c:"Verduras",n:"Acelga",u:"unidad",p:[2900,null,3500,1900,2600,1500],kg:500,costo:700,pVenta:2200},
+  {c:"Verduras",n:"Acelga",u:"unidad",p:[2900,null,3500,1900,1400,1500],kg:500,costo:700,pVenta:2200},
   {c:"Verduras",n:"Achicoria",u:"atado",p:[null,null,null,null,1200,null],kg:300,costo:400,pVenta:1100},
   {c:"Verduras",n:"Ajo",u:"unidad",p:[null,null,null,null,900,800],kg:60,costo:400,pVenta:850},
   {c:"Verduras",n:"Albahaca",u:"unidad",p:[null,null,null,null,2400,null],kg:30,costo:800,pVenta:2000},
-  {c:"Verduras",n:"Apio",u:"unidad",p:[2000,null,1400,3000,4000,2580],kg:600,costo:600,pVenta:1800},
-  {c:"Verduras",n:"Batata",u:"kg",p:[2500,null,4500,1850,1400,2000],kg:1000,costo:900,pVenta:2200},
-  {c:"Verduras",n:"Berenjena",u:"kg",p:[3900,null,null,3000,2700,1750],kg:1000,costo:1200,pVenta:3500},
+  {c:"Verduras",n:"Apio",u:"unidad",p:[1900,null,1400,3000,4000,2580],kg:600,costo:600,pVenta:1800},
+  {c:"Verduras",n:"Batata",u:"kg",p:[2700,null,4500,1850,1200,2000],kg:1000,costo:900,pVenta:2200},
+  {c:"Verduras",n:"Berenjena",u:"kg",p:[3900,null,null,3000,3000,1750],kg:1000,costo:1200,pVenta:3500},
   {c:"Verduras",n:"Boniato",u:"kg",p:[null,null,null,null,1800,null],kg:1000,costo:900,pVenta:2000},
-  {c:"Verduras",n:"Brócoli",u:"unidad",p:[null,null,null,3000,3200,null],kg:600,costo:1000,pVenta:2700},
+  {c:"Verduras",n:"Brócoli",u:"unidad",p:[5500,4165,null,3000,3000,null],kg:600,costo:1000,pVenta:2700},
   {c:"Verduras",n:"Brotes de soja",u:"200g",p:[null,null,null,null,2500,null],kg:200,costo:800,pVenta:2200},
   {c:"Verduras",n:"Calabacín",u:"kg",p:[null,null,null,null,1200,null],kg:1000,costo:600,pVenta:1500},
-  {c:"Verduras",n:"Cebolla",u:"kg",p:[1600,null,2800,2000,1600,500],kg:1000,costo:600,pVenta:1500},
+  {c:"Verduras",n:"Cebolla",u:"kg",p:[1500,1700,2800,2000,1300,500],kg:1000,costo:600,pVenta:1500},
   {c:"Verduras",n:"Cebolla de verdeo",u:"atado",p:[null,null,null,null,1875,1300],kg:250,costo:700,pVenta:1700},
   {c:"Verduras",n:"Cebolla morada",u:"kg",p:[null,null,null,null,2000,1000],kg:1000,costo:800,pVenta:1800},
-  {c:"Verduras",n:"Choclo",u:"unidad",p:[2050,null,null,900,1400,null],kg:300,costo:350,pVenta:1500},
+  {c:"Verduras",n:"Choclo",u:"unidad",p:[2400,1800,null,900,2200,null],kg:300,costo:350,pVenta:1500},
   {c:"Verduras",n:"Cilantro",u:"atado",p:[null,null,null,null,3000,null],kg:25,costo:500,pVenta:1500},
-  {c:"Verduras",n:"Coliflor",u:"unidad",p:[null,null,null,null,4500,null],kg:800,costo:1500,pVenta:4000},
-  {c:"Verduras",n:"Espinaca",u:"atado",p:[1900,null,3900,2000,2800,null],kg:300,costo:600,pVenta:1700},
+  {c:"Verduras",n:"Coliflor",u:"unidad",p:[null,null,null,null,3000,null],kg:800,costo:1500,pVenta:4000},
+  {c:"Verduras",n:"Espinaca",u:"atado",p:[1850,null,3900,2000,3000,null],kg:300,costo:600,pVenta:1700},
   {c:"Verduras",n:"Espárragos",u:"atado",p:[null,14000,null,null,null,null],kg:500,costo:5000,pVenta:12000},
-  {c:"Verduras",n:"Hinojo",u:"unidad",p:[null,null,null,null,2000,null],kg:400,costo:800,pVenta:1800},
-  {c:"Verduras",n:"Jengibre",u:"100g",p:[null,null,null,null,1100,820],kg:100,costo:400,pVenta:1000},
+  {c:"Verduras",n:"Hinojo",u:"unidad",p:[null,null,null,null,1500,null],kg:400,costo:800,pVenta:1800},
+  {c:"Verduras",n:"Jengibre",u:"100g",p:[null,null,null,null,600,820],kg:100,costo:400,pVenta:1000},
   {c:"Verduras",n:"Kale",u:"atado",p:[null,3400,3300,2500,null,null],kg:200,costo:900,pVenta:3000},
-  {c:"Verduras",n:"Lechuga",u:"unidad",p:[1400,3000,null,null,1350,1380],kg:300,costo:450,pVenta:1300},
-  {c:"Verduras",n:"Morrón rojo",u:"unidad",p:[1300,null,null,null,1040,1100],kg:200,costo:450,pVenta:1200},
-  {c:"Verduras",n:"Morrón verde",u:"unidad",p:[900,null,null,null,450,600],kg:150,costo:300,pVenta:850},
+  {c:"Verduras",n:"Lechuga",u:"unidad",p:[1400,3000,null,null,900,1380],kg:300,costo:450,pVenta:1300},
+  {c:"Verduras",n:"Morrón rojo",u:"unidad",p:[1600,2200,null,null,1100,1100],kg:200,costo:450,pVenta:1200},
+  {c:"Verduras",n:"Morrón verde",u:"unidad",p:[1100,null,null,null,450,600],kg:150,costo:300,pVenta:850},
   {c:"Verduras",n:"Nabo",u:"kg",p:[null,null,null,null,5800,null],kg:1000,costo:2000,pVenta:5500},
-  {c:"Verduras",n:"Papa",u:"kg",p:[1150,null,2600,2500,1500,650],kg:1000,costo:450,pVenta:1100},
+  {c:"Verduras",n:"Papa",u:"kg",p:[1650,3000,2600,2500,1500,650],kg:1000,costo:450,pVenta:1100},
   {c:"Verduras",n:"Papines",u:"500g",p:[null,null,5600,5000,null,null],kg:500,costo:2000,pVenta:5000},
-  {c:"Verduras",n:"Pepino",u:"kg",p:[null,null,null,null,4000,null],kg:1000,costo:1500,pVenta:3800},
+  {c:"Verduras",n:"Pepino",u:"kg",p:[null,null,null,null,3200,null],kg:1000,costo:1500,pVenta:3800},
   {c:"Verduras",n:"Perejil",u:"atado",p:[null,null,1500,950,240,344],kg:80,costo:300,pVenta:900},
   {c:"Verduras",n:"Puerro",u:"500g",p:[1700,null,2900,null,2250,2150],kg:500,costo:700,pVenta:1600},
   {c:"Verduras",n:"Rabanito",u:"atado",p:[null,null,null,null,1000,null],kg:200,costo:400,pVenta:950},
-  {c:"Verduras",n:"Remolacha",u:"kg",p:[null,null,3900,4000,4500,2500],kg:1000,costo:1200,pVenta:3500},
+  {c:"Verduras",n:"Remolacha",u:"kg",p:[null,null,3900,4000,5500,2500],kg:1000,costo:1200,pVenta:3500},
   {c:"Verduras",n:"Repollo blanco",u:"kg",p:[2000,null,3900,2300,3000,null],kg:1000,costo:700,pVenta:1900},
   {c:"Verduras",n:"Repollitos de Bruselas",u:"500g",p:[3400,3000,2500,4000,null,null],kg:500,costo:1100,pVenta:3000},
-  {c:"Verduras",n:"Rúcula",u:"unidad",p:[null,null,2200,700,null,null],kg:100,costo:250,pVenta:650},
-  {c:"Verduras",n:"Tomate cherry",u:"500g",p:[1600,null,1900,null,null,2800],kg:500,costo:600,pVenta:1500},
-  {c:"Verduras",n:"Tomate perita",u:"kg",p:[null,null,null,null,3500,2400],kg:1000,costo:1100,pVenta:3000},
-  {c:"Verduras",n:"Tomate redondo",u:"kg",p:[null,null,null,null,4000,2750],kg:1000,costo:1300,pVenta:3500},
-  {c:"Verduras",n:"Zanahoria",u:"kg",p:[2500,null,null,2500,2000,1200],kg:1000,costo:800,pVenta:2200},
-  {c:"Verduras",n:"Zapallo anco",u:"unidad",p:[1900,null,null,null,3200,2400],kg:2000,costo:700,pVenta:1700},
+  {c:"Verduras",n:"Rúcula",u:"unidad",p:[600,1300,2200,700,null,null],kg:100,costo:250,pVenta:650},
+  {c:"Verduras",n:"Tomate cherry",u:"500g",p:[3400,null,1900,null,2800,null],kg:500,costo:600,pVenta:1500},
+  {c:"Verduras",n:"Tomate perita",u:"kg",p:[null,4900,null,null,2800,2400],kg:1000,costo:1100,pVenta:3000},
+  {c:"Verduras",n:"Tomate redondo",u:"kg",p:[null,null,null,null,1800,2750],kg:1000,costo:1300,pVenta:3500},
+  {c:"Verduras",n:"Zanahoria",u:"kg",p:[2200,3000,null,2500,2000,1200],kg:1000,costo:800,pVenta:2200},
+  {c:"Verduras",n:"Zapallo anco",u:"unidad",p:[2100,null,null,null,3200,2400],kg:2000,costo:700,pVenta:1700},
   {c:"Verduras",n:"Zapallo kabutia",u:"unidad",p:[2600,null,4500,null,null,null],kg:1500,costo:900,pVenta:2400},
-  {c:"Verduras",n:"Zapallito",u:"kg",p:[4900,null,null,4500,5200,1800],kg:1000,costo:1500,pVenta:4500},
+  {c:"Verduras",n:"Zapallito",u:"kg",p:[5300,null,null,4500,2700,1800],kg:1000,costo:1500,pVenta:4500},
   {c:"Frutas",n:"Ananá",u:"unidad",p:[null,6500,null,7000,null,null],kg:1200,costo:2500,pVenta:6000},
-  {c:"Frutas",n:"Banana",u:"kg",p:[3350,null,6000,3000,3000,3100],kg:1000,costo:1100,pVenta:3000},
+  {c:"Frutas",n:"Banana",u:"kg",p:[3100,3500,6000,3000,2500,3100],kg:1000,costo:1100,pVenta:3000},
   {c:"Frutas",n:"Granada",u:"unidad",p:[null,8000,null,3500,null,null],kg:350,costo:1500,pVenta:3200},
-  {c:"Frutas",n:"Kiwi",u:"500g",p:[7000,null,4900,null,7000,null],kg:500,costo:2000,pVenta:4500},
+  {c:"Frutas",n:"Kiwi",u:"500g",p:[6500,null,4900,null,7000,null],kg:500,costo:2000,pVenta:4500},
   {c:"Frutas",n:"Lima",u:"kg",p:[null,3000,null,5000,6000,null],kg:1000,costo:1200,pVenta:2800},
-  {c:"Frutas",n:"Limón",u:"kg",p:[4400,null,4400,1300,1600,null],kg:1000,costo:500,pVenta:1200},
-  {c:"Frutas",n:"Mandarina",u:"kg",p:[1800,null,2900,1300,1600,1325],kg:1000,costo:500,pVenta:1700},
+  {c:"Frutas",n:"Limón",u:"kg",p:[1900,1530,4400,1300,1500,null],kg:1000,costo:500,pVenta:1200},
+  {c:"Frutas",n:"Mandarina",u:"kg",p:[1800,1800,2900,1300,1500,1325],kg:1000,costo:500,pVenta:1700},
   {c:"Frutas",n:"Mango",u:"unidad",p:[null,null,null,2800,2000,null],kg:400,costo:900,pVenta:2500},
-  {c:"Frutas",n:"Manzana verde",u:"kg",p:[6300,7000,7600,5500,5000,null],kg:1000,costo:2200,pVenta:5800},
-  {c:"Frutas",n:"Manzana roja",u:"kg",p:[6900,null,7600,5500,2800,3300],kg:1000,costo:2200,pVenta:6200},
+  {c:"Frutas",n:"Manzana verde",u:"kg",p:[6300,4250,7600,5500,5000,null],kg:1000,costo:2200,pVenta:5800},
+  {c:"Frutas",n:"Manzana roja",u:"kg",p:[5500,5000,7600,5500,2800,3300],kg:1000,costo:2200,pVenta:6200},
   {c:"Frutas",n:"Melón",u:"kg",p:[null,7500,null,4000,null,null],kg:1000,costo:1500,pVenta:3800},
-  {c:"Frutas",n:"Naranja jugo",u:"kg",p:[null,null,null,null,1400,1300],kg:1000,costo:500,pVenta:1400},
-  {c:"Frutas",n:"Naranja ombligo",u:"kg",p:[null,null,3500,2000,1700,1350],kg:1000,costo:700,pVenta:1900},
-  {c:"Frutas",n:"Palta Hass",u:"unidad",p:[2600,null,null,1500,1000,1550],kg:200,costo:600,pVenta:1400},
+  {c:"Frutas",n:"Naranja jugo",u:"kg",p:[5500,null,null,null,1200,1300],kg:1000,costo:500,pVenta:1400},
+  {c:"Frutas",n:"Naranja ombligo",u:"kg",p:[null,2500,3500,2000,1200,1350],kg:1000,costo:700,pVenta:1900},
+  {c:"Frutas",n:"Palta Hass",u:"unidad",p:[2000,1700,null,1500,1480,1550],kg:200,costo:600,pVenta:1400},
   {c:"Frutas",n:"Pera",u:"kg",p:[null,null,null,null,2800,2200],kg:1000,costo:1000,pVenta:2500},
-  {c:"Frutas",n:"Pomelo",u:"kg",p:[null,null,null,null,1500,null],kg:1000,costo:700,pVenta:1700},
+  {c:"Frutas",n:"Pomelo",u:"kg",p:[null,2720,null,null,1500,null],kg:1000,costo:700,pVenta:1700},
   {c:"Frutas",n:"Sandía",u:"unidad",p:[null,5000,null,null,null,null],kg:5000,costo:2000,pVenta:4500},
   {c:"Frutas",n:"Uva blanca",u:"500g",p:[9000,7000,null,null,null,null],kg:500,costo:3000,pVenta:6500},
-  {c:"Frutas",n:"Uva negra",u:"kg",p:[null,5500,null,null,null,null],kg:1000,costo:2500,pVenta:5000},
+  {c:"Frutas",n:"Uva negra",u:"kg",p:[null,9350,null,null,null,null],kg:1000,costo:2500,pVenta:5000},
   {c:"Hongos",n:"Champiñones",u:"200g",p:[null,null,8400,6550,5600,null],kg:200,costo:2500,pVenta:6000},
   {c:"Hongos",n:"Portobellos",u:"200g",p:[null,null,8700,6550,null,null],kg:200,costo:3000,pVenta:6500},
   {c:"Hongos",n:"Girgolas frescas",u:"200g",p:[null,null,6800,null,null,null],kg:200,costo:2200,pVenta:6000},
@@ -1189,7 +1190,7 @@ const ESTACIONALIDAD = {
   "Palta Hass":MESES_ALL,"Sandía":[0,1,2,11],"Uva blanca":[0,1,2,3,11],"Uva negra":[0,1,2,3,11],
   "Champiñones":MESES_ALL,"Portobellos":MESES_ALL,"Girgolas frescas":MESES_ALL,
   "Aceite de oliva":MESES_ALL,"Huevos":MESES_ALL,"Quinoa":MESES_ALL,"Lentejas":MESES_ALL,"Garbanzos":MESES_ALL,
-  // Productos nuevos (ref5 Ecofruta + ref6 Verduonline)
+  // Productos nuevos (ref5 MegaVerde + ref6 Verduonline)
   "Achicoria":MESES_ALL,"Ajo":MESES_ALL,"Albahaca":[9,10,11,0,1,2],"Boniato":[2,3,4,5,6,7,8,9,10],
   "Brotes de soja":MESES_ALL,"Calabacín":[0,1,2,10,11],"Cebolla de verdeo":MESES_ALL,"Cebolla morada":MESES_ALL,
   "Cilantro":MESES_ALL,"Coliflor":[3,4,5,6,7,8,9],"Hinojo":[3,4,5,6,7,8],"Jengibre":MESES_ALL,
@@ -1613,7 +1614,7 @@ function renderOriginal(){
           <th data-sort-tid="orig" data-sort-col="1">Verde Puro</th>
           <th data-sort-tid="orig" data-sort-col="2">El Click</th>
           <th data-sort-tid="orig" data-sort-col="3">Nico</th>
-          <th data-sort-tid="orig" data-sort-col="4">Ecofruta</th>
+          <th data-sort-tid="orig" data-sort-col="4">MegaVerde</th>
           <th data-sort-tid="orig" data-sort-col="5">Verduonline</th>
           <th data-sort-tid="orig" data-sort-col="avg" class="grp">Promedio</th>
           <th data-sort-tid="orig" data-sort-col="spread" class="grp">% min→max</th>
@@ -1677,7 +1678,7 @@ function renderKg(){
           <th data-sort-tid="kg" data-sort-col="1">Verde Puro</th>
           <th data-sort-tid="kg" data-sort-col="2">El Click</th>
           <th data-sort-tid="kg" data-sort-col="3">Nico</th>
-          <th data-sort-tid="kg" data-sort-col="4">Ecofruta</th>
+          <th data-sort-tid="kg" data-sort-col="4">MegaVerde</th>
           <th data-sort-tid="kg" data-sort-col="5">Verduonline</th>
           <th data-sort-tid="kg" data-sort-col="avg" class="grp">Promedio/kg</th>
           <th data-sort-tid="kg" data-sort-col="spread" class="grp">% min→max</th>
@@ -3234,7 +3235,7 @@ const COMPETENCIA=[
   {id:"verde",   nombre:"Verde Puro",      color:"#1d9e75", direccion:"Zona Norte, GBA",      zona:"Zona Norte", lat:-34.4708, lng:-58.5230, tel:"+54 11 2669-1368", web:"verdepuro.com.ar", entrega:"Lun a Vie", mia:false},
   {id:"click",   nombre:"El Click Bolsones",color:"#7f77dd", direccion:"CABA y AMBA",         zona:"CABA + AMBA",lat:-34.6118, lng:-58.4173, tel:"-", web:"elclick.com.ar", entrega:"Lun a Vie", mia:false},
   {id:"nico",    nombre:"Verdulería de Nico",color:"#ef9f27", direccion:"Zona Norte, GBA",    zona:"Zona Norte", lat:-34.4900, lng:-58.5000, tel:"-", web:"-", entrega:"A coordinar", mia:false},
-  {id:"ecofruta",nombre:"Ecofruta",        color:"#3aa055", direccion:"Av. Armada Argentina 397, Córdoba", zona:"Córdoba Capital", lat:-31.4287, lng:-64.1925, tel:"+54 9 351 648-7603", web:"ecofruta.com.ar", entrega:"Compra mínima $10.000", mia:false},
+  {id:"ecofruta",nombre:"MegaVerde",       color:"#3aa055", direccion:"Av. Armada Argentina 397, Córdoba", zona:"Córdoba Capital", lat:-31.4287, lng:-64.1925, tel:"+54 9 351 648-7603", web:"megaverde.com.ar", entrega:"Compra mínima $10.000", mia:false},
   {id:"verduon", nombre:"Verduonline.ar",  color:"#d97742", direccion:"CABA, online",         zona:"CABA",       lat:-34.6037, lng:-58.3816, tel:"-", web:"verduonline.ar", entrega:"Online, todos los días", mia:false},
 ];
 
