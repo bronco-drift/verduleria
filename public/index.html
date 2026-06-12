@@ -329,6 +329,18 @@ input.cell-input:focus{outline:none;border-color:var(--brand)}
 .prod-icon-photo{position:absolute;inset:0;background-size:cover;background-position:center;opacity:.35;transition:opacity .2s}
 .prod-card:hover .prod-icon-photo{opacity:.5}
 .prod-icon-emoji{position:relative;z-index:1;filter:drop-shadow(0 1px 2px rgba(0,0,0,.25))}
+/* Tema Lumina: tipografía Apple-like, hovers solo-borde, color únicamente en dots de categoría */
+html[data-theme="lumina"] h1{font-weight:600;letter-spacing:-0.025em}
+html[data-theme="lumina"] .prod-name,html[data-theme="lumina"] .rec-name,html[data-theme="lumina"] .store-menu-cat-title,html[data-theme="lumina"] .store-banner-name{letter-spacing:-0.015em}
+html[data-theme="lumina"] .prod-card{transition:border-color .2s}
+html[data-theme="lumina"] .prod-card:hover,html[data-theme="lumina"] .rec-card:hover{box-shadow:none;border-color:oklch(22% 0.005 250 / .3)}
+html[data-theme="lumina"] .shortcut:hover{transform:none}
+.prod-dot{display:none;width:8px;height:8px;border-radius:50%;margin-right:6px;flex-shrink:0}
+html[data-theme="lumina"] .prod-dot{display:inline-block}
+.prod-dot[data-cat="Verduras"]{background:#22C55E}
+.prod-dot[data-cat="Frutas"]{background:#F59E0B}
+.prod-dot[data-cat="Hongos"]{background:#8B5CF6}
+.prod-dot[data-cat="Almacén"]{background:#3B82F6}
 .prod-name{font-size:13px;font-weight:600;color:var(--ink);line-height:1.3}
 .prod-unit{font-size:11px;color:var(--ink-mute)}
 .prod-price{font-size:17px;font-weight:700;color:var(--ink);letter-spacing:-0.01em}
@@ -2315,7 +2327,7 @@ function buildStoreCardHTML(r,layout){
       ${stockBadge}
       ${iconHTML}
       <div class="prod-info">
-        <div class="prod-name">${r.n}</div>
+        <div class="prod-name"><span class="prod-dot" data-cat="${r.c}"></span>${r.n}</div>
         <div class="prod-unit">por ${r.u}</div>
         <div class="prod-comp">${compLabel}</div>
       </div>
@@ -2329,7 +2341,7 @@ function buildStoreCardHTML(r,layout){
     ${stockBadge}
     ${iconHTML}
     <div>
-      <div class="prod-name">${r.n}</div>
+      <div class="prod-name"><span class="prod-dot" data-cat="${r.c}"></span>${r.n}</div>
       <div class="prod-unit">por ${r.u}</div>
     </div>
     <div class="prod-price">${fmt(v)}</div>
@@ -4082,6 +4094,31 @@ const THEMES={
       "--info":"oklch(72% 0.14 250)",
       "--info-bg":"oklch(28% 0.060 250)"
     }
+  },
+  "lumina":{
+    label:"🤍 Lumina",
+    desc:"Minimal tipo Apple — blanco, negro, color solo en dots",
+    swatches:["oklch(99% 0.002 250)","oklch(22% 0.005 250)","oklch(92.5% 0.003 250)","#3B82F6"],
+    vars:{
+      "--bg":"oklch(99% 0.002 250)",
+      "--surface":"oklch(99.5% 0.002 250)",
+      "--surface-2":"oklch(96.5% 0.003 250)",
+      "--surface-3":"oklch(94% 0.004 250)",
+      "--border":"oklch(92.5% 0.003 250)",
+      "--border-strong":"oklch(86% 0.004 250)",
+      "--ink":"oklch(22% 0.005 250)",
+      "--ink-soft":"oklch(50% 0.006 250)",
+      "--ink-mute":"oklch(62% 0.005 250)",
+      "--ink-faint":"oklch(76% 0.004 250)",
+      "--brand":"oklch(22% 0.005 250)",
+      "--brand-hover":"oklch(34% 0.006 250)",
+      "--brand-tint":"oklch(96% 0.003 250)",
+      "--on-brand":"oklch(99% 0.002 250)",
+      "--success":"oklch(60% 0.13 160)",
+      "--success-bg":"oklch(95.5% 0.030 160)",
+      "--success-fg":"oklch(45% 0.11 165)",
+      "--font-sans":'Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif'
+    }
   }
 };
 const LAYOUTS={
@@ -4108,8 +4145,9 @@ function applyTenantStyle(t){
   allKeys.forEach(k=>root.style.removeProperty(k));
   // aplicar el tema nuevo
   Object.entries(theme.vars||{}).forEach(([k,v])=>root.style.setProperty(k,v));
-  // marker para reglas adicionales (modo dark)
-  root.dataset.theme=style.theme==="nocturno"?"dark":"";
+  // marker para reglas adicionales (dark / lumina)
+  const themeMarkers={nocturno:"dark",lumina:"lumina"};
+  root.dataset.theme=themeMarkers[style.theme]||"";
   // aplicar fuente al body si el tema la define
   if(theme.vars&&theme.vars["--font-sans"]){
     document.body.style.fontFamily=theme.vars["--font-sans"];
