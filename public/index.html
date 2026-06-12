@@ -492,6 +492,13 @@ html[data-theme="lumina"] .prod-dot{display:inline-block}
 .layout-mock--menu .lm-row::before{content:"";width:18px;height:3px;background:var(--ink-soft);opacity:0.3;border-radius:2px}
 .layout-mock--menu .lm-row .lm-block{flex:1;height:10px}
 
+/* Combos en el listado de la tienda */
+.combo-card{border:1.5px solid var(--brand)}
+.combo-badge{position:absolute;top:8px;left:8px;background:var(--brand);color:#fff;font-size:9px;font-weight:700;padding:3px 8px;border-radius:999px;letter-spacing:.04em;z-index:2}
+.combo-tachado{font-size:11px;color:var(--ink-faint);text-decoration:line-through;font-weight:500;margin-left:4px}
+.combo-items{line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.store-grid.store-mini .combo-card .combo-items{display:none}
+.store-grid.store-mini .combo-card .combo-tachado{display:none}
 /* Product view modal (detalle cliente) */
 .store-grid .prod-icon{cursor:pointer}
 .prod-view-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9998;display:none}
@@ -2238,6 +2245,75 @@ const EMOJIS={
   "Aceite de oliva":"🫒","Huevos":"🥚","Quinoa":"🌾","Lentejas":"🫘","Garbanzos":"🫘"
 };
 
+// Popularidad base (canasta argentina típica). Los no listados valen 0.
+// A esto se le suma lo realmente vendido en pedidos del tenant (peso x5).
+const POPULARIDAD_BASE={
+  "Papa":100,"Tomate redondo":95,"Cebolla":90,"Banana":88,"Zanahoria":85,
+  "Lechuga":82,"Manzana roja":80,"Naranja jugo":78,"Limón":76,"Zapallito":74,
+  "Acelga":72,"Batata":70,"Morrón rojo":68,"Huevos":67,"Mandarina":65,
+  "Tomate perita":64,"Espinaca":62,"Zapallo anco":60,"Brócoli":58,"Palta Hass":56,
+  "Pera":54,"Manzana verde":52,"Ajo":50,"Tomate cherry":48,"Cebolla morada":46,
+  "Naranja ombligo":44,"Repollo blanco":42,"Choclo":40,"Perejil":38,"Coliflor":36,
+  "Berenjena":34,"Pepino":32,"Rúcula":30,"Cebolla de verdeo":28,"Pomelo":26,"Champiñones":24
+};
+
+function ventasPorProducto(){
+  const acc={};
+  (pedidos||[]).forEach(p=>{
+    if(p.estado==="cancelado")return;
+    (p.items||[]).forEach(i=>{acc[i.nombre]=(acc[i.nombre]||0)+i.qty;});
+  });
+  return acc;
+}
+
+function popScore(nombre,ventas){
+  return (POPULARIDAD_BASE[nombre]||0)+((ventas&&ventas[nombre])||0)*5;
+}
+
+// Combos de tienda (precio dinámico = suma de componentes con descuento)
+const COMBOS_TIENDA=[
+  {
+    id:"semanal",emoji:"🧺",nombre:"Combo Semanal",
+    desc:"La base de la semana para una familia",
+    descuento:10,
+    items:[{n:"Papa",qty:2},{n:"Cebolla",qty:1},{n:"Tomate redondo",qty:1},{n:"Zanahoria",qty:1},{n:"Lechuga",qty:1},{n:"Acelga",qty:1},{n:"Zapallito",qty:1},{n:"Banana",qty:1},{n:"Manzana roja",qty:1},{n:"Naranja jugo",qty:2}]
+  },
+  {
+    id:"casual",emoji:"🥗",nombre:"Combo Casual",
+    desc:"Frescos para 2-3 días",
+    descuento:5,
+    items:[{n:"Papa",qty:1},{n:"Tomate redondo",qty:1},{n:"Lechuga",qty:1},{n:"Zanahoria",qty:1},{n:"Banana",qty:1}]
+  },
+  {
+    id:"receta-wok",emoji:"🥢",nombre:"Combo Receta: Wok de verduras",
+    desc:"Todo para el wok (2 personas) + receta en Combos receta",
+    descuento:5,
+    items:[{n:"Zanahoria",qty:1},{n:"Morrón rojo",qty:1},{n:"Morrón verde",qty:1},{n:"Zapallito",qty:1},{n:"Champiñones",qty:1}]
+  }
+];
+
+function comboInfo(combo){
+  let bruto=0,disponible=true;
+  combo.items.forEach(i=>{
+    const s=stockState[i.n];
+    if(!s||!s.activo||s.stock<i.qty)disponible=false;
+    bruto+=(pVentas[i.n]||0)*i.qty;
+  });
+  const final=Math.round(bruto*(1-combo.descuento/100));
+  return {bruto,final,ahorro:bruto-final,disponible};
+}
+
+function agregarComboTienda(id){
+  const combo=COMBOS_TIENDA.find(c=>c.id===id);
+  if(!combo)return;
+  const info=comboInfo(combo);
+  if(!info.disponible){alert("Algunos productos del combo no están disponibles ahora.");return;}
+  combo.items.forEach(i=>{cart[i.n]=(cart[i.n]||0)+i.qty;});
+  updateCartBadge();
+  if(typeof updateCartBar==="function")updateCartBar();
+  renderStoreGrid();
+}
+
 let cart={};// {nombre: qty}
 let storeActiveCat="Todas";
 let storeSearch="";
@@ -2300,7 +2376,7 @@ function renderTienda(){
 function renderStoreGrid(){
   const grid=document.getElementById("store-grid");
   if(!grid)return;
-  const rows=D.filter(r=>{
+  let rows=D.filter(r=>{
     if(storeActiveCat!=="Todas"&&r.c!==storeActiveCat)return false;
     if(storeSearch&&!r.n.toLowerCase().includes(storeSearch))return false;
     if(stockState&&stockState[r.n]&&!stockState[r.n].activo)return false;
@@ -2308,6 +2384,23 @@ function renderStoreGrid(){
   });
   const style=getTenantStyle(tenants[currentTenantId]);
   const layout=style.layout||"grilla";
+  const orden=style.ordenCatalogo||"popularidad";
+  const sinStockAlFinal=style.sinStockAlFinal!==false;
+  const conCombos=style.mostrarCombos!==false&&storeActiveCat==="Todas"&&!storeSearch;
+
+  // Orden del catálogo
+  if(orden==="popularidad"){
+    const ventas=ventasPorProducto();
+    rows.sort((a,b)=>popScore(b.n,ventas)-popScore(a.n,ventas)||a.n.localeCompare(b.n));
+  } else if(orden==="alfabetico"){
+    rows.sort((a,b)=>a.n.localeCompare(b.n));
+  }
+  // "categoria": orden natural del array D (agrupado por categoría)
+  if(sinStockAlFinal){
+    const out=r=>{const s=stockState[r.n];return s&&s.stock<=0?1:0;};
+    rows.sort((a,b)=>out(a)-out(b));// sort estable: conserva el orden interno
+  }
+
   // Reset clases de layout y aplicar la nueva
   grid.classList.remove("store-list","store-catalog","store-menu","store-mini");
   if(layout==="lista-compacta")grid.classList.add("store-list");
@@ -2315,7 +2408,9 @@ function renderStoreGrid(){
   else if(layout==="menu-categoria")grid.classList.add("store-menu");
   else if(layout==="grilla-compacta")grid.classList.add("store-mini");
 
-  if(!rows.length){
+  const combosHTML=conCombos?COMBOS_TIENDA.map(c=>buildComboCardHTML(c,layout==="menu-categoria"?"grilla":layout)).join(""):"";
+
+  if(!rows.length&&!combosHTML){
     grid.innerHTML=`<div style="color:var(--ink-faint);font-size:13px;padding:1rem">Sin productos</div>`;
     return;
   }
@@ -2323,14 +2418,54 @@ function renderStoreGrid(){
     // Agrupar por categoría, respetando filtro activo
     const groups={};
     rows.forEach(r=>{(groups[r.c]=groups[r.c]||[]).push(r);});
-    grid.innerHTML=`<div class="store-menu-cats">${Object.entries(groups).map(([cat,items])=>`
+    const comboSection=combosHTML?`
+      <div class="store-menu-cat">
+        <div class="store-menu-cat-title">🧺 Combos <span class="count">${COMBOS_TIENDA.length}</span></div>
+        <div class="cat-scroll">${combosHTML}</div>
+      </div>`:"";
+    grid.innerHTML=`<div class="store-menu-cats">${comboSection}${Object.entries(groups).map(([cat,items])=>`
       <div class="store-menu-cat">
         <div class="store-menu-cat-title">${cat} <span class="count">${items.length}</span></div>
         <div class="cat-scroll">${items.map(r=>buildStoreCardHTML(r,"grilla")).join("")}</div>
       </div>`).join("")}</div>`;
     return;
   }
-  grid.innerHTML=rows.map(r=>buildStoreCardHTML(r,layout)).join("");
+  grid.innerHTML=combosHTML+rows.map(r=>buildStoreCardHTML(r,layout)).join("");
+}
+
+function buildComboCardHTML(combo,layout){
+  const info=comboInfo(combo);
+  const resumen=combo.items.map(i=>`${i.qty}× ${i.n}`).join(" · ");
+  const dis=info.disponible?"":"disabled";
+  const disStyle=info.disponible?"":"background:var(--ink-mute);cursor:not-allowed";
+  if(layout==="lista-compacta"){
+    return`<div class="prod-card combo-card" style="position:relative;${info.disponible?"":"opacity:.55"}">
+      <div class="combo-badge">COMBO −${combo.descuento}%</div>
+      <div class="prod-icon"><span class="prod-icon-emoji">${combo.emoji}</span></div>
+      <div class="prod-info">
+        <div class="prod-name">${combo.nombre}</div>
+        <div class="prod-unit">${combo.desc}</div>
+        <div class="prod-comp combo-items">${resumen}</div>
+      </div>
+      <div class="prod-actions">
+        <div class="prod-price">${fmt(info.final)}</div>
+        <button class="add-btn" onclick="agregarComboTienda('${combo.id}')" ${dis} style="${disStyle}">${info.disponible?"Agregar":"No disp."}</button>
+      </div>
+    </div>`;
+  }
+  return`<div class="prod-card combo-card" style="position:relative;${info.disponible?"":"opacity:.55"}">
+    <div class="combo-badge">COMBO −${combo.descuento}%</div>
+    <div class="prod-icon"><span class="prod-icon-emoji">${combo.emoji}</span></div>
+    <div>
+      <div class="prod-name">${combo.nombre}</div>
+      <div class="prod-unit">${combo.desc}</div>
+    </div>
+    <div class="prod-price">${fmt(info.final)} <span class="combo-tachado">${fmt(info.bruto)}</span></div>
+    <div class="prod-comp combo-items">${resumen}</div>
+    <button class="add-btn" onclick="agregarComboTienda('${combo.id}')" ${dis} style="${disStyle}">
+      ${info.disponible?`Agregar combo · ahorrás ${fmt(info.ahorro)}`:"No disponible"}
+    </button>
+  </div>`;
 }
 
 function buildStoreCardHTML(r,layout){
@@ -4560,8 +4695,72 @@ function renderAdminStyle(){
           <input type="checkbox" ${mostrarFotosEnabled(t)?"checked":""} onchange="setTenantShowFotos(this.checked)">
           <span class="et-switch"></span>
         </label>
+        <div class="style-sub" style="margin-top:18px">🛒 Catálogo</div>
+        <div class="style-grid" style="grid-template-columns:repeat(3,1fr)">${(()=>{
+          const curOrden=t.style.ordenCatalogo||"popularidad";
+          const ORDENES={
+            "popularidad":{label:"Popularidad",desc:"Los más vendidos primero"},
+            "alfabetico":{label:"A → Z",desc:"Orden alfabético"},
+            "categoria":{label:"Por categoría",desc:"Agrupado: verduras, frutas…"}
+          };
+          return Object.entries(ORDENES).map(([id,o])=>`
+            <div class="style-card ${id===curOrden?"on":""}" onclick="setTenantOrden('${id}')">
+              <div class="sc-check">✓</div>
+              <div class="sc-name">${o.label}</div>
+              <div class="sc-desc">${o.desc}</div>
+            </div>`).join("");
+        })()}</div>
+        <label class="entrega-toggle" style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:10px 14px;margin-top:10px">
+          <div class="et-info">
+            <strong>Sin stock al final</strong>
+            <span>Los productos agotados se muestran al final del listado.</span>
+          </div>
+          <input type="checkbox" ${t.style.sinStockAlFinal!==false?"checked":""} onchange="setTenantSinStockFinal(this.checked)">
+          <span class="et-switch"></span>
+        </label>
+        <label class="entrega-toggle" style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:10px 14px;margin-top:8px">
+          <div class="et-info">
+            <strong>Mostrar combos</strong>
+            <span>Combo Semanal, Casual y de Receta al inicio del catálogo (precio dinámico con descuento).</span>
+          </div>
+          <input type="checkbox" ${t.style.mostrarCombos!==false?"checked":""} onchange="setTenantMostrarCombos(this.checked)">
+          <span class="et-switch"></span>
+        </label>
       </div>
     </div>`;
+}
+
+function setTenantOrden(orden){
+  const t=tenants[currentTenantId];
+  if(!t)return;
+  if(!t.style)t.style={theme:"verde-fresco",layout:"grilla"};
+  t.style.ordenCatalogo=orden;
+  renderAdminStyle();
+  const tp=document.getElementById("panel-tienda");
+  if(tp&&tp.dataset.init&&typeof renderStoreGrid==="function")renderStoreGrid();
+  autoSave();
+}
+
+function setTenantSinStockFinal(enabled){
+  const t=tenants[currentTenantId];
+  if(!t)return;
+  if(!t.style)t.style={theme:"verde-fresco",layout:"grilla"};
+  t.style.sinStockAlFinal=!!enabled;
+  renderAdminStyle();
+  const tp=document.getElementById("panel-tienda");
+  if(tp&&tp.dataset.init&&typeof renderStoreGrid==="function")renderStoreGrid();
+  autoSave();
+}
+
+function setTenantMostrarCombos(enabled){
+  const t=tenants[currentTenantId];
+  if(!t)return;
+  if(!t.style)t.style={theme:"verde-fresco",layout:"grilla"};
+  t.style.mostrarCombos=!!enabled;
+  renderAdminStyle();
+  const tp=document.getElementById("panel-tienda");
+  if(tp&&tp.dataset.init&&typeof renderStoreGrid==="function")renderStoreGrid();
+  autoSave();
 }
 
 function setTenantShowFotos(enabled){
