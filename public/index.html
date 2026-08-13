@@ -191,6 +191,23 @@ body[data-role="socio"] .admin-trigger{display:none}
 .drb-btn.on{background:var(--surface);color:var(--ink);box-shadow:var(--shadow-sm)}
 .drb-note{color:var(--ink-faint);font-size:10px;margin-left:auto}
 @media(max-width:640px){.drb-note{display:none}}
+/* Home del cliente: elegir restaurante */
+.home-hero{margin:6px 0 16px}
+.home-hero h2{font-size:22px;font-weight:700;letter-spacing:-0.02em;color:var(--ink);margin-bottom:4px}
+.home-hero p{font-size:13px;color:var(--ink-soft)}
+.home-list{display:flex;flex-direction:column;gap:10px;margin-top:14px}
+.home-card{display:flex;align-items:center;gap:14px;padding:14px 16px;background:var(--surface);border:1px solid var(--border);border-radius:12px;cursor:pointer;transition:border-color .2s}
+.home-card:hover{border-color:oklch(22% 0.005 250 / .3)}
+.home-card.cerrado{opacity:.6}
+.home-card-icon{width:52px;height:52px;font-size:28px;display:flex;align-items:center;justify-content:center;background:var(--bg);border-radius:12px;flex-shrink:0}
+.home-card-info{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.home-card-name{font-size:15px;font-weight:600;letter-spacing:-0.01em;color:var(--ink)}
+.home-card-meta{font-size:12px;color:var(--ink-soft)}
+.home-card-tags{font-size:11px;color:var(--ink-mute);display:flex;gap:10px}
+/* Volver al listado (solo vista cliente) */
+.volver-locales{display:none;align-items:center;gap:6px;height:32px;padding:0 12px;margin-bottom:12px;background:transparent;border:1px solid var(--border-strong);border-radius:8px;color:var(--ink-soft);font-size:12px;font-weight:600;cursor:pointer}
+.volver-locales:hover{color:var(--ink);border-color:var(--brand)}
+body.vista-final .volver-locales{display:inline-flex}
 /* Info drawer */
 .info-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:9998;display:none}
 .info-overlay.open{display:block}
@@ -1006,7 +1023,6 @@ select.cell-sel{height:26px;padding:0 6px;font-size:11px;border:1px solid var(--
   </div>
   <div class="topbar-actions">
     <button class="info-trigger" onclick="openInfo()" aria-label="Información"><span class="ta-icon">ℹ</span><span class="ta-label">Info</span></button>
-    <button class="admin-trigger" onclick="openAdmin()" aria-label="Administración"><span class="ta-icon">⚙</span><span class="ta-label">Admin</span></button>
   </div>
 </div>
 
@@ -1432,20 +1448,26 @@ function getSortState(tid){
 // IZIFUD: recetas / sugeridos / proveedores / estacionalidad / referencia
 // quedan escondidas (los renderers siguen en el código por si se reactivan)
 const TABS=[
-  // PÚBLICO (cliente)
+  // PÚBLICO (cliente final)
+  {id:"home",label:"🏠 Restaurantes", group:"publico"},
   {id:"tienda",label:"🛒 Tienda", group:"publico"},
-  {id:"ubicacion",label:"📍 Locales", group:"publico"},
-  // GESTIÓN (socio)
+  {id:"ubicacion",label:"📍 Mapa", group:"publico"},
+  // GESTIÓN (socio: SU restaurante)
   {id:"pedidos",label:"🧾 Pedidos", group:"gestion"},
   {id:"dashboard",label:"🏪 Mi restaurante", group:"gestion"},
   {id:"stock",label:"📦 Carta y precios", group:"gestion"},
   {id:"margen",label:"💰 Margen bruto", group:"gestion"},
   {id:"envio",label:"🚚 Costo de envío", group:"gestion"},
+  // PLATAFORMA (admin B2B: gestión de socios, sin carta propia)
+  {id:"socios",label:"🤝 Socios", group:"plataforma"},
+  {id:"plataforma-dash",label:"📊 Plataforma", group:"plataforma"},
 ];
 
+// Cada grupo es visible según el rol de desarrollo activo
 const GROUPS=[
-  {id:"publico", label:"Público", icon:"👥"},
-  {id:"gestion", label:"Gestión", icon:"⚙"},
+  {id:"publico", label:"Público", icon:"👥", roles:["cliente","socio","admin"]},
+  {id:"gestion", label:"Gestión", icon:"⚙", roles:["socio","admin"]},
+  {id:"plataforma", label:"Plataforma", icon:"🏢", roles:["admin"]},
 ];
 let activeGroup="publico";
 
@@ -1453,16 +1475,20 @@ const tabbar=document.getElementById("tabbar");
 const panelsEl=document.getElementById("panels");
 const groupPillsEl=document.getElementById("group-pills");
 
-// Build group pills
-GROUPS.forEach(g=>{
-  const count=TABS.filter(t=>t.group===g.id).length;
-  const pill=document.createElement("button");
-  pill.className="group-pill"+(g.id===activeGroup?" on":"");
-  pill.innerHTML=`<span class="group-pill-icon">${g.icon}</span>${g.label}<span class="group-pill-count">${count}</span>`;
-  pill.dataset.group=g.id;
-  pill.onclick=()=>switchGroup(g.id);
-  groupPillsEl.appendChild(pill);
-});
+// Pills de grupo según el rol activo (se re-renderiza al cambiar de rol).
+// No se auto-ejecuta acá: applyDevRole() la llama en el boot.
+function renderGroupPills(){
+  groupPillsEl.innerHTML="";
+  GROUPS.filter(g=>g.roles.includes(devRole)).forEach(g=>{
+    const count=TABS.filter(t=>t.group===g.id).length;
+    const pill=document.createElement("button");
+    pill.className="group-pill"+(g.id===activeGroup?" on":"");
+    pill.innerHTML=`<span class="group-pill-icon">${g.icon}</span>${g.label}<span class="group-pill-count">${count}</span>`;
+    pill.dataset.group=g.id;
+    pill.onclick=()=>switchGroup(g.id);
+    groupPillsEl.appendChild(pill);
+  });
+}
 
 // Build all panels (always exist but hidden); tabs render dynamically per group
 TABS.forEach(t=>{
@@ -2306,6 +2332,7 @@ function renderTienda(){
   const p=document.getElementById("panel-tienda");
   if(!p.dataset.init){
     p.innerHTML=`
+      <button class="volver-locales" onclick="goToTab('home')">← Elegir otro restaurante</button>
       <div class="store-header">
         <div class="store-search">
           <input type="text" placeholder="Buscar platos..." oninput="storeSearch=this.value.toLowerCase();renderStoreGrid()">
@@ -4574,7 +4601,10 @@ function applyDevRole(){
   document.body.dataset.role=devRole;
   document.body.classList.toggle("vista-final",vistaFinal);
   document.querySelectorAll(".drb-btn").forEach(b=>b.classList.toggle("on",b.dataset.role===devRole));
-  if(vistaFinal&&activeGroup!=="publico")switchGroup("publico");
+  renderGroupPills();
+  // Cada rol aterriza en SU grupo: cliente→home, socio→pedidos, admin→socios
+  const defaults={cliente:"publico",socio:"gestion",admin:"plataforma"};
+  switchGroup(defaults[devRole]||"publico");
 }
 
 function updateGlobalHeader(){
@@ -5516,11 +5546,6 @@ function renderDashboardContent(){
             <div class="sc-text"><strong>Zonas de envío</strong><span>Costos y mínimos</span></div>
             <div class="sc-arrow">→</div>
           </div>
-          <div class="shortcut" onclick="goToTab('admin')">
-            <div class="sc-icon">⚙</div>
-            <div class="sc-text"><strong>Cambiar restaurante</strong><span>Multi-tenant</span></div>
-            <div class="sc-arrow">→</div>
-          </div>
         </div>
       </div>
     </div>
@@ -5641,8 +5666,8 @@ function saveMyVerdu(){
 }
 
 function goToTab(id){
-  // Special case: admin is a drawer, not a tab
-  if(id==="admin"){openAdmin();return;}
+  // Legacy: "admin" ahora es la tab Socios del grupo Plataforma
+  if(id==="admin")id="socios";
   const tab=TABS.find(t=>t.id===id);
   if(!tab)return;
   // Switch group if needed
@@ -5790,13 +5815,132 @@ function resetAllData(){
 }
 
 // ─── INITIAL RENDER ──────────────────────────────────────
+// ─── HOME DEL CLIENTE (elegir restaurante) ────────────────
+let homeSearch="";
+
+function renderHome(){
+  const p=document.getElementById("panel-home");
+  if(!p.dataset.init){
+    p.innerHTML=`
+      <div class="home-hero">
+        <h2>¿Qué querés comer hoy?</h2>
+        <p>Elegí un restaurante para ver su carta y pedir online.</p>
+      </div>
+      <div class="top">
+        <input type="text" id="home-search" placeholder="Buscar restaurante o zona..." oninput="homeSearch=this.value.toLowerCase();renderHomeList()">
+        <button class="ubi-btn alt" onclick="goToTab('ubicacion')">📍 Ver en mapa</button>
+      </div>
+      <div class="home-list" id="home-list"></div>`;
+    p.dataset.init="1";
+  }
+  renderHomeList();
+}
+
+function renderHomeList(){
+  const el=document.getElementById("home-list");
+  if(!el)return;
+  const socios=Object.values(tenants).filter(t=>
+    !homeSearch||t.nombre.toLowerCase().includes(homeSearch)||(t.zona||"").toLowerCase().includes(homeSearch));
+  if(!socios.length){
+    el.innerHTML=`<div class="pedido-empty"><strong>Sin resultados</strong>Probá con otro nombre o zona.</div>`;
+    return;
+  }
+  el.innerHTML=socios.map(t=>{
+    const carta=D.filter(r=>r.rest===t.id);
+    const cfg=getEntregaConfig(t);
+    const disp=isLocalDisponible(t);
+    const tags=[cfg.delivery?"🛵 Delivery":"",cfg.pickup?"🏪 Retiro":""].filter(Boolean).join("  ");
+    return`<div class="home-card ${disp?"":"cerrado"}" onclick="elegirRestaurante('${t.id}')">
+      <div class="home-card-icon">${t.icono||"🍽"}</div>
+      <div class="home-card-info">
+        <div class="home-card-name">${t.nombre}</div>
+        <div class="home-card-meta">${t.zona||""}${t.diasEnvio?" · "+t.diasEnvio:""} · ${carta.length} platos</div>
+        <div class="home-card-tags">${tags}</div>
+      </div>
+      <span class="store-banner-status ${disp?"on":"off"}">${disp?"Abierto":"Cerrado"}</span>
+    </div>`;
+  }).join("");
+}
+
+function elegirRestaurante(id){
+  if(id!==currentTenantId)switchTenant(id);
+  goToTab("tienda");
+}
+
+// ─── PLATAFORMA (admin B2B) ───────────────────────────────
+function renderSocios(){
+  const p=document.getElementById("panel-socios");
+  if(!p.dataset.init){
+    p.innerHTML=`<div id="admin-content"></div>`;
+    p.dataset.init="1";
+  }
+  renderAdminContent();
+}
+
+function renderPlataformaDash(){
+  const p=document.getElementById("panel-plataforma-dash");
+  // Snapshot del tenant activo para que sus números estén frescos
+  if(tenants[currentTenantId])tenants[currentTenantId].data=snapshotCurrentState();
+  const rows=Object.values(tenants).map(t=>{
+    const carta=D.filter(r=>r.rest===t.id);
+    const ss=(t.data&&t.data.stockState)||{};
+    const activos=carta.filter(r=>ss[r.n]&&ss[r.n].activo).length;
+    const peds=((t.data&&t.data.pedidos)||[]).filter(x=>x.estado!=="cancelado");
+    const entregados=peds.filter(x=>x.estado==="entregado");
+    const revenue=entregados.reduce((a,x)=>a+x.total,0);
+    const unidades=peds.reduce((a,x)=>a+(x.items||[]).reduce((s,i)=>s+i.qty,0),0);
+    return{t,carta:carta.length,activos,pedidos:peds.length,entregados:entregados.length,revenue,unidades,disp:isLocalDisponible(t)};
+  });
+  const totRevenue=rows.reduce((a,r)=>a+r.revenue,0);
+  const totPedidos=rows.reduce((a,r)=>a+r.pedidos,0);
+  const totEntregados=rows.reduce((a,r)=>a+r.entregados,0);
+  const ticket=totEntregados?Math.round(totRevenue/totEntregados):0;
+  p.innerHTML=`
+    <div class="rec-header">
+      <h2>📊 Plataforma IZIFUD</h2>
+      <p>Vista interna: volumen y ventas de todos los socios. Los datos vienen de los pedidos de cada restaurante.</p>
+    </div>
+    <div class="summary-bar">
+      <div class="summary-card"><div class="lbl">Socios</div><div class="val">${rows.length}</div></div>
+      <div class="summary-card ok"><div class="lbl">Abiertos</div><div class="val">${rows.filter(r=>r.disp).length}</div></div>
+      <div class="summary-card"><div class="lbl">Platos publicados</div><div class="val">${rows.reduce((a,r)=>a+r.carta,0)}</div></div>
+      <div class="summary-card"><div class="lbl">Pedidos</div><div class="val">${totPedidos}</div></div>
+      <div class="summary-card ok"><div class="lbl">Ventas (entregados)</div><div class="val">${fmt(totRevenue)||"$0"}</div></div>
+      <div class="summary-card"><div class="lbl">Ticket promedio</div><div class="val">${ticket?fmt(ticket):"—"}</div></div>
+    </div>
+    <div class="ow"><table style="min-width:760px">
+      <thead><tr>
+        <th>Socio</th><th>Estado</th><th>Platos</th><th>Pedidos</th><th>Entregados</th><th>Unidades</th><th>Ventas</th><th></th>
+      </tr></thead>
+      <tbody>
+        ${rows.map(r=>`<tr>
+          <td>${r.t.icono||"🍽"} <strong>${r.t.nombre}</strong><span class="u">${r.t.zona||""}</span></td>
+          <td><span class="badge ${r.disp?"ok":"warn"}">${r.disp?"Abierto":"Cerrado"}</span></td>
+          <td>${r.activos}/${r.carta}</td>
+          <td>${r.pedidos}</td>
+          <td>${r.entregados}</td>
+          <td>${r.unidades}</td>
+          <td><strong>${fmt(r.revenue)||"$0"}</strong></td>
+          <td><button class="edit-btn" onclick="adminGestionarSocio('${r.t.id}')">Gestionar →</button></td>
+        </tr>`).join("")}
+      </tbody>
+    </table></div>
+    <p class="foot">Ventas = pedidos en estado Entregado. "Gestionar" te lleva a la vista de gestión de ese socio (misma que ve él).</p>`;
+}
+
+function adminGestionarSocio(id){
+  if(id!==currentTenantId)switchTenant(id);
+  switchGroup("gestion");
+}
+
 const renderMap={
   original:renderOriginal,kg:renderKg,margen:renderMargen,
   sugeridos:renderSugeridos,envio:renderEnvio,
   estacional:renderEstacional,proveedor:renderProveedor,
   pedidos:renderPedidos,
   tienda:renderTienda,recetas:renderRecetas,ubicacion:renderUbicacion,
-  stock:renderStock,dashboard:renderDashboard
+  stock:renderStock,dashboard:renderDashboard,
+  home:renderHome,socios:renderSocios,"plataforma-dash":renderPlataformaDash
 };
 
 function renderTab(id){
