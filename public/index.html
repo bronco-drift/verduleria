@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>verduras.ar — Frutas, verduras y almacén con envío a domicilio</title>
-<meta name="description" content="Comprá frutas, verduras y almacén online en verduras.ar. Encontrá la verdulería más cercana, comparalas con la competencia y elegí delivery o retiro en local. Pedidos por WhatsApp, Mercado Pago, efectivo o transferencia.">
-<meta name="keywords" content="verdulería online, frutas y verduras delivery, verduras a domicilio, almacén online, verduras CABA, verduras GBA, verduras Argentina, frutas online, verduras orgánicas, bolsón de verduras, mercado online">
-<meta name="author" content="verduras.ar">
+<title>IZIFUD — Pedí online en tus restaurantes favoritos</title>
+<meta name="description" content="IZIFUD: pedidos online de restaurantes. Mirá la carta, elegí delivery o retiro en el local y pagá como quieras. Parrilla, sushi, pizza y más.">
+<meta name="keywords" content="pedidos online, delivery restaurantes, comida a domicilio, carta online, parrilla delivery, sushi delivery, pizza delivery, Argentina">
+<meta name="author" content="IZIFUD">
 <meta name="robots" content="index, follow, max-image-preview:large">
 <meta name="format-detection" content="telephone=yes,address=yes,email=yes">
 <link rel="canonical" href="https://verduras.ar/">
@@ -16,10 +16,10 @@
 <meta name="theme-color" content="#2e5f7a" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0f1419" media="(prefers-color-scheme: dark)">
 <meta name="color-scheme" content="light dark">
-<meta name="application-name" content="verduras.ar">
+<meta name="application-name" content="IZIFUD">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="verduras.ar">
+<meta name="apple-mobile-web-app-title" content="IZIFUD">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="msapplication-TileColor" content="#2e5f7a">
 <meta name="msapplication-tap-highlight" content="no">
@@ -31,9 +31,9 @@
 
 <!-- Open Graph (Facebook, WhatsApp, LinkedIn) -->
 <meta property="og:type" content="website">
-<meta property="og:site_name" content="verduras.ar">
-<meta property="og:title" content="verduras.ar — Frutas, verduras y almacén con envío">
-<meta property="og:description" content="Comprá frutas, verduras y almacén online. Encontrá la verdulería más cercana, elegí delivery o retiro y pagá como prefieras.">
+<meta property="og:site_name" content="IZIFUD">
+<meta property="og:title" content="IZIFUD — Pedí online en tus restaurantes favoritos">
+<meta property="og:description" content="Mirá la carta, elegí delivery o retiro en el local y pagá como quieras.">
 <meta property="og:url" content="https://verduras.ar/">
 <meta property="og:image" content="https://verduras.ar/icon-512.svg">
 <meta property="og:image:alt" content="Logo de verduras.ar">
@@ -41,8 +41,8 @@
 
 <!-- Twitter Card -->
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="verduras.ar — Frutas y verduras con envío">
-<meta name="twitter:description" content="Comprá online en la verdulería más cercana. Delivery o retiro, múltiples formas de pago.">
+<meta name="twitter:title" content="IZIFUD — Pedidos online de restaurantes">
+<meta name="twitter:description" content="Mirá la carta, elegí delivery o retiro, pagá como quieras.">
 <meta name="twitter:image" content="https://verduras.ar/icon-512.svg">
 
 <!-- Hint a buscadores: SPA -->
@@ -180,6 +180,17 @@ body.vista-final .store-banner{display:none}
 body.vista-final .admin-trigger{display:none}
 body.vista-final .topbar-title .subtitle{display:block;font-weight:600;color:var(--ink)}
 @media(max-width:640px){body.vista-final .topbar-title .subtitle{display:block}}
+/* Rol socio: gestión de su restaurante, sin admin global */
+body[data-role="socio"] .admin-trigger{display:none}
+/* Barra de rol (desarrollo) */
+.dev-role-bar{display:flex;align-items:center;gap:12px;padding:7px 12px;margin-bottom:14px;background:var(--surface);border:1px solid var(--border);border-radius:9px;font-size:11px;flex-wrap:wrap}
+.drb-label{font-weight:700;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.05em;font-size:10px}
+.drb-group{display:flex;gap:4px;padding:3px;background:var(--surface-2);border-radius:8px}
+.drb-btn{height:26px;padding:0 14px;border:none;background:transparent;color:var(--ink-soft);font-size:11px;font-weight:600;border-radius:6px;cursor:pointer;transition:background .15s,color .15s}
+.drb-btn:hover{color:var(--ink)}
+.drb-btn.on{background:var(--surface);color:var(--ink);box-shadow:var(--shadow-sm)}
+.drb-note{color:var(--ink-faint);font-size:10px;margin-left:auto}
+@media(max-width:640px){.drb-note{display:none}}
 /* Info drawer */
 .info-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:9998;display:none}
 .info-overlay.open{display:block}
@@ -977,13 +988,23 @@ select.cell-sel{height:26px;padding:0 6px;font-size:11px;border:1px solid var(--
 </style>
 </head>
 <body>
+<!-- Barra de rol (solo desarrollo, sin auth real) -->
+<div class="dev-role-bar">
+  <span class="drb-label">Ver como</span>
+  <div class="drb-group">
+    <button class="drb-btn" data-role="cliente" onclick="setDevRole('cliente')">Cliente</button>
+    <button class="drb-btn" data-role="socio" onclick="setDevRole('socio')">Socio</button>
+    <button class="drb-btn" data-role="admin" onclick="setDevRole('admin')">Admin</button>
+  </div>
+  <span class="drb-note">modo desarrollo · sin login</span>
+</div>
+
 <div class="topbar">
   <div class="topbar-title">
-    <h1>🥦 verduras.ar</h1>
-    <p class="subtitle">Frutas, verduras y almacén con envío a domicilio</p>
+    <h1>IZIFUD</h1>
+    <p class="subtitle">Pedí online en tus restaurantes favoritos</p>
   </div>
   <div class="topbar-actions">
-    <button class="view-trigger" onclick="toggleVistaFinal()" aria-label="Vista de cliente final"><span class="ta-icon">👁</span><span class="ta-label">Vista</span></button>
     <button class="info-trigger" onclick="openInfo()" aria-label="Información"><span class="ta-icon">ℹ</span><span class="ta-label">Info</span></button>
     <button class="admin-trigger" onclick="openAdmin()" aria-label="Administración"><span class="ta-icon">⚙</span><span class="ta-label">Admin</span></button>
   </div>
@@ -1110,80 +1131,55 @@ select.cell-sel{height:26px;padding:0 6px;font-size:11px;border:1px solid var(--
 const MESES_NAMES=["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"];
 const MESES_ALL=[0,1,2,3,4,5,6,7,8,9,10,11];
 
-// p: [Barata, Verde, Click, Nico, MegaVerde, Verduonline] - precios normalizados a la unidad de venta
-// Última verificación contra los sitios: 2026-05-29 (Click y Nico no verificables)
+// IZIFUD: catálogo maestro. Cada item pertenece a un restaurante (rest).
+// getMenu() filtra la carta del tenant activo. p:[] queda por compat con stats().
 const D=[
-  {c:"Verduras",n:"Acelga",u:"unidad",p:[2900,null,3500,1900,1400,1500],kg:500,costo:700,pVenta:2200},
-  {c:"Verduras",n:"Achicoria",u:"atado",p:[null,null,null,null,1200,null],kg:300,costo:400,pVenta:1100},
-  {c:"Verduras",n:"Ajo",u:"unidad",p:[null,null,null,null,900,800],kg:60,costo:400,pVenta:850},
-  {c:"Verduras",n:"Albahaca",u:"unidad",p:[null,null,null,null,2400,null],kg:30,costo:800,pVenta:2000},
-  {c:"Verduras",n:"Apio",u:"unidad",p:[1900,null,1400,3000,4000,2580],kg:600,costo:600,pVenta:1800},
-  {c:"Verduras",n:"Batata",u:"kg",p:[2700,null,4500,1850,1200,2000],kg:1000,costo:900,pVenta:2200},
-  {c:"Verduras",n:"Berenjena",u:"kg",p:[3900,null,null,3000,3000,1750],kg:1000,costo:1200,pVenta:3500},
-  {c:"Verduras",n:"Boniato",u:"kg",p:[null,null,null,null,1800,null],kg:1000,costo:900,pVenta:2000},
-  {c:"Verduras",n:"Brócoli",u:"unidad",p:[5500,4165,null,3000,3000,null],kg:600,costo:1000,pVenta:2700},
-  {c:"Verduras",n:"Brotes de soja",u:"200g",p:[null,null,null,null,2500,null],kg:200,costo:800,pVenta:2200},
-  {c:"Verduras",n:"Calabacín",u:"kg",p:[null,null,null,null,1200,null],kg:1000,costo:600,pVenta:1500},
-  {c:"Verduras",n:"Cebolla",u:"kg",p:[1500,1700,2800,2000,1300,500],kg:1000,costo:600,pVenta:1500},
-  {c:"Verduras",n:"Cebolla de verdeo",u:"atado",p:[null,null,null,null,1875,1300],kg:250,costo:700,pVenta:1700},
-  {c:"Verduras",n:"Cebolla morada",u:"kg",p:[null,null,null,null,2000,1000],kg:1000,costo:800,pVenta:1800},
-  {c:"Verduras",n:"Choclo",u:"unidad",p:[2400,1800,null,900,2200,null],kg:300,costo:350,pVenta:1500},
-  {c:"Verduras",n:"Cilantro",u:"atado",p:[null,null,null,null,3000,null],kg:25,costo:500,pVenta:1500},
-  {c:"Verduras",n:"Coliflor",u:"unidad",p:[null,null,null,null,3000,null],kg:800,costo:1500,pVenta:4000},
-  {c:"Verduras",n:"Espinaca",u:"atado",p:[1850,null,3900,2000,3000,null],kg:300,costo:600,pVenta:1700},
-  {c:"Verduras",n:"Espárragos",u:"atado",p:[null,14000,null,null,null,null],kg:500,costo:5000,pVenta:12000},
-  {c:"Verduras",n:"Hinojo",u:"unidad",p:[null,null,null,null,1500,null],kg:400,costo:800,pVenta:1800},
-  {c:"Verduras",n:"Jengibre",u:"100g",p:[null,null,null,null,600,820],kg:100,costo:400,pVenta:1000},
-  {c:"Verduras",n:"Kale",u:"atado",p:[null,3400,3300,2500,null,null],kg:200,costo:900,pVenta:3000},
-  {c:"Verduras",n:"Lechuga",u:"unidad",p:[1400,3000,null,null,900,1380],kg:300,costo:450,pVenta:1300},
-  {c:"Verduras",n:"Morrón rojo",u:"unidad",p:[1600,2200,null,null,1100,1100],kg:200,costo:450,pVenta:1200},
-  {c:"Verduras",n:"Morrón verde",u:"unidad",p:[1100,null,null,null,450,600],kg:150,costo:300,pVenta:850},
-  {c:"Verduras",n:"Nabo",u:"kg",p:[null,null,null,null,5800,null],kg:1000,costo:2000,pVenta:5500},
-  {c:"Verduras",n:"Papa",u:"kg",p:[1650,3000,2600,2500,1500,650],kg:1000,costo:450,pVenta:1100},
-  {c:"Verduras",n:"Papines",u:"500g",p:[null,null,5600,5000,null,null],kg:500,costo:2000,pVenta:5000},
-  {c:"Verduras",n:"Pepino",u:"kg",p:[null,null,null,null,3200,null],kg:1000,costo:1500,pVenta:3800},
-  {c:"Verduras",n:"Perejil",u:"atado",p:[null,null,1500,950,240,344],kg:80,costo:300,pVenta:900},
-  {c:"Verduras",n:"Puerro",u:"500g",p:[1700,null,2900,null,2250,2150],kg:500,costo:700,pVenta:1600},
-  {c:"Verduras",n:"Rabanito",u:"atado",p:[null,null,null,null,1000,null],kg:200,costo:400,pVenta:950},
-  {c:"Verduras",n:"Remolacha",u:"kg",p:[null,null,3900,4000,5500,2500],kg:1000,costo:1200,pVenta:3500},
-  {c:"Verduras",n:"Repollo blanco",u:"kg",p:[2000,null,3900,2300,3000,null],kg:1000,costo:700,pVenta:1900},
-  {c:"Verduras",n:"Repollitos de Bruselas",u:"500g",p:[3400,3000,2500,4000,null,null],kg:500,costo:1100,pVenta:3000},
-  {c:"Verduras",n:"Rúcula",u:"unidad",p:[600,1300,2200,700,null,null],kg:100,costo:250,pVenta:650},
-  {c:"Verduras",n:"Tomate cherry",u:"500g",p:[3400,null,1900,null,2800,null],kg:500,costo:600,pVenta:1500},
-  {c:"Verduras",n:"Tomate perita",u:"kg",p:[null,4900,null,null,2800,2400],kg:1000,costo:1100,pVenta:3000},
-  {c:"Verduras",n:"Tomate redondo",u:"kg",p:[null,null,null,null,1800,2750],kg:1000,costo:1300,pVenta:3500},
-  {c:"Verduras",n:"Zanahoria",u:"kg",p:[2200,3000,null,2500,2000,1200],kg:1000,costo:800,pVenta:2200},
-  {c:"Verduras",n:"Zapallo anco",u:"unidad",p:[2100,null,null,null,3200,2400],kg:2000,costo:700,pVenta:1700},
-  {c:"Verduras",n:"Zapallo kabutia",u:"unidad",p:[2600,null,4500,null,null,null],kg:1500,costo:900,pVenta:2400},
-  {c:"Verduras",n:"Zapallito",u:"kg",p:[5300,null,null,4500,2700,1800],kg:1000,costo:1500,pVenta:4500},
-  {c:"Frutas",n:"Ananá",u:"unidad",p:[null,6500,null,7000,null,null],kg:1200,costo:2500,pVenta:6000},
-  {c:"Frutas",n:"Banana",u:"kg",p:[3100,3500,6000,3000,2500,3100],kg:1000,costo:1100,pVenta:3000},
-  {c:"Frutas",n:"Granada",u:"unidad",p:[null,8000,null,3500,null,null],kg:350,costo:1500,pVenta:3200},
-  {c:"Frutas",n:"Kiwi",u:"500g",p:[6500,null,4900,null,7000,null],kg:500,costo:2000,pVenta:4500},
-  {c:"Frutas",n:"Lima",u:"kg",p:[null,3000,null,5000,6000,null],kg:1000,costo:1200,pVenta:2800},
-  {c:"Frutas",n:"Limón",u:"kg",p:[1900,1530,4400,1300,1500,null],kg:1000,costo:500,pVenta:1200},
-  {c:"Frutas",n:"Mandarina",u:"kg",p:[1800,1800,2900,1300,1500,1325],kg:1000,costo:500,pVenta:1700},
-  {c:"Frutas",n:"Mango",u:"unidad",p:[null,null,null,2800,2000,null],kg:400,costo:900,pVenta:2500},
-  {c:"Frutas",n:"Manzana verde",u:"kg",p:[6300,4250,7600,5500,5000,null],kg:1000,costo:2200,pVenta:5800},
-  {c:"Frutas",n:"Manzana roja",u:"kg",p:[5500,5000,7600,5500,2800,3300],kg:1000,costo:2200,pVenta:6200},
-  {c:"Frutas",n:"Melón",u:"kg",p:[null,7500,null,4000,null,null],kg:1000,costo:1500,pVenta:3800},
-  {c:"Frutas",n:"Naranja jugo",u:"kg",p:[5500,null,null,null,1200,1300],kg:1000,costo:500,pVenta:1400},
-  {c:"Frutas",n:"Naranja ombligo",u:"kg",p:[null,2500,3500,2000,1200,1350],kg:1000,costo:700,pVenta:1900},
-  {c:"Frutas",n:"Palta Hass",u:"unidad",p:[2000,1700,null,1500,1480,1550],kg:200,costo:600,pVenta:1400},
-  {c:"Frutas",n:"Pera",u:"kg",p:[null,null,null,null,2800,2200],kg:1000,costo:1000,pVenta:2500},
-  {c:"Frutas",n:"Pomelo",u:"kg",p:[null,2720,null,null,1500,null],kg:1000,costo:700,pVenta:1700},
-  {c:"Frutas",n:"Sandía",u:"unidad",p:[null,5000,null,null,null,null],kg:5000,costo:2000,pVenta:4500},
-  {c:"Frutas",n:"Uva blanca",u:"500g",p:[9000,7000,null,null,null,null],kg:500,costo:3000,pVenta:6500},
-  {c:"Frutas",n:"Uva negra",u:"kg",p:[null,9350,null,null,null,null],kg:1000,costo:2500,pVenta:5000},
-  {c:"Hongos",n:"Champiñones",u:"200g",p:[null,null,8400,6550,5600,null],kg:200,costo:2500,pVenta:6000},
-  {c:"Hongos",n:"Portobellos",u:"200g",p:[null,null,8700,6550,null,null],kg:200,costo:3000,pVenta:6500},
-  {c:"Hongos",n:"Girgolas frescas",u:"200g",p:[null,null,6800,null,null,null],kg:200,costo:2200,pVenta:6000},
-  {c:"Almacén",n:"Aceite de oliva",u:"500ml",p:[null,null,18700,19990,5400,null],kg:500,costo:9000,pVenta:17000},
-  {c:"Almacén",n:"Huevos",u:"docena",p:[4000,null,null,3000,2620,4000],kg:null,costo:1800,pVenta:3200},
-  {c:"Almacén",n:"Quinoa",u:"250g",p:[null,null,8900,null,null,null],kg:250,costo:3500,pVenta:8000},
-  {c:"Almacén",n:"Lentejas",u:"450g",p:[null,null,4900,null,null,null],kg:450,costo:1800,pVenta:4500},
-  {c:"Almacén",n:"Garbanzos",u:"500g",p:[null,null,4200,null,null,null],kg:500,costo:1700,pVenta:3900},
+  // ── Parrilla Don Tito ──
+  {rest:"tito",c:"Platos",n:"Asado de tira",u:"porción",p:[],kg:null,costo:12000,pVenta:25000},
+  {rest:"tito",c:"Platos",n:"Vacío al asador",u:"porción",p:[],kg:null,costo:11000,pVenta:23000},
+  {rest:"tito",c:"Platos",n:"Choripán",u:"unidad",p:[],kg:null,costo:3200,pVenta:7500},
+  {rest:"tito",c:"Platos",n:"Provoleta",u:"unidad",p:[],kg:null,costo:4500,pVenta:9800},
+  {rest:"tito",c:"Platos",n:"Matambre a la pizza",u:"porción",p:[],kg:null,costo:9000,pVenta:19500},
+  {rest:"tito",c:"Platos",n:"Ensalada mixta",u:"unidad",p:[],kg:null,costo:2500,pVenta:6500},
+  {rest:"tito",c:"Combos",n:"Parrillada para 2",u:"combo",p:[],kg:null,costo:26000,pVenta:52000},
+  {rest:"tito",c:"Combos",n:"Choripán + bebida",u:"combo",p:[],kg:null,costo:4800,pVenta:10500},
+  {rest:"tito",c:"Bebidas",n:"Copa de Malbec",u:"copa",p:[],kg:null,costo:2800,pVenta:7000},
+  {rest:"tito",c:"Bebidas",n:"Coca-Cola 500ml",u:"unidad",p:[],kg:null,costo:1400,pVenta:3500},
+  {rest:"tito",c:"Bebidas",n:"Agua sin gas",u:"unidad",p:[],kg:null,costo:900,pVenta:2500},
+  {rest:"tito",c:"Postres",n:"Flan casero",u:"unidad",p:[],kg:null,costo:2200,pVenta:5800},
+  {rest:"tito",c:"Postres",n:"Queso y dulce",u:"unidad",p:[],kg:null,costo:2100,pVenta:5500},
+  // ── Sakura Sushi ──
+  {rest:"sakura",c:"Platos",n:"Roll Philadelphia x8",u:"unidad",p:[],kg:null,costo:5200,pVenta:11500},
+  {rest:"sakura",c:"Platos",n:"Niguiri de salmón x5",u:"unidad",p:[],kg:null,costo:4600,pVenta:9800},
+  {rest:"sakura",c:"Platos",n:"Sashimi mixto x12",u:"unidad",p:[],kg:null,costo:8200,pVenta:16500},
+  {rest:"sakura",c:"Platos",n:"Gyozas de cerdo x6",u:"unidad",p:[],kg:null,costo:3900,pVenta:8900},
+  {rest:"sakura",c:"Platos",n:"Yakisoba de pollo",u:"porción",p:[],kg:null,costo:5600,pVenta:12800},
+  {rest:"sakura",c:"Combos",n:"Combo 30 piezas",u:"combo",p:[],kg:null,costo:15500,pVenta:32000},
+  {rest:"sakura",c:"Combos",n:"Combo individual 15p",u:"combo",p:[],kg:null,costo:8200,pVenta:17500},
+  {rest:"sakura",c:"Bebidas",n:"Té verde",u:"unidad",p:[],kg:null,costo:1000,pVenta:3200},
+  {rest:"sakura",c:"Bebidas",n:"Cerveza Sapporo",u:"unidad",p:[],kg:null,costo:2900,pVenta:6500},
+  {rest:"sakura",c:"Bebidas",n:"Agua saborizada",u:"unidad",p:[],kg:null,costo:1200,pVenta:3000},
+  {rest:"sakura",c:"Postres",n:"Mochi x2",u:"unidad",p:[],kg:null,costo:3000,pVenta:6800},
+  {rest:"sakura",c:"Postres",n:"Helado de té verde",u:"unidad",p:[],kg:null,costo:2500,pVenta:5900},
+  // ── Napoli Pizza ──
+  {rest:"napoli",c:"Platos",n:"Muzzarella",u:"unidad",p:[],kg:null,costo:5000,pVenta:12500},
+  {rest:"napoli",c:"Platos",n:"Napolitana",u:"unidad",p:[],kg:null,costo:6200,pVenta:14500},
+  {rest:"napoli",c:"Platos",n:"Fugazzeta rellena",u:"unidad",p:[],kg:null,costo:7400,pVenta:16800},
+  {rest:"napoli",c:"Platos",n:"Calabresa",u:"unidad",p:[],kg:null,costo:6800,pVenta:15500},
+  {rest:"napoli",c:"Platos",n:"Porción de fainá",u:"porción",p:[],kg:null,costo:900,pVenta:2800},
+  {rest:"napoli",c:"Combos",n:"Pizza + fainá + bebida",u:"combo",p:[],kg:null,costo:8600,pVenta:18900},
+  {rest:"napoli",c:"Combos",n:"2 muzzarellas promo",u:"combo",p:[],kg:null,costo:9400,pVenta:21500},
+  {rest:"napoli",c:"Bebidas",n:"Cerveza artesanal pinta",u:"unidad",p:[],kg:null,costo:2900,pVenta:6800},
+  {rest:"napoli",c:"Bebidas",n:"Coca-Cola 1.5L",u:"unidad",p:[],kg:null,costo:2400,pVenta:5500},
+  {rest:"napoli",c:"Bebidas",n:"Agua con gas",u:"unidad",p:[],kg:null,costo:900,pVenta:2500},
+  {rest:"napoli",c:"Postres",n:"Tiramisú",u:"porción",p:[],kg:null,costo:3200,pVenta:7200},
+  {rest:"napoli",c:"Postres",n:"Cannoli x3",u:"unidad",p:[],kg:null,costo:2800,pVenta:6500},
 ];
+
+// La carta del restaurante activo (los items sin rest son compartidos)
+function getMenu(){
+  return D.filter(r=>!r.rest||r.rest===currentTenantId);
+}
 
 // Estacionalidad default (meses disponibles, 0=Ene)
 const ESTACIONALIDAD = {
@@ -1433,29 +1429,23 @@ function getSortState(tid){
 }
 
 // ─── TAB SYSTEM ──────────────────────────────────────────
+// IZIFUD: recetas / sugeridos / proveedores / estacionalidad / referencia
+// quedan escondidas (los renderers siguen en el código por si se reactivan)
 const TABS=[
-  // PÚBLICO (cara al cliente — landing del sitio)
+  // PÚBLICO (cliente)
   {id:"tienda",label:"🛒 Tienda", group:"publico"},
-  {id:"recetas",label:"👨‍🍳 Combos receta", group:"publico"},
-  {id:"ubicacion",label:"📍 Mi ubicación", group:"publico"},
-  // GESTIÓN (ordenadas por frecuencia de uso del dueño)
+  {id:"ubicacion",label:"📍 Locales", group:"publico"},
+  // GESTIÓN (socio)
   {id:"pedidos",label:"🧾 Pedidos", group:"gestion"},
-  {id:"dashboard",label:"🏪 Mi verdulería", group:"gestion"},
-  {id:"stock",label:"📦 Precios y Stock", group:"gestion"},
+  {id:"dashboard",label:"🏪 Mi restaurante", group:"gestion"},
+  {id:"stock",label:"📦 Carta y precios", group:"gestion"},
   {id:"margen",label:"💰 Margen bruto", group:"gestion"},
   {id:"envio",label:"🚚 Costo de envío", group:"gestion"},
-  {id:"sugeridos",label:"🎯 Precios sugeridos", group:"gestion"},
-  {id:"proveedor",label:"📋 Proveedores", group:"gestion"},
-  {id:"estacional",label:"📅 Estacionalidad", group:"gestion"},
-  // REFERENCIA (competencia)
-  {id:"original",label:"📊 Precios competencia", group:"referencia"},
-  {id:"kg",label:"⚖ Por kg", group:"referencia"},
 ];
 
 const GROUPS=[
   {id:"publico", label:"Público", icon:"👥"},
   {id:"gestion", label:"Gestión", icon:"⚙"},
-  {id:"referencia", label:"Referencia", icon:"📊"},
 ];
 let activeGroup="publico";
 
@@ -1571,7 +1561,7 @@ function getSearch(inputId){
 function filteredData(containerId,inputId){
   const cat=getActiveCat(containerId);
   const sv=getSearch(inputId);
-  return D.filter(r=>(cat==="Todas"||r.c===cat)&&(!sv||r.n.toLowerCase().includes(sv)));
+  return getMenu().filter(r=>(cat==="Todas"||r.c===cat)&&(!sv||r.n.toLowerCase().includes(sv)));
 }
 
 function makeSortableTh(th, tid, col, renderFn){
@@ -1763,7 +1753,7 @@ function renderMargen(){
 }
 
 function renderMargenCards(){
-  const all=D.map(r=>({m:margen(costos[r.n],pVentas[r.n])})).filter(x=>x.m!=null);
+  const all=getMenu().map(r=>({m:margen(costos[r.n],pVentas[r.n])})).filter(x=>x.m!=null);
   const avg=all.reduce((a,b)=>a+b.m,0)/all.length;
   const bajos=all.filter(x=>x.m<20).length;
   const buenos=all.filter(x=>x.m>=margenObj).length;
@@ -2236,28 +2226,35 @@ function eliminarPedido(id){
 
 // ── TAB: TIENDA ──
 const EMOJIS={
-  "Acelga":"🥬","Apio":"🌿","Batata":"🍠","Berenjena":"🍆","Brócoli":"🥦","Cebolla":"🧅",
-  "Choclo":"🌽","Espinaca":"🥬","Espárragos":"🌱","Kale":"🥬","Lechuga":"🥬","Morrón rojo":"🫑",
-  "Morrón verde":"🫑","Papa":"🥔","Papines":"🥔","Perejil":"🌿","Puerro":"🌿","Remolacha":"🫚",
-  "Repollo blanco":"🥬","Repollitos de Bruselas":"🥦","Rúcula":"🌿","Tomate cherry":"🍅",
-  "Zanahoria":"🥕","Zapallo anco":"🎃","Zapallo kabutia":"🎃","Zapallito":"🥒",
-  "Ananá":"🍍","Banana":"🍌","Granada":"🍎","Kiwi":"🥝","Lima":"🍋","Limón":"🍋",
-  "Mandarina":"🍊","Mango":"🥭","Manzana verde":"🍏","Manzana roja":"🍎","Melón":"🍈",
-  "Naranja ombligo":"🍊","Palta Hass":"🥑","Sandía":"🍉","Uva blanca":"🍇","Uva negra":"🍇",
-  "Champiñones":"🍄","Portobellos":"🍄","Girgolas frescas":"🍄",
-  "Aceite de oliva":"🫒","Huevos":"🥚","Quinoa":"🌾","Lentejas":"🫘","Garbanzos":"🫘"
+  // Parrilla Don Tito
+  "Asado de tira":"🥩","Vacío al asador":"🥩","Choripán":"🌭","Provoleta":"🧀",
+  "Matambre a la pizza":"🥩","Ensalada mixta":"🥗","Parrillada para 2":"🔥",
+  "Choripán + bebida":"🌭","Copa de Malbec":"🍷","Coca-Cola 500ml":"🥤",
+  "Agua sin gas":"💧","Flan casero":"🍮","Queso y dulce":"🧀",
+  // Sakura Sushi
+  "Roll Philadelphia x8":"🍣","Niguiri de salmón x5":"🍣","Sashimi mixto x12":"🐟",
+  "Gyozas de cerdo x6":"🥟","Yakisoba de pollo":"🍜","Combo 30 piezas":"🍱",
+  "Combo individual 15p":"🍱","Té verde":"🍵","Cerveza Sapporo":"🍺",
+  "Agua saborizada":"🥤","Mochi x2":"🍡","Helado de té verde":"🍨",
+  // Napoli Pizza
+  "Muzzarella":"🍕","Napolitana":"🍕","Fugazzeta rellena":"🍕","Calabresa":"🍕",
+  "Porción de fainá":"🫓","Pizza + fainá + bebida":"🍕","2 muzzarellas promo":"🍕",
+  "Cerveza artesanal pinta":"🍺","Coca-Cola 1.5L":"🥤","Agua con gas":"💧",
+  "Tiramisú":"🍰","Cannoli x3":"🥐"
 };
 
-// Popularidad base (canasta argentina típica). Los no listados valen 0.
+// Popularidad base (platos estrella por restaurante). Los no listados valen 0.
 // A esto se le suma lo realmente vendido en pedidos del tenant (peso x5).
 const POPULARIDAD_BASE={
-  "Papa":100,"Tomate redondo":95,"Cebolla":90,"Banana":88,"Zanahoria":85,
-  "Lechuga":82,"Manzana roja":80,"Naranja jugo":78,"Limón":76,"Zapallito":74,
-  "Acelga":72,"Batata":70,"Morrón rojo":68,"Huevos":67,"Mandarina":65,
-  "Tomate perita":64,"Espinaca":62,"Zapallo anco":60,"Brócoli":58,"Palta Hass":56,
-  "Pera":54,"Manzana verde":52,"Ajo":50,"Tomate cherry":48,"Cebolla morada":46,
-  "Naranja ombligo":44,"Repollo blanco":42,"Choclo":40,"Perejil":38,"Coliflor":36,
-  "Berenjena":34,"Pepino":32,"Rúcula":30,"Cebolla de verdeo":28,"Pomelo":26,"Champiñones":24
+  // Tito
+  "Asado de tira":95,"Choripán":90,"Parrillada para 2":85,"Provoleta":75,
+  "Vacío al asador":70,"Flan casero":60,"Copa de Malbec":55,"Coca-Cola 500ml":50,
+  // Sakura
+  "Combo 30 piezas":95,"Roll Philadelphia x8":90,"Combo individual 15p":80,
+  "Gyozas de cerdo x6":72,"Niguiri de salmón x5":65,"Cerveza Sapporo":52,
+  // Napoli
+  "Muzzarella":100,"Napolitana":88,"Fugazzeta rellena":78,"Pizza + fainá + bebida":74,
+  "Porción de fainá":68,"Calabresa":62,"Cerveza artesanal pinta":54,"Tiramisú":50
 };
 
 function ventasPorProducto(){
@@ -2273,27 +2270,9 @@ function popScore(nombre,ventas){
   return (POPULARIDAD_BASE[nombre]||0)+((ventas&&ventas[nombre])||0)*5;
 }
 
-// Combos de tienda (precio dinámico = suma de componentes con descuento)
-const COMBOS_TIENDA=[
-  {
-    id:"semanal",emoji:"🧺",nombre:"Combo Semanal",
-    desc:"La base de la semana para una familia",
-    descuento:10,
-    items:[{n:"Papa",qty:2},{n:"Cebolla",qty:1},{n:"Tomate redondo",qty:1},{n:"Zanahoria",qty:1},{n:"Lechuga",qty:1},{n:"Acelga",qty:1},{n:"Zapallito",qty:1},{n:"Banana",qty:1},{n:"Manzana roja",qty:1},{n:"Naranja jugo",qty:2}]
-  },
-  {
-    id:"casual",emoji:"🥗",nombre:"Combo Casual",
-    desc:"Frescos para 2-3 días",
-    descuento:5,
-    items:[{n:"Papa",qty:1},{n:"Tomate redondo",qty:1},{n:"Lechuga",qty:1},{n:"Zanahoria",qty:1},{n:"Banana",qty:1}]
-  },
-  {
-    id:"receta-wok",emoji:"🥢",nombre:"Combo Wok de verduras",
-    desc:"La receta completa para 2 personas",
-    descuento:5,
-    items:[{n:"Zanahoria",qty:1},{n:"Morrón rojo",qty:1},{n:"Morrón verde",qty:1},{n:"Zapallito",qty:1},{n:"Champiñones",qty:1}]
-  }
-];
+// Combos armados de tienda: en IZIFUD los combos son categoría de la carta
+// de cada restaurante, así que esta lista queda vacía.
+const COMBOS_TIENDA=[];
 
 function comboInfo(combo){
   let bruto=0,disponible=true;
@@ -2329,7 +2308,7 @@ function renderTienda(){
     p.innerHTML=`
       <div class="store-header">
         <div class="store-search">
-          <input type="text" placeholder="Buscar productos..." oninput="storeSearch=this.value.toLowerCase();renderStoreGrid()">
+          <input type="text" placeholder="Buscar platos..." oninput="storeSearch=this.value.toLowerCase();renderStoreGrid()">
         </div>
         <div class="cart-btn-wrap" onclick="openCart()">
           <button class="cart-btn">🛒 Carrito <span class="js-cart-label">vacío</span></button>
@@ -2379,7 +2358,7 @@ function renderTienda(){
 function renderStoreGrid(){
   const grid=document.getElementById("store-grid");
   if(!grid)return;
-  let rows=D.filter(r=>{
+  let rows=getMenu().filter(r=>{
     if(storeActiveCat!=="Todas"&&r.c!==storeActiveCat)return false;
     if(storeSearch&&!r.n.toLowerCase().includes(storeSearch))return false;
     if(stockState&&stockState[r.n]&&!stockState[r.n].activo)return false;
@@ -2426,10 +2405,11 @@ function renderStoreGrid(){
         <div class="store-menu-cat-title">🧺 Combos <span class="count">${COMBOS_TIENDA.length}</span></div>
         <div class="cat-scroll">${combosHTML}</div>
       </div>`:"";
-    grid.innerHTML=`<div class="store-menu-cats">${comboSection}${Object.entries(groups).map(([cat,items])=>`
+    const catOrder=CATS.filter(c=>c!=="Todas"&&groups[c]);
+    grid.innerHTML=`<div class="store-menu-cats">${comboSection}${catOrder.map(cat=>`
       <div class="store-menu-cat">
-        <div class="store-menu-cat-title">${cat} <span class="count">${items.length}</span></div>
-        <div class="cat-scroll">${items.map(r=>buildStoreCardHTML(r,"grilla")).join("")}</div>
+        <div class="store-menu-cat-title">${cat} <span class="count">${groups[cat].length}</span></div>
+        <div class="cat-scroll">${groups[cat].map(r=>buildStoreCardHTML(r,"grilla")).join("")}</div>
       </div>`).join("")}</div>`;
     return;
   }
@@ -2610,7 +2590,7 @@ function closeCart(){
 }
 
 function prefillCheckoutForm(){
-  const saved=JSON.parse(localStorage.getItem("verduleria_cliente_data")||"{}");
+  const saved=JSON.parse(localStorage.getItem("izifud_cliente_data")||"{}");
   const set=(id,v)=>{const e=document.getElementById(id);if(e&&!e.value)e.value=v||"";};
   // Dirección: prioridad userLocation (Mi ubicación) > saved
   const dirSaved=(userLocation&&userLocation.label)||saved.direccion||"";
@@ -2897,7 +2877,7 @@ function submitCheckout(){
     estado:"pendiente"
   };
   pedidos.unshift(pedido);
-  localStorage.setItem("verduleria_cliente_data",JSON.stringify({direccion,telefono,correo,formaDePago}));
+  localStorage.setItem("izifud_cliente_data",JSON.stringify({direccion,telefono,correo,formaDePago}));
   saveToLocalStorage();
   const entregaTxt=entregaMode==="delivery"?"Delivery":"Retiro en local";
   alert(`✓ Pedido #${pedido.id} recibido\n\nProductos: ${items.length}\nTotal: ${fmt(total)}\nEntrega: ${entregaTxt}\nPago: ${FORMA_PAGO_LABEL[formaDePago]||formaDePago}\n\nGestionalo desde la tab 🧾 Pedidos.`);
@@ -3370,14 +3350,8 @@ function agregarComboAlCarrito(recipeId){
 // ── TAB: UBICACIÓN ──
 // Ubicaciones aproximadas en CABA (lat, lng) basadas en lo declarado por cada verdulería
 // Competencia (verdulerías de referencia)
-const COMPETENCIA=[
-  {id:"barata",  nombre:"La Barata Shop",  color:"#e24b4a", direccion:"Palermo, CABA",        zona:"CABA",       lat:-34.5780, lng:-58.4300, tel:"+54 9 11 4192-0076", web:"labarata.shop", entrega:"Todos los días", mia:false},
-  {id:"verde",   nombre:"Verde Puro",      color:"#1d9e75", direccion:"Zona Norte, GBA",      zona:"Zona Norte", lat:-34.4708, lng:-58.5230, tel:"+54 11 2669-1368", web:"verdepuro.com.ar", entrega:"Lun a Vie", mia:false},
-  {id:"click",   nombre:"El Click Bolsones",color:"#7f77dd", direccion:"CABA y AMBA",         zona:"CABA + AMBA",lat:-34.6118, lng:-58.4173, tel:"-", web:"elclick.com.ar", entrega:"Lun a Vie", mia:false},
-  {id:"nico",    nombre:"Verdulería de Nico",color:"#ef9f27", direccion:"Zona Norte, GBA",    zona:"Zona Norte", lat:-34.4900, lng:-58.5000, tel:"-", web:"-", entrega:"A coordinar", mia:false},
-  {id:"ecofruta",nombre:"MegaVerde",       color:"#3aa055", direccion:"Av. Armada Argentina 397, Córdoba", zona:"Córdoba Capital", lat:-31.4287, lng:-64.1925, tel:"+54 9 351 648-7603", web:"megaverde.com.ar", entrega:"Compra mínima $10.000", mia:false},
-  {id:"verduon", nombre:"Verduonline.ar",  color:"#d97742", direccion:"CABA, online",         zona:"CABA",       lat:-34.6037, lng:-58.3816, tel:"-", web:"verduonline.ar", entrega:"Online, todos los días", mia:false},
-];
+// En IZIFUD el mapa muestra solo los restaurantes socios (tenants con coords)
+const COMPETENCIA=[];
 
 // TIENDAS combina mis verdulerías (tenants con coords) + competencia
 function getAllTiendas(){
@@ -3426,8 +3400,8 @@ function renderUbicacion(){
   if(!p.dataset.init){
     p.innerHTML=`
       <div class="rec-header">
-        <h2>📍 Encontrá la verdulería más cercana</h2>
-        <p>Configurá tu dirección o usá tu ubicación actual para ver qué verdulería tenés más cerca.</p>
+        <h2>📍 Encontrá el local más cercano</h2>
+        <p>Configurá tu dirección o usá tu ubicación actual para ver qué restaurante tenés más cerca.</p>
       </div>
       <div class="ubi-grid">
         <div class="map-wrap">
@@ -3445,7 +3419,7 @@ function renderUbicacion(){
             <div class="ubi-current" id="ubi-current">Aún no configuraste una ubicación</div>
           </div>
           <div class="ubi-card">
-            <h3>🥬 Verdulerías disponibles</h3>
+            <h3>🍽 Locales disponibles</h3>
             <div class="tienda-list" id="tienda-list"></div>
           </div>
         </div>
@@ -3647,7 +3621,7 @@ function rebuildMapMarkers(){
       iconAnchor:[pin.anchorX,pin.anchorY]
     });
     const marker=L.marker([t.lat,t.lng],{icon}).addTo(mapInstance);
-    const tag=isMine?'<span style="background:var(--brand);color:#fff;font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;margin-left:6px">MI VERDULERÍA</span>':'<span style="background:var(--ink-soft);color:#fff;font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;margin-left:6px">REFERENCIA</span>';
+    const tag=isMine?'<span style="background:var(--brand);color:#fff;font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;margin-left:6px">SOCIO IZIFUD</span>':'<span style="background:var(--ink-soft);color:#fff;font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;margin-left:6px">REFERENCIA</span>';
     marker.bindPopup(`<b>${t.nombre}${tag}</b>${t.direccion}<br><span style="color:var(--ink-soft)">${t.zona}</span><br>📦 ${t.entrega}`);
     marker.on("click",()=>selectTienda(t.id));
     tiendaMarkers[t.id]=marker;
@@ -3695,7 +3669,7 @@ function renderTiendaList(){
   if(!el)return;
   const ordered=tiendasOrdenadas();
   if(!userLocation){
-    el.innerHTML=`<div class="tienda-empty">Configurá tu ubicación para ver las verdulerías ordenadas por cercanía.</div>` +
+    el.innerHTML=`<div class="tienda-empty">Configurá tu ubicación para ver los locales ordenados por cercanía.</div>` +
       ordered.map(t=>`
         <div class="tienda-row ${selectedTienda===t.id?"sel":""} ${t.mia?"is-mia":""}" onclick="selectTienda('${t.id}')">
           <div class="tienda-top">
@@ -3781,8 +3755,8 @@ function _seedFromName(s){let h=0;for(let i=0;i<s.length;i++){h=(h*31+s.charCode
 D.forEach(r=>{
   const rnd=_seedFromName(r.n);
   stockState[r.n]={
-    activo: rnd > 0.05,
-    stock: rnd > 0.85 ? 0 : Math.floor(rnd*40)+2,
+    activo: true,
+    stock: Math.floor(rnd*36)+4,
     stockMin: 5,
   };
 });
@@ -3807,8 +3781,8 @@ function renderStock(){
   if(!p.dataset.init){
     p.innerHTML=`
       <div class="rec-header">
-        <h2>📦 Gestión de precios y stock</h2>
-        <p>Activá/desactivá productos, ajustá precios de venta y costos, y controlá el stock disponible.</p>
+        <h2>📦 Tu carta: precios y disponibilidad</h2>
+        <p>Activá/desactivá platos, ajustá precios y costos, y marcá qué está disponible hoy.</p>
       </div>
       <div class="summary-bar" id="stock-summary"></div>
       <div class="stock-toolbar">
@@ -3902,7 +3876,7 @@ function renderStock(){
 }
 
 function filteredStock(){
-  return D.filter(r=>{
+  return getMenu().filter(r=>{
     if(stockFilters.cat!=="Todas"&&r.c!==stockFilters.cat)return false;
     if(stockFilters.search&&!r.n.toLowerCase().includes(stockFilters.search))return false;
     if(stockFilters.status!=="all"&&stockStatus(r.n)!==stockFilters.status)return false;
@@ -3913,7 +3887,7 @@ function filteredStock(){
 function renderStockSummary(){
   const el=document.getElementById("stock-summary");
   if(!el)return;
-  const all=D;
+  const all=getMenu();
   const activos=all.filter(r=>stockState[r.n].activo);
   const bajos=all.filter(r=>stockStatus(r.n)==="low");
   const sinStock=all.filter(r=>stockStatus(r.n)==="out");
@@ -4038,7 +4012,8 @@ function renderProductView(){
   const inCart=cart[nombre]>0;
   const compLabel=compSt.mn&&v?v<=compSt.mn?`<span style="color:var(--success-fg);font-weight:600">✓ Mejor precio del mercado</span>`:v>=compSt.mx?`<span style="color:var(--danger)">Más caro del mercado</span>`:`Competencia: ${fmt(compSt.mn)}–${fmt(compSt.mx)}`:"";
   const meses=estacionalidad[nombre]||MESES_ALL;
-  const tempStr=meses.length===12?"🌱 Disponible todo el año":"📅 Temporada: "+meses.map(m=>MESES_NAMES[m]).join(" · ");
+  // Para platos (sin estacionalidad configurada) la franja no se muestra
+  const tempStr=meses.length<12?"📅 Temporada: "+meses.map(m=>MESES_NAMES[m]).join(" · "):"";
   const stockTag=sinStock
     ?`<span class="pv-stock-tag" style="background:var(--danger-bg);color:var(--danger-fg)">SIN STOCK</span>`
     :stockBajo?`<span class="pv-stock-tag" style="background:var(--warn-bg);color:var(--warn-fg)">⚠ Quedan ${s.stock}</span>`
@@ -4055,7 +4030,7 @@ function renderProductView(){
       <div class="pv-meta">${r.c} · se vende por ${r.u}</div>
       <div class="pv-price">${fmt(v)}</div>
       ${compLabel?`<div class="pv-comp">${compLabel}</div>`:""}
-      <div class="pv-temp">${tempStr}</div>
+      ${tempStr?`<div class="pv-temp">${tempStr}</div>`:""}
       <div class="pv-actions">
         <div class="qty-row">
           <button class="qty-btn" onclick="pvChangeQty(-1)" ${dis}>−</button>
@@ -4309,7 +4284,7 @@ function exportCSV(){
 // ─── MULTI-TENANT SYSTEM ──────────────────────────────────
 // Each tenant has its own snapshot of costos, pVentas, stockState, zonas, proveedores
 let tenants={};// id -> tenantData
-let currentTenantId="default";
+let currentTenantId="tito";
 let editingTenant=null;// for form
 let adminStyleOpen=false;
 
@@ -4497,8 +4472,8 @@ function loadTenantState(t){
     if(!(r.n in stockState)){
       const rnd=_seedFromName(r.n);
       stockState[r.n]={
-        activo: rnd > 0.05,
-        stock: rnd > 0.85 ? 0 : Math.floor(rnd*40)+2,
+        activo: true,
+        stock: Math.floor(rnd*36)+4,
         stockMin: 5,
       };
     }
@@ -4506,50 +4481,39 @@ function loadTenantState(t){
 }
 
 function initTenants(){
-  // Save the original "default" tenant from initial state
-  tenants["default"]={
-    id:"default",
-    nombre:"Verdulería Principal",
-    icono:"🥬",
-    zona:"CABA",
-    direccion:"Palermo, CABA",
-    tel:"+54 11 4192-0076",
-    diasEnvio:"Lun-Vie",
-    lat:-34.5870, lng:-58.4250,
-    creada:"2025-01-15",
-    style:{theme:"verde-fresco",layout:"grilla"},
+  // 3 restaurantes socios de prueba, todos con tema Lumina (línea IZIFUD)
+  tenants["tito"]={
+    id:"tito",nombre:"Parrilla Don Tito",icono:"🥩",
+    zona:"Palermo",direccion:"Costa Rica 4501, CABA",
+    tel:"+54 11 4832-1001",diasEnvio:"Mar-Dom 12-23h",
+    lat:-34.5860, lng:-58.4290,
+    creada:"2026-01-10",
+    style:{theme:"lumina",layout:"lista-compacta",mostrarFotos:false,mostrarCombos:false},
     entregaConfig:{delivery:true,pickup:true},
     activo:true,
     data:snapshotCurrentState(),
   };
-  // Add 2 example tenants with variations
-  const t2State=snapshotCurrentState();
-  Object.keys(t2State.pVentas).forEach(k=>{t2State.pVentas[k]=Math.round(t2State.pVentas[k]*1.10);});
-  Object.keys(t2State.stockState).forEach(k=>{t2State.stockState[k].stock=Math.floor(Math.random()*25)+1;});
-  tenants["norte"]={
-    id:"norte",nombre:"Sucursal Zona Norte",icono:"🌿",
-    zona:"Zona Norte",direccion:"San Isidro, GBA",
-    tel:"+54 11 5555-1234",diasEnvio:"Lun-Sab",
-    lat:-34.4710, lng:-58.5060,
-    creada:"2025-03-10",
-    style:{theme:"mercado-barrio",layout:"catalogo-grande"},
+  tenants["sakura"]={
+    id:"sakura",nombre:"Sakura Sushi",icono:"🍣",
+    zona:"Belgrano",direccion:"Av. Cabildo 2210, CABA",
+    tel:"+54 11 4780-2244",diasEnvio:"Lun-Dom 19-24h",
+    lat:-34.5620, lng:-58.4560,
+    creada:"2026-02-18",
+    style:{theme:"lumina",layout:"grilla",mostrarFotos:false,mostrarCombos:false},
     entregaConfig:{delivery:true,pickup:false},
     activo:true,
-    data:t2State,
+    data:snapshotCurrentState(),
   };
-  const t3State=snapshotCurrentState();
-  Object.keys(t3State.pVentas).forEach(k=>{t3State.pVentas[k]=Math.round(t3State.pVentas[k]*1.25);});
-  Object.keys(t3State.stockState).forEach(k=>{t3State.stockState[k].stock=Math.floor(Math.random()*15)+3;});
-  tenants["organico"]={
-    id:"organico",nombre:"Verde Orgánico",icono:"🌱",
-    zona:"CABA Premium",direccion:"Recoleta, CABA",
-    tel:"+54 11 4444-9876",diasEnvio:"Lun-Vie",
-    lat:-34.5880, lng:-58.3960,
-    creada:"2025-04-22",
-    style:{theme:"organico-premium",layout:"menu-categoria"},
-    entregaConfig:{delivery:false,pickup:true},
+  tenants["napoli"]={
+    id:"napoli",nombre:"Napoli Pizza",icono:"🍕",
+    zona:"Caballito",direccion:"Av. Rivadavia 5102, CABA",
+    tel:"+54 11 4901-7788",diasEnvio:"Mié-Lun 18-24h",
+    lat:-34.6180, lng:-58.4410,
+    creada:"2026-03-05",
+    style:{theme:"lumina",layout:"menu-categoria",mostrarFotos:false,mostrarCombos:false},
+    entregaConfig:{delivery:true,pickup:true},
     activo:true,
-    data:t3State,
+    data:snapshotCurrentState(),
   };
 }
 
@@ -4559,7 +4523,7 @@ function switchTenant(id){
   tenants[currentTenantId].data=snapshotCurrentState();
   // Load new tenant
   const t=tenants[id];
-  if(!t){alert("Verdulería no encontrada");return;}
+  if(!t){alert("Restaurante no encontrado");return;}
   loadTenantState(t);
   currentTenantId=id;
   applyTenantStyle(t);
@@ -4591,43 +4555,43 @@ function switchTenant(id){
   saveToLocalStorage();
 }
 
-// Default: vista pública. Si el dueño desactiva, se persiste en localStorage.
-let vistaFinal=localStorage.getItem("verduleria_vista_final")!=="0";
+// Rol de desarrollo (sin auth real): cliente | socio | admin
+// - cliente: solo tabs Público, sin banner ni Admin (lo que ve el usuario final)
+// - socio: Público + Gestión de SU restaurante, sin admin global
+// - admin: todo, incluido ⚙ Admin (gestión de todos los restaurantes)
+let devRole=localStorage.getItem("izifud_dev_role")||"cliente";
+let vistaFinal=devRole==="cliente";// compat: updateGlobalHeader lo usa para el subtítulo
 
-function toggleVistaFinal(){
-  vistaFinal=!vistaFinal;
-  localStorage.setItem("verduleria_vista_final",vistaFinal?"1":"0");
-  document.body.classList.toggle("vista-final",vistaFinal);
-  document.querySelector(".view-trigger")?.classList.toggle("on",vistaFinal);
-  // Si entraste a vista final desde un grupo no-público, forzar Público
-  if(vistaFinal&&activeGroup!=="publico"){
-    switchGroup("publico");
-  }
+function setDevRole(r){
+  devRole=r;
+  localStorage.setItem("izifud_dev_role",r);
+  applyDevRole();
   updateGlobalHeader();
 }
 
-function initVistaFinal(){
-  if(vistaFinal){
-    document.body.classList.add("vista-final");
-    document.querySelector(".view-trigger")?.classList.add("on");
-  }
+function applyDevRole(){
+  vistaFinal=devRole==="cliente";
+  document.body.dataset.role=devRole;
+  document.body.classList.toggle("vista-final",vistaFinal);
+  document.querySelectorAll(".drb-btn").forEach(b=>b.classList.toggle("on",b.dataset.role===devRole));
+  if(vistaFinal&&activeGroup!=="publico")switchGroup("publico");
 }
 
 function updateGlobalHeader(){
   const t=tenants[currentTenantId];
   if(!t)return;
-  // Topbar queda fija como marca paraguas verduras.ar
+  // Topbar queda fija como marca paraguas IZIFUD
   const h1=document.querySelector(".topbar-title h1");
-  if(h1)h1.textContent="🥦 verduras.ar";
+  if(h1)h1.textContent="IZIFUD";
   const sub=document.querySelector(".topbar-title .subtitle");
   if(sub){
     if(vistaFinal){
-      // En vista final el subtítulo muestra el local actual
-      const parts=[`${t.icono||"🥬"} ${t.nombre||"Verdulería"}`];
+      // En vista cliente el subtítulo muestra el restaurante actual
+      const parts=[`${t.icono||"🍽"} ${t.nombre||"Restaurante"}`];
       if(t.zona)parts.push(t.zona);
       sub.textContent=parts.join(" · ");
     } else {
-      sub.textContent="Frutas, verduras y almacén con envío a domicilio";
+      sub.textContent="Pedí online en tus restaurantes favoritos";
     }
   }
   // Sub-header: muestra el local actual
@@ -4659,7 +4623,7 @@ function renderAdminContent(){
   const current=tenants[currentTenantId];
   const tList=Object.values(tenants);
   cont.innerHTML=`
-    <p style="font-size:12px;color:var(--ink-soft);margin-bottom:1.25rem">Gestioná todas tus verdulerías desde un solo lugar. Cada una tiene sus propios precios, stock y configuración.</p>
+    <p style="font-size:12px;color:var(--ink-soft);margin-bottom:1.25rem">Gestioná todos tus restaurantes socios desde un solo lugar. Cada una tiene sus propios precios, stock y configuración.</p>
 
     <div class="admin-header">
       <div class="admin-current">
@@ -4667,10 +4631,10 @@ function renderAdminContent(){
         <div class="meta">${current.zona} · ${current.direccion}</div>
         <div class="meta">Activa desde: ${current.creada}</div>
       </div>
-      <button class="form-btn primary" onclick="showNewTenantForm()" style="height:42px">+ Nueva verdulería</button>
+      <button class="form-btn primary" onclick="showNewTenantForm()" style="height:42px">+ Nuevo restaurante</button>
     </div>
 
-    <h3 style="font-size:13px;font-weight:700;margin-bottom:10px;color:var(--ink)">Tus verdulerías (${tList.length})</h3>
+    <h3 style="font-size:13px;font-weight:700;margin-bottom:10px;color:var(--ink)">Tus restaurantes (${tList.length})</h3>
     <div class="admin-tenants">
       ${tList.map(t=>{
         const productos=Object.keys(t.data.stockState||{}).length;
@@ -4776,14 +4740,6 @@ function renderAdminStyle(){
           <input type="checkbox" ${t.style.sinStockAlFinal!==false?"checked":""} onchange="setTenantSinStockFinal(this.checked)">
           <span class="et-switch"></span>
         </label>
-        <label class="entrega-toggle" style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:10px 14px;margin-top:8px">
-          <div class="et-info">
-            <strong>Mostrar combos</strong>
-            <span>Combo Semanal, Casual y de Receta al inicio del catálogo (precio dinámico con descuento).</span>
-          </div>
-          <input type="checkbox" ${t.style.mostrarCombos!==false?"checked":""} onchange="setTenantMostrarCombos(this.checked)">
-          <span class="et-switch"></span>
-        </label>
       </div>
     </div>`;
 }
@@ -4882,7 +4838,7 @@ function renderTenantDetail(){
         <div class="info-item"><div class="l">Zonas envío</div><div class="v">${(t.data.zonas||[]).length}</div></div>
       </div>
       <p style="font-size:11px;color:var(--ink-soft);line-height:1.6">
-        Cuando seleccionás una verdulería, todas las pestañas (Tienda, Stock, Margen, Recetas, etc.) muestran sus datos específicos.
+        Cuando seleccionás un restaurante, todas las pestañas (Tienda, Stock, Margen, Recetas, etc.) muestran sus datos específicos.
         Las opciones de entrega se configuran en la tab <strong>🚚 Costo de envío</strong>.
       </p>
     </div>`;
@@ -5175,7 +5131,7 @@ function renderTenantForm(){
   const e=editingTenant;
   cont.innerHTML=`
     <div class="tenant-form">
-      <h3>${e.isNew?"+ Nueva verdulería":"✎ Editando "+e.nombre}</h3>
+      <h3>${e.isNew?"+ Nuevo restaurante":"✎ Editando "+e.nombre}</h3>
       <div class="form-grid">
         <div class="form-field">
           <label>Ícono (emoji)</label>
@@ -5226,7 +5182,7 @@ function renderTenantForm(){
       </div>
       <p style="font-size:11px;color:var(--ink-soft);margin-bottom:10px">💡 Tip: ingresá la dirección y hacé clic en "Buscar en mapa" para autocompletar las coordenadas. También podés ingresar las coordenadas manualmente o dejarlas vacías (no aparecerá en el mapa).</p>
       <div class="form-actions">
-        <button class="form-btn primary" onclick="saveTenant()">${e.isNew?"Crear verdulería":"Guardar cambios"}</button>
+        <button class="form-btn primary" onclick="saveTenant()">${e.isNew?"Crear restaurante":"Guardar cambios"}</button>
         <button class="form-btn alt" onclick="editingTenant=null;renderTenantForm()">Cancelar</button>
       </div>
     </div>`;
@@ -5296,7 +5252,7 @@ function saveTenant(){
     renderAdminContent();
     rebuildMapMarkers();
     saveToLocalStorage();
-    alert(`✓ Verdulería "${nombre}" creada${data.lat!=null?" y agregada al mapa":""}`);
+    alert(`✓ Restaurante "${nombre}" creada${data.lat!=null?" y agregada al mapa":""}`);
   } else {
     Object.assign(tenants[editingTenant.id],data);
     editingTenant=null;
@@ -5321,13 +5277,13 @@ function duplicateTenant(id){
   renderAdminContent();
   rebuildMapMarkers();
   saveToLocalStorage();
-  alert(`✓ Verdulería duplicada como "${tenants[newId].nombre}"`);
+  alert(`✓ Restaurante duplicado como "${tenants[newId].nombre}"`);
 }
 
 function deleteTenant(id){
   const t=tenants[id];
   if(!t)return;
-  if(!confirm(`¿Eliminar la verdulería "${t.nombre}"?\n\nEsta acción no se puede deshacer.`))return;
+  if(!confirm(`¿Eliminar el restaurante "${t.nombre}"?\n\nEsta acción no se puede deshacer.`))return;
   if(id===currentTenantId){
     const other=Object.keys(tenants).find(k=>k!==id);
     if(other)switchTenant(other);
@@ -5338,7 +5294,7 @@ function deleteTenant(id){
   saveToLocalStorage();
 }
 
-// ── TAB: MI VERDULERÍA ──
+// ── TAB: SOCIO IZIFUD ──
 function renderDashboard(){
   const p=document.getElementById("panel-dashboard");
   if(!p.dataset.init){
@@ -5356,14 +5312,15 @@ function renderDashboardContent(){
   if(!t){cont.innerHTML="<div style='padding:2rem;color:var(--ink-soft)'>No hay verdulería seleccionada</div>";return;}
 
   // Stats del tenant actual
-  const totalProd=D.length;
-  const activos=D.filter(r=>stockState[r.n]&&stockState[r.n].activo).length;
-  const sinStock=D.filter(r=>stockState[r.n]&&stockState[r.n].activo&&stockState[r.n].stock<=0).length;
-  const stockBajo=D.filter(r=>{const s=stockState[r.n];return s&&s.activo&&s.stock>0&&s.stock<=s.stockMin;}).length;
-  const valorInv=D.reduce((a,r)=>a+((stockState[r.n]&&stockState[r.n].activo?stockState[r.n].stock:0)*(costos[r.n]||0)),0);
-  const valorVenta=D.reduce((a,r)=>a+((stockState[r.n]&&stockState[r.n].activo?stockState[r.n].stock:0)*(pVentas[r.n]||0)),0);
+  const MENU=getMenu();
+  const totalProd=MENU.length;
+  const activos=MENU.filter(r=>stockState[r.n]&&stockState[r.n].activo).length;
+  const sinStock=MENU.filter(r=>stockState[r.n]&&stockState[r.n].activo&&stockState[r.n].stock<=0).length;
+  const stockBajo=MENU.filter(r=>{const s=stockState[r.n];return s&&s.activo&&s.stock>0&&s.stock<=s.stockMin;}).length;
+  const valorInv=MENU.reduce((a,r)=>a+((stockState[r.n]&&stockState[r.n].activo?stockState[r.n].stock:0)*(costos[r.n]||0)),0);
+  const valorVenta=MENU.reduce((a,r)=>a+((stockState[r.n]&&stockState[r.n].activo?stockState[r.n].stock:0)*(pVentas[r.n]||0)),0);
   const gananciaPotencial=valorVenta-valorInv;
-  const margenes=D.filter(r=>stockState[r.n]&&stockState[r.n].activo).map(r=>margen(costos[r.n],pVentas[r.n])).filter(x=>x!=null);
+  const margenes=MENU.filter(r=>stockState[r.n]&&stockState[r.n].activo).map(r=>margen(costos[r.n],pVentas[r.n])).filter(x=>x!=null);
   const margenProm=margenes.length?margenes.reduce((a,b)=>a+b,0)/margenes.length:0;
 
   // Alertas
@@ -5378,14 +5335,14 @@ function renderDashboardContent(){
   });
 
   // Top ganancia
-  const topGanancia=D.filter(r=>stockState[r.n]&&stockState[r.n].activo&&stockState[r.n].stock>0)
+  const topGanancia=MENU.filter(r=>stockState[r.n]&&stockState[r.n].activo&&stockState[r.n].stock>0)
     .map(r=>({n:r.n,ganancia:(stockState[r.n].stock||0)*((pVentas[r.n]||0)-(costos[r.n]||0))}))
     .sort((a,b)=>b.ganancia-a.ganancia).slice(0,6);
   const maxGan=Math.max(...topGanancia.map(x=>x.ganancia),1);
 
   // Status donut
   const statusCount={ok:0,low:0,out:0,off:0};
-  D.forEach(r=>{const st=stockStatus(r.n);statusCount[st]++;});
+  MENU.forEach(r=>{const st=stockStatus(r.n);statusCount[st]++;});
   const totalStat=statusCount.ok+statusCount.low+statusCount.out+statusCount.off;
   let cumAngle=0;
   const donutSegs=[
@@ -5462,9 +5419,9 @@ function renderDashboardContent(){
         <div class="dash-kpi-sub">${sinStock} sin stock · ${stockBajo} bajos</div>
       </div>
       <div class="dash-kpi accent-green">
-        <div class="dash-kpi-lbl">Productos activos</div>
+        <div class="dash-kpi-lbl">Platos activos</div>
         <div class="dash-kpi-val">${activos}<span style="font-size:14px;color:var(--ink-soft);margin-left:2px">/${totalProd}</span></div>
-        <div class="dash-kpi-sub">${Math.round(activos/totalProd*100)}% del catálogo</div>
+        <div class="dash-kpi-sub">${Math.round(activos/totalProd*100)}% de la carta</div>
       </div>
     </div>
 
@@ -5561,7 +5518,7 @@ function renderDashboardContent(){
           </div>
           <div class="shortcut" onclick="goToTab('admin')">
             <div class="sc-icon">⚙</div>
-            <div class="sc-text"><strong>Cambiar verdulería</strong><span>Multi-tenant</span></div>
+            <div class="sc-text"><strong>Cambiar restaurante</strong><span>Multi-tenant</span></div>
             <div class="sc-arrow">→</div>
           </div>
         </div>
@@ -5703,7 +5660,7 @@ function goToTab(id){
 }
 
 // ─── PERSISTENCIA EN LOCALSTORAGE ─────────────────────────
-const STORAGE_KEY="verduleria_app_v1";
+const STORAGE_KEY="izifud_app_v1";
 let saveTimer=null;
 let lastSaveTime=null;
 
@@ -5877,7 +5834,7 @@ setInterval(()=>saveToLocalStorage(),30000);
 // Initial render: build tabs of default group
 renderTabsForGroup();
 renderSiteFooter();
-initVistaFinal();
+applyDevRole();
 updateGlobalHeader();
 
 // ─── PWA: Service Worker registration ─────────────────────
@@ -5933,7 +5890,7 @@ function renderInfoBody(){
     {q:"¿Cómo pago?",a:"Aceptamos efectivo al recibir, transferencia, Mercado Pago y tarjeta al recibir. Elegís la forma al confirmar el pedido."},
     {q:"¿Puedo retirar en el local?",a:"Sí, en el carrito elegí \"🏪 Retiro en local\" antes de confirmar. El retiro no tiene costo de envío."},
     {q:"¿Puedo cancelar un pedido?",a:"Sí, mientras esté en estado Pendiente o Preparando podés cancelarlo desde la tab Pedidos."},
-    {q:"¿Los precios son por kilo o por unidad?",a:"Cada producto muestra su unidad al lado del precio (kg, unidad, atado, 200g, etc). Calculamos el total automático según la cantidad que elijas."},
+    {q:"¿Puedo pedir de varios restaurantes a la vez?",a:"Por ahora cada pedido es de un solo restaurante. Elegí el local, armá el carrito y confirmá; después podés hacer otro pedido en otro local."},
   ];
   const faqHTML=FAQ.map(f=>`<div class="info-faq-item"><div class="q">${f.q}</div><div class="a">${f.a}</div></div>`).join("");
   el.innerHTML=`
@@ -5949,7 +5906,7 @@ function renderInfoBody(){
         ${t.tel?`<div><span>Teléfono</span><strong>${t.tel}</strong></div>`:""}
         ${t.diasEnvio?`<div><span>Atención</span><strong>${t.diasEnvio}</strong></div>`:""}
         <div><span>Zonas activas</span><strong>${(zonas||[]).length}</strong></div>
-        <div><span>Productos</span><strong>${D.filter(r=>stockState[r.n]&&stockState[r.n].activo).length}</strong></div>
+        <div><span>Platos</span><strong>${getMenu().filter(r=>stockState[r.n]&&stockState[r.n].activo).length}</strong></div>
       </div>
     </div>
 
@@ -5960,8 +5917,7 @@ function renderInfoBody(){
       </div>
       <div class="info-section-body">
         <div class="info-steps">
-          <div class="info-step"><div><strong>Elegí tus productos</strong><span>Navegá la tienda y agregá lo que necesitás al carrito. Podés filtrar por categoría o buscar por nombre.</span></div></div>
-          <div class="info-step"><div><strong>Sumá combos por receta (opcional)</strong><span>En la tab Combos receta seleccionás una receta y cantidad de personas, y armamos el combo automáticamente.</span></div></div>
+          <div class="info-step"><div><strong>Elegí tus platos</strong><span>Navegá la carta y agregá lo que quieras al carrito. Podés filtrar por categoría o buscar por nombre.</span></div></div>
           <div class="info-step"><div><strong>Abrí el carrito</strong><span>Revisá el subtotal y elegí si querés delivery a tu casa o retiro en el local.</span></div></div>
           <div class="info-step"><div><strong>Completá tus datos</strong><span>Dirección (si es delivery), teléfono, correo opcional y forma de pago.</span></div></div>
           <div class="info-step"><div><strong>Confirmá el pedido</strong><span>Te aparece un código de pedido (ORD-…). Podés seguir su estado desde la tab Pedidos.</span></div></div>
@@ -6024,9 +5980,8 @@ function updateSiteFooter(){
     <div class="footer-cols">
       <div class="footer-col">
         <h4>Tienda</h4>
-        <a class="fl" onclick="goToTab('tienda')">Catálogo</a>
-        <a class="fl" onclick="goToTab('recetas')">Combos por receta</a>
-        <a class="fl" onclick="goToTab('ubicacion')">Mi ubicación</a>
+        <a class="fl" onclick="goToTab('tienda')">Carta</a>
+        <a class="fl" onclick="goToTab('ubicacion')">Locales</a>
         <a class="fl" onclick="goToTab('pedidos')">Mis pedidos</a>
       </div>
       <div class="footer-col">
@@ -6051,7 +6006,7 @@ function updateSiteFooter(){
       </div>
     </div>
     <div class="footer-bottom">
-      <span>© ${year} · verduras.ar · ${t.nombre||"Verdulería"} · Hecho con 🥦</span>
+      <span>© ${year} · IZIFUD · ${t.nombre||"Restaurante"}</span>
       <span>Activa desde ${t.creada||"—"}</span>
     </div>`;
 }

@@ -1,7 +1,7 @@
 {
-  "name": "verduras.ar — Frutas y verduras con envío",
-  "short_name": "verduras.ar",
-  "description": "Frutas, verduras y almacén con envío a domicilio en CABA, GBA y todo el país. Encontrá la verdulería más cercana, comprá online y elegí delivery o retiro en local.",
+  "name": "IZIFUD — Pedí online en tus restaurantes favoritos",
+  "short_name": "IZIFUD",
+  "description": "Pedidos online de restaurantes: mirá la carta, elegí delivery o retiro en el local y pagá como quieras.",
   "start_url": "/",
   "scope": "/",
   "id": "/",

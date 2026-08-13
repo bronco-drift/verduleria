@@ -1,5 +1,5 @@
 // Service worker mínimo: cache-first para shell + assets, network-first para API
-const CACHE = "verduras-ar-v1";
+const CACHE = "izifud-v1";
 const SHELL = [
   "/",
   "/index.html",
