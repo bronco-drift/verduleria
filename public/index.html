@@ -4981,7 +4981,13 @@ function initTenants(){
     pais:"AR",moneda:"ARS",
     data:snapshotCurrentState(),
   };
-  // ── VENEZUELA · San Cristóbal (precios en USD) ──
+  seedVenezuela();
+}
+
+// ── VENEZUELA · San Cristóbal (precios en USD) ──
+// Función aparte: la usa initTenants en el primer boot Y la migración
+// (migrarSeedsNuevos) para agregar VE a datos guardados de antes de esta capa.
+function seedVenezuela(){
   tenants["arepas"]={
     id:"arepas",nombre:"Arepas El Táchira",icono:"🥙",
     zona:"Centro",direccion:"Carrera 9 con Calle 10, San Cristóbal",
@@ -5014,25 +5020,36 @@ function initTenants(){
   ];
   tenants["arepas"].data.zonas=JSON.parse(JSON.stringify(zonasSC));
   tenants["marquesina"].data.zonas=JSON.parse(JSON.stringify(zonasSC));
+  // Pedidos demo de San Cristóbal (el snapshot pudo traer pedidos del tenant activo: se pisan)
+  tenants["arepas"].data.pedidos=[
+    mkPedidoDemo({id:"ORD-DEMO-V1",haceMin:11,estado:"pendiente",items:[["Arepa reina pepiada",2],["Jugo natural",2]],dir:"Calle 5 con Carrera 20, Pueblo Nuevo, San Cristóbal",coords:{lat:7.7735,lng:-72.2312},tel:"+58 414 700-1101"}),
+    mkPedidoDemo({id:"ORD-DEMO-V2",haceMin:60*28,estado:"entregado",rider:"r4",items:[["Pabellón criollo",1],["Malta",1],["Quesillo",1]],dir:"Carrera 19, La Concordia, San Cristóbal",coords:{lat:7.7528,lng:-72.2286},tel:"+58 424 700-1102"}),
+  ];
+  tenants["marquesina"].data.pedidos=[
+    mkPedidoDemo({id:"ORD-DEMO-V3",haceMin:19,estado:"preparando",rider:"r4",items:[["Pizza tachirense",1],["Refresco 2L",1]],dir:"Av. Carabobo, Barrio Obrero, San Cristóbal",coords:{lat:7.7612,lng:-72.2198},tel:"+58 416 700-1103"}),
+  ];
 }
 
 // Pedidos de demo: en un dispositivo nuevo cada rol arranca con material para
 // probar (socio: pendiente para avanzar; rider: asignada + en camino + cola;
 // admin: entregados que alimentan las estadísticas). Solo corre en el primer boot.
-function initDemoPedidos(){
+// Constructor de pedidos demo (usado por los seeds AR y VE)
+function mkPedidoDemo(o){
   const precio=n=>{const d=D.find(x=>x.n===n);return d?d.pVenta:0;};
-  const mk=o=>{
-    const items=o.items.map(([n,q])=>({nombre:n,qty:q,precioUnit:precio(n),subtotal:precio(n)*q,unidad:(D.find(x=>x.n===n)||{}).u||"",emoji:EMOJIS[n]||"🍽"}));
-    const subtotal=items.reduce((a,i)=>a+i.subtotal,0);
-    return{
-      id:o.id,fecha:new Date(Date.now()-o.haceMin*60000).toISOString(),
-      items,subtotal,zona:o.zona||"CABA",costoEnvio:0,envioGratis:true,total:subtotal,
-      tipoEntrega:"delivery",
-      cliente:{direccion:o.dir,telefono:o.tel,correo:"",formaDePago:"efectivo",coords:o.coords||null},
-      estado:o.estado,
-      ...(o.rider?{riderId:o.rider}:{})
-    };
+  const items=o.items.map(([n,q])=>({nombre:n,qty:q,precioUnit:precio(n),subtotal:precio(n)*q,unidad:(D.find(x=>x.n===n)||{}).u||"",emoji:EMOJIS[n]||"🍽"}));
+  const subtotal=items.reduce((a,i)=>a+i.subtotal,0);
+  return{
+    id:o.id,fecha:new Date(Date.now()-o.haceMin*60000).toISOString(),
+    items,subtotal,zona:o.zona||"CABA",costoEnvio:0,envioGratis:true,total:subtotal,
+    tipoEntrega:"delivery",
+    cliente:{direccion:o.dir,telefono:o.tel,correo:"",formaDePago:"efectivo",coords:o.coords||null},
+    estado:o.estado,
+    ...(o.rider?{riderId:o.rider}:{})
   };
+}
+
+function initDemoPedidos(){
+  const mk=mkPedidoDemo;
   // Tito es el tenant activo al boot: sus pedidos van al estado runtime y se re-snapshotea
   pedidos=[
     mk({id:"ORD-DEMO-T1",haceMin:9,estado:"pendiente",items:[["Asado de tira",1],["Provoleta",1]],dir:"Gorriti 4890, CABA",coords:{lat:-34.5893,lng:-58.4287},tel:"+54 11 6111-9001"}),
@@ -5048,14 +5065,26 @@ function initDemoPedidos(){
     mk({id:"ORD-DEMO-N1",haceMin:14,estado:"preparando",items:[["Muzzarella",1],["Porción de fainá",2],["Coca-Cola 1.5L",1]],dir:"Av. Rivadavia 4980, CABA",coords:{lat:-34.6172,lng:-58.4355},tel:"+54 11 6333-9006"}),
     mk({id:"ORD-DEMO-N2",haceMin:60*50,estado:"entregado",rider:"r2",items:[["2 muzzarellas promo",1],["Tiramisú",1]],dir:"Yerbal 2300, CABA",coords:{lat:-34.6205,lng:-58.4462},tel:"+54 11 6333-9007"}),
   ];
-  // Venezuela · San Cristóbal
-  tenants["arepas"].data.pedidos=[
-    mk({id:"ORD-DEMO-V1",haceMin:11,estado:"pendiente",items:[["Arepa reina pepiada",2],["Jugo natural",2]],dir:"Calle 5 con Carrera 20, Pueblo Nuevo, San Cristóbal",coords:{lat:7.7735,lng:-72.2312},tel:"+58 414 700-1101"}),
-    mk({id:"ORD-DEMO-V2",haceMin:60*28,estado:"entregado",rider:"r4",items:[["Pabellón criollo",1],["Malta",1],["Quesillo",1]],dir:"Carrera 19, La Concordia, San Cristóbal",coords:{lat:7.7528,lng:-72.2286},tel:"+58 424 700-1102"}),
-  ];
-  tenants["marquesina"].data.pedidos=[
-    mk({id:"ORD-DEMO-V3",haceMin:19,estado:"preparando",rider:"r4",items:[["Pizza tachirense",1],["Refresco 2L",1]],dir:"Av. Carabobo, Barrio Obrero, San Cristóbal",coords:{lat:7.7612,lng:-72.2198},tel:"+58 416 700-1103"}),
-  ];
+  // (Los pedidos demo de Venezuela los siembra seedVenezuela)
+}
+
+// Migración al cargar datos guardados: agrega lo que no existía cuando se
+// guardaron (seeds de Venezuela, rider VE, campo pais/moneda) SIN tocar lo tuyo.
+function migrarSeedsNuevos(){
+  let cambio=false;
+  Object.values(tenants).forEach(t=>{
+    if(!t.pais){t.pais="AR";t.moneda=t.moneda||"ARS";cambio=true;}
+  });
+  riders.forEach(r=>{if(!r.pais){r.pais="AR";cambio=true;}});
+  if(!tenants["arepas"]||!tenants["marquesina"]){
+    seedVenezuela();
+    cambio=true;
+  }
+  if(!riders.some(r=>r.id==="r4")){
+    riders.push({id:"r4",nombre:"Jesús Contreras",tel:"+58 416 555-1122",vehiculo:"🛵 Moto",turno:"Lun-Sáb 11-22h",activo:true,enLinea:true,pais:"VE"});
+    cambio=true;
+  }
+  if(cambio)saveToLocalStorage();
 }
 
 // Carrito por restaurante: cambiar de local no te borra lo que ya armaste en otro
@@ -7257,6 +7286,23 @@ if(!loaded){
   initRiders();
   initDemoPedidos();
   saveToLocalStorage();
+} else {
+  // Datos guardados de una versión anterior: sumar seeds nuevos (Venezuela, etc.)
+  migrarSeedsNuevos();
+  // Si el país elegido no coincide con el local cargado, pasar a un local de ese país
+  const tBoot=tenants[currentTenantId];
+  if(tBoot&&(tBoot.pais||"AR")!==paisActivo){
+    const lista=Object.values(tenants).filter(x=>(x.pais||"AR")===paisActivo);
+    const destino=lista.find(x=>x.activo!==false)||lista[0];
+    if(destino){
+      tenants[currentTenantId].data=snapshotCurrentState();
+      loadTenantState(destino);
+      currentTenantId=destino.id;
+    } else {
+      paisActivo=tBoot.pais||"AR";
+      localStorage.setItem("izifud_pais",paisActivo);
+    }
+  }
 }
 updateGlobalHeader();
 // Aplicar estilo del tenant activo al boot
