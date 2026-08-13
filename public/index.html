@@ -188,6 +188,8 @@ body.vista-final .tabs{display:none}
 body[data-role="socio"] .group-pills,body[data-role="admin"] .group-pills,body[data-role="rider"] .group-pills{display:none}
 /* Rider: el banner del restaurante activo no aplica */
 body[data-role="rider"] .store-banner{display:none}
+/* Admin opera la plataforma, no un local: el banner del restaurante no va acá */
+body[data-role="admin"] .store-banner{display:none}
 /* Entregas del rider */
 .rider-head{display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:14px;flex-wrap:wrap}
 .rider-head select{height:34px;padding:0 10px;font-size:13px;border:1px solid var(--border-strong);border-radius:8px;background:var(--surface);color:var(--ink)}
@@ -4860,6 +4862,34 @@ const THEMES={
       "--success-fg":"oklch(45% 0.11 165)",
       "--font-sans":'Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif'
     }
+  },
+  "izi-test":{
+    label:"🟡 IZI TEST",
+    desc:"Amarillo mostaza + negro — aurinegro tachirense",
+    swatches:["oklch(85% 0.16 95)","oklch(20% 0.015 90)","oklch(98.5% 0.030 95)","oklch(70% 0.12 90)"],
+    vars:{
+      "--bg":"oklch(96% 0.055 95)",
+      "--surface":"oklch(98.5% 0.028 95)",
+      "--surface-2":"oklch(93% 0.065 95)",
+      "--surface-3":"oklch(90% 0.075 95)",
+      "--border":"oklch(88% 0.070 95)",
+      "--border-strong":"oklch(77% 0.095 95)",
+      "--ink":"oklch(20% 0.015 90)",
+      "--ink-soft":"oklch(41% 0.030 90)",
+      "--ink-mute":"oklch(54% 0.042 90)",
+      "--ink-faint":"oklch(65% 0.052 90)",
+      "--brand":"oklch(21% 0.020 90)",
+      "--brand-hover":"oklch(33% 0.032 90)",
+      "--brand-tint":"oklch(91% 0.090 95)",
+      "--on-brand":"oklch(88% 0.145 95)",
+      "--warn":"oklch(78% 0.155 90)",
+      "--warn-bg":"oklch(92% 0.095 95)",
+      "--warn-fg":"oklch(44% 0.100 85)",
+      "--success":"oklch(56% 0.120 140)",
+      "--success-bg":"oklch(94% 0.045 140)",
+      "--success-fg":"oklch(43% 0.105 145)",
+      "--font-sans":'Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif'
+    }
   }
 };
 const LAYOUTS={
@@ -4994,7 +5024,7 @@ function seedVenezuela(){
     tel:"+58 276 341-2200",diasEnvio:"Lun-Dom 7-22h",
     lat:7.7669, lng:-72.2250,
     creada:"2026-04-02",
-    style:{theme:"lumina",layout:"lista-compacta",mostrarFotos:false,mostrarCombos:false},
+    style:{theme:"izi-test",layout:"lista-compacta",mostrarFotos:false,mostrarCombos:false},
     entregaConfig:{delivery:true,pickup:true},
     activo:true,
     pais:"VE",moneda:"USD",
@@ -5082,6 +5112,13 @@ function migrarSeedsNuevos(){
   }
   if(!riders.some(r=>r.id==="r4")){
     riders.push({id:"r4",nombre:"Jesús Contreras",tel:"+58 416 555-1122",vehiculo:"🛵 Moto",turno:"Lun-Sáb 11-22h",activo:true,enLinea:true,pais:"VE"});
+    cambio=true;
+  }
+  // One-shot: la arepera estrena el tema IZI TEST (si después elegís otro, no se vuelve a pisar)
+  if(tenants["arepas"]&&!tenants["arepas"]._temaIziTest){
+    tenants["arepas"]._temaIziTest=true;
+    tenants["arepas"].style=tenants["arepas"].style||{};
+    if(tenants["arepas"].style.theme==="lumina")tenants["arepas"].style.theme="izi-test";
     cambio=true;
   }
   if(cambio)saveToLocalStorage();
