@@ -1856,6 +1856,7 @@ const TABS=[
   {id:"socios",label:"🤝 Socios", group:"plataforma"},
   {id:"plataforma-dash",label:"📊 Estadísticas", group:"plataforma"},
   {id:"riders",label:"🛵 Riders", group:"plataforma"},
+  {id:"apariencia",label:"🎨 Apariencia", group:"plataforma"},
   {id:"sistema",label:"🗺 Sistema", group:"plataforma"},
   // REPARTO (rider de plataforma)
   {id:"entregas",label:"🛵 Pedidos activos", group:"reparto"},
@@ -5309,9 +5310,15 @@ function mostrarFotosEnabled(t){
   const s=getTenantStyle(t);
   return s.mostrarFotos!==false;// default true si no está seteado
 }
-function applyTenantStyle(t){
-  const style=getTenantStyle(t);
-  const theme=THEMES[style.theme]||THEMES["verde-fresco"];
+// ── TEMA DE LA APP ────────────────────────────────────────
+// El tema es de IZIFUD, no de cada local: la marca es una sola y el cliente
+// no cambia de look al pasar de un restaurante a otro. Cada local sigue
+// eligiendo su LAYOUT de carta, que sí es decisión suya.
+let appTheme=localStorage.getItem("izifud_tema")||"lumina";
+if(!THEMES[appTheme])appTheme="lumina";
+
+function applyAppTheme(){
+  const theme=THEMES[appTheme]||THEMES["lumina"];
   const root=document.documentElement;
   // limpiar todos los overrides previos (de cualquier tema)
   const allKeys=new Set();
@@ -5321,14 +5328,23 @@ function applyTenantStyle(t){
   Object.entries(theme.vars||{}).forEach(([k,v])=>root.style.setProperty(k,v));
   // marker para reglas adicionales (dark / lumina)
   const themeMarkers={nocturno:"dark",lumina:"lumina","lumina-amarillo":"lumina"};
-  root.dataset.theme=themeMarkers[style.theme]||"";
-  // aplicar fuente al body si el tema la define
-  if(theme.vars&&theme.vars["--font-sans"]){
-    document.body.style.fontFamily=theme.vars["--font-sans"];
-  } else {
-    document.body.style.fontFamily="";
-  }
+  root.dataset.theme=themeMarkers[appTheme]||"";
+  document.body.style.fontFamily=(theme.vars&&theme.vars["--font-sans"])||"";
 }
+
+function setAppTheme(id){
+  if(!THEMES[id])return;
+  appTheme=id;
+  localStorage.setItem("izifud_tema",id);
+  applyAppTheme();
+  const ap=document.getElementById("panel-apariencia");
+  if(ap&&ap.classList.contains("on"))renderApariencia();
+  const tp=document.getElementById("panel-tienda");
+  if(tp&&tp.dataset.init&&typeof renderStoreGrid==="function")renderStoreGrid();
+}
+
+// El tema ya no depende del local; queda como puente para los llamados existentes.
+function applyTenantStyle(t){applyAppTheme();}
 
 function snapshotCurrentState(){
   return{
@@ -5650,8 +5666,10 @@ function updateGlobalHeader(){
   if(h1)h1.textContent="IZIFUD";
   const sub=document.querySelector(".topbar-title .subtitle");
   if(sub){
-    if(vistaFinal){
-      // En vista cliente el subtítulo muestra el restaurante actual
+    // El restaurante aparece SOLO estando dentro de su tienda: en la home,
+    // en Mis pedidos y en los demás roles seguimos parados en IZIFUD.
+    const enTienda=!!document.getElementById("panel-tienda")?.classList.contains("on");
+    if(vistaFinal&&enTienda){
       const parts=[`${t.icono||"🍽"} ${t.nombre||"Restaurante"}`];
       if(t.zona)parts.push(t.zona);
       sub.textContent=parts.join(" · ");
@@ -5692,11 +5710,6 @@ function renderAdminContent(){
     <p style="font-size:12px;color:var(--ink-soft);margin-bottom:1.25rem">Gestioná los socios de ${pPais.flag} ${pPais.ciudad} (cambiá de país arriba, en la barra "Ver como"). Cada local tiene sus propios precios, stock y configuración.</p>
 
     <div class="admin-header">
-      <div class="admin-current">
-        <strong>${current.icono} ${current.nombre}</strong>
-        <div class="meta">${current.zona} · ${current.direccion}</div>
-        <div class="meta">Activa desde: ${current.creada}</div>
-      </div>
       <button class="form-btn primary" onclick="showNewTenantForm()" style="height:42px">+ Nuevo restaurante</button>
     </div>
 
@@ -5725,13 +5738,9 @@ function renderAdminContent(){
     </div>
 
     <div id="admin-form-container"></div>
-    <div id="admin-detail-container"></div>
     <div id="admin-pinstyle-container"></div>
-    <div id="admin-style-container"></div>
   `;
-  renderTenantDetail();
   renderPinStyleEditor();
-  renderAdminStyle();
 }
 
 function renderAdminStyle(){
@@ -5742,13 +5751,6 @@ function renderAdminStyle(){
   if(!t.style)t.style={theme:"verde-fresco",layout:"grilla"};
   const curTheme=t.style.theme||"verde-fresco";
   const curLayout=t.style.layout||"grilla";
-  const themeCards=Object.entries(THEMES).map(([id,th])=>`
-    <div class="style-card ${id===curTheme?"on":""}" onclick="setTenantTheme('${id}')">
-      <div class="sc-check">✓</div>
-      <div class="sc-name">${th.label}</div>
-      <div class="sc-desc">${th.desc}</div>
-      <div class="swatches-row">${th.swatches.map(c=>`<div class="swatch" style="background:${c}"></div>`).join("")}</div>
-    </div>`).join("");
   const layoutMocks={
     "grilla":`<div class="layout-mock layout-mock--grid"><div class="lm-block"></div><div class="lm-block"></div><div class="lm-block"></div><div class="lm-block"></div><div class="lm-block"></div><div class="lm-block"></div></div>`,
     "grilla-compacta":`<div class="layout-mock layout-mock--mini"><div class="lm-block"></div><div class="lm-block"></div><div class="lm-block"></div><div class="lm-block"></div><div class="lm-block"></div><div class="lm-block"></div><div class="lm-block"></div><div class="lm-block"></div><div class="lm-block"></div></div>`,
@@ -5766,14 +5768,12 @@ function renderAdminStyle(){
   cont.innerHTML=`
     <div class="style-section ${adminStyleOpen?"open":""}" id="style-section-wrap">
       <div class="style-section-head" onclick="toggleAdminStyle()">
-        <h3>🎨 Estilo de tienda</h3>
+        <h3>📐 Cómo se ve tu carta</h3>
         <div class="style-toggle">▾</div>
       </div>
       <div class="style-section-body">
-        <p style="font-size:11px;color:var(--ink-soft);margin-bottom:14px;line-height:1.5">Cada verdulería tiene su propio tema visual y layout de tienda. Los cambios se aplican al instante.</p>
-        <div class="style-sub">🎨 Tema</div>
-        <div class="style-grid">${themeCards}</div>
-        <div class="style-sub" style="margin-top:18px">📐 Layout de la tienda</div>
+        <p style="font-size:11px;color:var(--ink-soft);margin-bottom:14px;line-height:1.5">Elegí cómo se muestran tus platos. Los colores de la app los define IZIFUD, así el cliente ve siempre la misma marca. Los cambios se aplican al instante.</p>
+        <div class="style-sub">📐 Layout de la carta</div>
         <div class="style-grid">${layoutCards}</div>
         <div class="style-sub" style="margin-top:18px">📸 Fotos de productos</div>
         <label class="entrega-toggle" style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:10px 14px">
@@ -5861,19 +5861,6 @@ function toggleAdminStyle(){
   if(wrap)wrap.classList.toggle("open",adminStyleOpen);
 }
 
-function setTenantTheme(themeId){
-  const t=tenants[currentTenantId];
-  if(!t)return;
-  if(!t.style)t.style={theme:"verde-fresco",layout:"grilla"};
-  t.style.theme=themeId;
-  applyTenantStyle(t);
-  renderAdminStyle();
-  // refrescar la tienda si estaba inicializada
-  const tp=document.getElementById("panel-tienda");
-  if(tp&&tp.dataset.init&&typeof renderStoreGrid==="function")renderStoreGrid();
-  autoSave();
-}
-
 function setTenantLayout(layoutId){
   const t=tenants[currentTenantId];
   if(!t)return;
@@ -5885,31 +5872,6 @@ function setTenantLayout(layoutId){
   autoSave();
 }
 
-function renderTenantDetail(){
-  const cont=document.getElementById("admin-detail-container");
-  if(!cont)return;
-  const t=tenants[currentTenantId];
-  const productos=Object.keys(t.data.stockState).length;
-  const activos=Object.values(t.data.stockState).filter(s=>s.activo).length;
-  const sinStock=Object.entries(t.data.stockState).filter(([n,s])=>s.activo&&s.stock<=0).length;
-  const valorInv=Object.entries(t.data.stockState).reduce((a,[n,s])=>a+(s.activo?s.stock*(t.data.costos[n]||0):0),0);
-  cont.innerHTML=`
-    <div class="tenant-detail" style="margin-top:1rem">
-      <h3>${t.icono} Detalle de "${t.nombre}"</h3>
-      <div class="tenant-info-grid">
-        <div class="info-item"><div class="l">Productos</div><div class="v">${productos}</div></div>
-        <div class="info-item"><div class="l">Activos</div><div class="v" style="color:var(--success-fg)">${activos}</div></div>
-        <div class="info-item"><div class="l">Sin stock</div><div class="v" style="color:var(--danger)">${sinStock}</div></div>
-        <div class="info-item"><div class="l">Valor inventario</div><div class="v">${fmt(valorInv)||"$0"}</div></div>
-        <div class="info-item"><div class="l">Margen objetivo</div><div class="v">${t.data.margenObj||40}%</div></div>
-        <div class="info-item"><div class="l">Zonas envío</div><div class="v">${(t.data.zonas||[]).length}</div></div>
-      </div>
-      <p style="font-size:11px;color:var(--ink-soft);line-height:1.6">
-        Cuando seleccionás un restaurante, todas las pestañas (Tienda, Stock, Margen, Recetas, etc.) muestran sus datos específicos.
-        Las opciones de entrega se configuran en la tab <strong>🚚 Costo de envío</strong>.
-      </p>
-    </div>`;
-}
 
 // ── COBROS DEL SOCIO (métodos, datos y tasas) ──
 function renderCobrosConfigHTML(t){
@@ -6466,10 +6428,12 @@ function deleteTenant(id){
 function renderDashboard(){
   const p=document.getElementById("panel-dashboard");
   if(!p.dataset.init){
-    p.innerHTML=`<div id="dashboard-content"></div>`;
+    // El layout de la carta es decisión del socio, por eso vive acá y no en admin
+    p.innerHTML=`<div id="dashboard-content"></div><div id="admin-style-container"></div>`;
     p.dataset.init="1";
   }
   renderDashboardContent();
+  renderAdminStyle();
 }
 
 let editingMyVerdu=false;
@@ -7687,6 +7651,26 @@ function verMiPedido(){
   goToTab("mis-pedidos");
 }
 
+// ─── TAB: APARIENCIA (tema de toda la app) ─────────────────
+function renderApariencia(){
+  const p=document.getElementById("panel-apariencia");
+  if(!p)return;
+  const cards=Object.entries(THEMES).map(([id,th])=>`
+    <div class="style-card ${id===appTheme?"on":""}" onclick="setAppTheme('${id}')">
+      <div class="sc-check">✓</div>
+      <div class="sc-name">${th.label}</div>
+      <div class="sc-desc">${th.desc}</div>
+      <div class="swatches-row">${th.swatches.map(c=>`<div class="swatch" style="background:${c}"></div>`).join("")}</div>
+    </div>`).join("");
+  p.innerHTML=`
+    <div class="rec-header">
+      <h2>🎨 Apariencia de IZIFUD</h2>
+      <p>Un solo tema para toda la app: lo ven el cliente, los socios y los riders, en los dos países. Los locales eligen el layout de su carta, no los colores.</p>
+    </div>
+    <div class="style-grid">${cards}</div>
+    <p class="foot">Tema actual: <strong>${THEMES[appTheme].label}</strong>. Se guarda en este dispositivo (con cuentas reales pasa a ser configuración de la plataforma).</p>`;
+}
+
 // ─── TAB: SISTEMA (diagrama vivo, solo desarrollo) ─────────
 // Capas opcionales del diagrama (se prenden/apagan con los chips)
 let sysCapaId=true;
@@ -7867,11 +7851,13 @@ const renderMap={
   stock:renderStock,dashboard:renderDashboard,
   home:renderHome,socios:renderSocios,"plataforma-dash":renderPlataformaDash,
   entregas:renderEntregas,riders:renderRiders,"mis-pedidos":renderMisPedidos,
-  "rider-historial":renderRiderHistorial,sistema:renderSistema
+  "rider-historial":renderRiderHistorial,sistema:renderSistema,apariencia:renderApariencia
 };
 
 function renderTab(id){
   if(renderMap[id])renderMap[id]();
+  // El encabezado depende de dónde estés parado (IZIFUD vs dentro de una tienda)
+  if(typeof updateGlobalHeader==="function")updateGlobalHeader();
 }
 
 // Initialize multi-tenant system: try loading from localStorage, otherwise init defaults
