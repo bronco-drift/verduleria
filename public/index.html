@@ -269,6 +269,45 @@ body.vista-final .mis-pedidos-trigger{display:flex}
 .exito-acciones{display:flex;flex-direction:column;gap:8px}
 .exito-acciones button{width:100%;padding:10px;border-radius:9px;border:1px solid var(--border-strong);background:var(--surface);font-weight:600;font-size:13px;cursor:pointer;color:var(--ink)}
 .exito-acciones button.primary{background:var(--brand);border-color:var(--brand);color:#fff}
+/* Perfil de usuario (topbar 👤, solo vista cliente) */
+.perfil-trigger{display:none}
+body.vista-final .perfil-trigger{display:flex}
+.perfil-sec{margin-bottom:18px}
+.perfil-sec h3{font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-faint);margin:0 0 8px}
+.perfil-sec .form-field{margin-bottom:8px}
+.pf-toggle{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 12px;border:1px solid var(--border);border-radius:9px;margin-bottom:8px;cursor:pointer}
+.pf-toggle .pf-t-txt{font-size:12.5px;font-weight:600;color:var(--ink)}
+.pf-toggle .pf-t-sub{display:block;font-size:11px;font-weight:400;color:var(--ink-faint)}
+.pf-guardar{width:100%;padding:11px;border-radius:9px;border:1px solid var(--brand);background:var(--brand);color:#fff;font-weight:700;font-size:13px;cursor:pointer}
+.pf-ayuda{display:block;text-align:center;margin-top:12px;font-size:12px;color:var(--ink-faint);cursor:pointer;text-decoration:underline}
+/* Resumen tipo ticket */
+.resumen-modal{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%) scale(.94);z-index:10001;background:var(--bg);border:1px solid var(--border);border-radius:16px;padding:20px 18px;width:min(430px,calc(100vw - 32px));max-height:min(86dvh,720px);overflow-y:auto;box-shadow:0 24px 70px rgba(0,0,0,.28);opacity:0;pointer-events:none;transition:opacity .22s,transform .22s}
+.resumen-modal.open{opacity:1;pointer-events:auto;transform:translate(-50%,-50%) scale(1)}
+.tkt-head{text-align:center;border-bottom:1px dashed var(--border-strong);padding-bottom:10px;margin-bottom:10px}
+.tkt-head .tkt-rest{font-size:16px;font-weight:800}
+.tkt-head .tkt-sub{font-size:11px;color:var(--ink-faint);margin-top:2px}
+.tkt-row{display:flex;justify-content:space-between;gap:10px;font-size:12.5px;padding:2.5px 0;color:var(--ink)}
+.tkt-row .tkt-n{flex:1}
+.tkt-row .tkt-q{color:var(--ink-faint);white-space:nowrap}
+.tkt-row strong{white-space:nowrap}
+.tkt-sep{border-top:1px dashed var(--border-strong);margin:8px 0}
+.tkt-total{display:flex;justify-content:space-between;font-size:16px;font-weight:800;padding:4px 0}
+.tkt-datos{background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:9px 11px;font-size:12px;margin-top:10px}
+.tkt-datos .td-row{display:flex;gap:8px;padding:2px 0}
+.tkt-datos .td-row span{color:var(--ink-faint);min-width:74px}
+/* Diagrama del sistema (tab dev en admin) */
+.sys-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:12px;background:var(--surface);padding:10px}
+.sys-svg{min-width:860px;width:100%;height:auto;display:block}
+.sys-svg .nodo{fill:var(--bg);stroke:var(--border-strong);stroke-width:1.2;rx:10}
+.sys-svg .nodo-hl{fill:var(--bg);stroke:var(--ink);stroke-width:1.6}
+.sys-svg .tit{fill:var(--ink);font-size:13px;font-weight:800}
+.sys-svg .sub{fill:var(--ink-faint);font-size:10.5px}
+.sys-svg .dato{fill:var(--ink);font-size:10.5px;font-weight:600}
+.sys-svg .fl{stroke:var(--ink);stroke-width:1.4;fill:none;marker-end:url(#sys-arr)}
+.sys-svg .fl-soft{stroke:var(--ink-faint);stroke-width:1.2;stroke-dasharray:5 4;fill:none;marker-end:url(#sys-arr-soft)}
+.sys-svg .fl-lbl{fill:var(--ink-soft);font-size:10px;font-weight:600}
+.sys-svg .stor{fill:var(--surface);stroke:var(--border)}
+.sys-svg .stor-t{fill:var(--ink-faint);font-size:9.5px;font-family:ui-monospace,monospace}
 /* Home del cliente: elegir restaurante */
 .home-hero{margin:6px 0 16px}
 .home-hero h2{font-size:22px;font-weight:700;letter-spacing:-0.02em;color:var(--ink);margin-bottom:4px}
@@ -1103,7 +1142,7 @@ select.cell-sel{height:26px;padding:0 6px;font-size:11px;border:1px solid var(--
   </div>
   <div class="topbar-actions">
     <button class="info-trigger mis-pedidos-trigger" id="btn-mis-pedidos" onclick="goToTab('mis-pedidos')" aria-label="Mis pedidos"><span class="ta-icon">📦</span><span class="ta-label">Mis pedidos</span><span class="mp-badge" id="mp-badge"></span></button>
-    <button class="info-trigger" onclick="openInfo()" aria-label="Información"><span class="ta-icon">ℹ</span><span class="ta-label">Info</span></button>
+    <button class="info-trigger perfil-trigger" onclick="openPerfil()" aria-label="Mi cuenta"><span class="ta-icon">👤</span><span class="ta-label">Mi cuenta</span></button>
   </div>
 </div>
 
@@ -1142,6 +1181,26 @@ select.cell-sel{height:26px;padding:0 6px;font-size:11px;border:1px solid var(--
   <div class="pe-foot">
     <button onclick="closeProductEditor()">Cancelar</button>
     <button class="primary" onclick="saveProductEdit()">Guardar cambios</button>
+  </div>
+</div>
+
+<!-- PERFIL DE USUARIO (datos guardados + notificaciones) -->
+<div class="info-overlay" id="perfil-overlay" onclick="closePerfil()"></div>
+<div class="info-drawer" id="perfil-drawer">
+  <div class="info-head">
+    <h2>👤 Mi cuenta</h2>
+    <button class="cart-close" onclick="closePerfil()">✕</button>
+  </div>
+  <div class="info-body" id="perfil-body"></div>
+</div>
+
+<!-- RESUMEN TIPO TICKET (antes de confirmar el pedido) -->
+<div class="exito-overlay" id="resumen-overlay" onclick="closeResumen()"></div>
+<div class="resumen-modal" id="resumen-modal" role="dialog" aria-modal="true">
+  <div id="resumen-body"></div>
+  <div class="exito-acciones" style="margin-top:14px">
+    <button class="primary" onclick="confirmarPedidoFinal()">Confirmar pedido ✓</button>
+    <button onclick="closeResumen()">← Corregir algo</button>
   </div>
 </div>
 
@@ -1569,6 +1628,7 @@ const TABS=[
   {id:"socios",label:"🤝 Socios", group:"plataforma"},
   {id:"plataforma-dash",label:"📊 Estadísticas", group:"plataforma"},
   {id:"riders",label:"🛵 Riders", group:"plataforma"},
+  {id:"sistema",label:"🗺 Sistema", group:"plataforma"},
   // REPARTO (rider de plataforma)
   {id:"entregas",label:"🛵 Pedidos activos", group:"reparto"},
   {id:"rider-historial",label:"🕓 Historial", group:"reparto"},
@@ -2304,6 +2364,7 @@ function renderPedidosList(){
         ${p.cliente?`<div class="pedido-cliente">
           <div class="pedido-cliente-title">👤 Cliente · ${tipoEmoji} ${tipoLabel}</div>
           <div class="pedido-cliente-grid">
+            ${p.cliente.nombre?`<div><span>👤 Nombre</span><strong>${p.cliente.nombre}</strong></div>`:""}
             ${tipo==="delivery"?`<div><span>📍 Dirección</span><strong>${p.cliente.direccion||"—"}</strong></div>`:""}
             ${tipo==="delivery"&&p.riderId?`<div><span>🛵 Rider asignado</span><strong>${riderNombre(p.riderId)}</strong></div>`:""}
             <div><span>📞 Teléfono</span><strong>${p.cliente.telefono||"—"}</strong></div>
@@ -3030,21 +3091,135 @@ function submitCheckout(){
     envioGratis:gratis,
     total,
     tipoEntrega:entregaMode,
-    cliente:{direccion,telefono,correo,formaDePago,coords:entregaMode==="delivery"&&userLocation?{lat:userLocation.lat,lng:userLocation.lng}:null},
+    cliente:{nombre:getClienteData().nombre||"",direccion,telefono,correo,formaDePago,coords:entregaMode==="delivery"&&userLocation?{lat:userLocation.lat,lng:userLocation.lng}:null},
     estado:"pendiente"
   };
+  // Paso intermedio: resumen tipo ticket para revisar antes de confirmar
+  pedidoPreview=pedido;
+  openResumen(pedido);
+}
+
+// ── RESUMEN TIPO TICKET (revisión antes de confirmar) ──
+let pedidoPreview=null;
+
+function openResumen(p){
+  const t=tenants[currentTenantId];
+  const f=new Date(p.fecha);
+  const fechaStr=f.toLocaleDateString("es-AR",{day:"2-digit",month:"2-digit",year:"numeric"})+" · "+f.toLocaleTimeString("es-AR",{hour:"2-digit",minute:"2-digit"});
+  const pickup=p.tipoEntrega==="pickup";
+  const body=document.getElementById("resumen-body");
+  body.innerHTML=`
+    <div class="tkt-head">
+      <div style="font-size:26px">${(t&&t.icono)||"🍽"}</div>
+      <div class="tkt-rest">${t?t.nombre:""}</div>
+      <div class="tkt-sub">Resumen de tu pedido · ${fechaStr}</div>
+    </div>
+    <div class="tkt-items">
+      ${p.items.map(i=>`<div class="tkt-row"><span class="tkt-n">${i.emoji} ${i.nombre}</span><span class="tkt-q">×${i.qty}</span><strong>${fmt(i.subtotal)}</strong></div>`).join("")}
+    </div>
+    <div class="tkt-sep"></div>
+    <div class="tkt-row"><span class="tkt-n">Subtotal</span><strong>${fmt(p.subtotal)}</strong></div>
+    ${pickup
+      ?`<div class="tkt-row"><span class="tkt-n">Retiro en el local</span><strong style="color:var(--success-fg)">Sin cargo</strong></div>`
+      :`<div class="tkt-row"><span class="tkt-n">Envío ${p.envioGratis?"(gratis)":""} · ${p.zona}</span><strong>${p.envioGratis?"$0":fmt(p.costoEnvio)}</strong></div>`}
+    <div class="tkt-sep"></div>
+    <div class="tkt-total"><span>Total</span><span>${fmt(p.total)}</span></div>
+    <div class="tkt-datos">
+      ${p.cliente.nombre?`<div class="td-row"><span>Nombre</span><strong>${p.cliente.nombre}</strong></div>`:""}
+      <div class="td-row"><span>Entrega</span><strong>${pickup?`🏪 Retiro en ${(t&&t.direccion)||"el local"}`:`🛵 ${p.cliente.direccion}`}</strong></div>
+      <div class="td-row"><span>Teléfono</span><strong>${p.cliente.telefono}</strong></div>
+      ${p.cliente.correo?`<div class="td-row"><span>Correo</span><strong>${p.cliente.correo}</strong></div>`:""}
+      <div class="td-row"><span>Pago</span><strong>${FORMA_PAGO_LABEL[p.cliente.formaDePago]||p.cliente.formaDePago}</strong></div>
+    </div>`;
+  document.getElementById("resumen-overlay").classList.add("open");
+  document.getElementById("resumen-modal").classList.add("open");
+}
+
+function closeResumen(){
+  document.getElementById("resumen-overlay").classList.remove("open");
+  document.getElementById("resumen-modal").classList.remove("open");
+}
+
+function confirmarPedidoFinal(){
+  if(!pedidoPreview)return;
+  const pedido=pedidoPreview;
+  pedidoPreview=null;
+  const c=pedido.cliente;
   pedidos.unshift(pedido);
-  localStorage.setItem("izifud_cliente_data",JSON.stringify({direccion,telefono,correo,formaDePago}));
+  const prev=getClienteData();
+  localStorage.setItem("izifud_cliente_data",JSON.stringify({...prev,
+    direccion:c.direccion||prev.direccion||"",telefono:c.telefono,correo:c.correo,formaDePago:c.formaDePago}));
   saveToLocalStorage();
   registrarMiPedido(currentTenantId,pedido.id);
   cart={};
   updateCartBadge();
   if(typeof updateCartBar==="function")updateCartBar();
   renderStoreGrid();
+  closeResumen();
   closeCart();
   openExito(pedido);
   const pp=document.getElementById("panel-pedidos");
   if(pp&&pp.dataset.init){renderPedidosSummary();renderPedidosList();}
+}
+
+// ── PERFIL DE USUARIO (👤 Mi cuenta) ──
+function getClienteData(){
+  try{return JSON.parse(localStorage.getItem("izifud_cliente_data")||"{}")||{};}catch(e){return{};}
+}
+
+function openPerfil(){
+  const d=getClienteData();
+  const notif=d.notif||{estado:true,ofertas:false};
+  const esc=s=>String(s||"").replace(/"/g,"&quot;");
+  const body=document.getElementById("perfil-body");
+  body.innerHTML=`
+    <div class="perfil-sec">
+      <h3>Mis datos</h3>
+      <div class="form-field"><label>Nombre</label><input type="text" id="pf-nombre" placeholder="Tu nombre" value="${esc(d.nombre)}"></div>
+      <div class="form-field"><label>Teléfono</label><input type="tel" id="pf-telefono" placeholder="+54 11 ..." value="${esc(d.telefono)}"></div>
+      <div class="form-field"><label>Correo (opcional)</label><input type="email" id="pf-correo" placeholder="tu@correo.com" value="${esc(d.correo)}"></div>
+    </div>
+    <div class="perfil-sec">
+      <h3>Entrega</h3>
+      <div class="form-field"><label>Dirección habitual</label><input type="text" id="pf-direccion" placeholder="Calle 123, CABA" value="${esc(d.direccion)}"></div>
+    </div>
+    <div class="perfil-sec">
+      <h3>Pago preferido</h3>
+      <div class="form-field"><select id="pf-pago">
+        ${Object.entries(FORMA_PAGO_LABEL).map(([k,v])=>`<option value="${k}" ${d.formaDePago===k?"selected":""}>${v}</option>`).join("")}
+      </select></div>
+    </div>
+    <div class="perfil-sec">
+      <h3>Notificaciones</h3>
+      <label class="pf-toggle"><span class="pf-t-txt">Estado de mis pedidos<span class="pf-t-sub">Confirmado, en camino, entregado</span></span><input type="checkbox" id="pf-notif-estado" ${notif.estado?"checked":""}></label>
+      <label class="pf-toggle"><span class="pf-t-txt">Ofertas y novedades<span class="pf-t-sub">Promos de tus restaurantes</span></span><input type="checkbox" id="pf-notif-ofertas" ${notif.ofertas?"checked":""}></label>
+      <p class="foot" style="margin-top:2px">Demo: las notificaciones reales llegan cuando conectemos push.</p>
+    </div>
+    <button class="pf-guardar" onclick="savePerfil()">Guardar</button>
+    <a class="pf-ayuda" onclick="closePerfil();openInfo()">❓ Ayuda: cómo comprar, zonas de envío, contacto</a>`;
+  document.getElementById("perfil-overlay").classList.add("open");
+  document.getElementById("perfil-drawer").classList.add("open");
+}
+
+function closePerfil(){
+  document.getElementById("perfil-overlay").classList.remove("open");
+  document.getElementById("perfil-drawer").classList.remove("open");
+}
+
+function savePerfil(){
+  const g=id=>(document.getElementById(id)?.value||"").trim();
+  const data={...getClienteData(),
+    nombre:g("pf-nombre"),telefono:g("pf-telefono"),correo:g("pf-correo"),
+    direccion:g("pf-direccion"),formaDePago:document.getElementById("pf-pago")?.value||"",
+    notif:{estado:!!document.getElementById("pf-notif-estado")?.checked,ofertas:!!document.getElementById("pf-notif-ofertas")?.checked}
+  };
+  localStorage.setItem("izifud_cliente_data",JSON.stringify(data));
+  // El checkout precarga estos datos: limpiar los campos ya montados para que tomen el valor nuevo
+  ["co-direccion","co-telefono","co-correo"].forEach(id=>{const e=document.getElementById(id);if(e)e.value="";});
+  const cp=document.getElementById("co-pago");
+  if(cp&&data.formaDePago)cp.value=data.formaDePago;
+  prefillCheckoutForm();
+  closePerfil();
 }
 
 // Alias legacy por compatibilidad si algo viejo lo llama
@@ -6645,6 +6820,118 @@ function verMiPedido(){
   goToTab("mis-pedidos");
 }
 
+// ─── TAB: SISTEMA (diagrama vivo, solo desarrollo) ─────────
+function renderSistema(){
+  const p=document.getElementById("panel-sistema");
+  if(!p)return;
+  const todos=allPedidosCrossTenant();
+  const cnt=e=>todos.filter(x=>x.p.estado===e).length;
+  const nSocios=Object.keys(tenants).length;
+  const nPlatos=D.filter(r=>r.rest).length;
+  const nRiders=riders.length;
+  const enLinea=riders.filter(r=>r.activo&&r.enLinea).length;
+  const conFlota=Object.values(tenants).filter(t=>{const c=getEntregaConfig(t);return c.delivery&&c.riderPlataforma!==false;}).length;
+  const sinAsignar=todos.filter(x=>x.p.estado==="preparando"&&!x.p.riderId&&x.p.tipoEntrega!=="pickup").length;
+  p.innerHTML=`
+    <div class="rec-header">
+      <h2>🗺 Sistema</h2>
+      <p>Mapa vivo de los objetos de la app y sus relaciones. Los números salen del estado actual. Vista de desarrollo — después la sacamos.</p>
+    </div>
+    <div class="sys-wrap">
+    <svg class="sys-svg" viewBox="0 0 900 640" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Diagrama del sistema IZIFUD">
+      <defs>
+        <marker id="sys-arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--ink)"/></marker>
+        <marker id="sys-arr-soft" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--ink-faint)"/></marker>
+      </defs>
+
+      <!-- CLIENTE -->
+      <rect class="nodo" x="40" y="60" width="210" height="150" rx="12"/>
+      <text class="tit" x="58" y="88">👥 CLIENTE</text>
+      <text class="sub" x="58" y="110">Elige restaurante en la home</text>
+      <text class="sub" x="58" y="126">Carrito → ticket → confirma</text>
+      <text class="sub" x="58" y="142">👤 Perfil: datos guardados</text>
+      <text class="dato" x="58" y="166">📦 Sigue todo en Mis pedidos</text>
+      <text class="sub" x="58" y="188">Sin login: por dispositivo</text>
+
+      <!-- PEDIDO -->
+      <rect class="nodo-hl" x="345" y="40" width="230" height="190" rx="12"/>
+      <text class="tit" x="363" y="68">🧾 PEDIDO (${todos.length})</text>
+      <text class="sub" x="363" y="90">El objeto que une todo:</text>
+      <text class="dato" x="363" y="112">⏳ pendiente · ${cnt("pendiente")}</text>
+      <text class="dato" x="363" y="130">🔥 preparando · ${cnt("preparando")}</text>
+      <text class="dato" x="363" y="148">🛵 en camino · ${cnt("en_camino")}</text>
+      <text class="dato" x="363" y="166">✅ entregado · ${cnt("entregado")}</text>
+      <text class="dato" x="363" y="184">✕ cancelado · ${cnt("cancelado")}</text>
+      <text class="sub" x="363" y="208">items · cliente · rider · entrega</text>
+
+      <!-- SOCIO -->
+      <rect class="nodo" x="650" y="40" width="215" height="190" rx="12"/>
+      <text class="tit" x="668" y="68">🏪 SOCIO (${nSocios})</text>
+      <text class="sub" x="668" y="90">Cliente B2B de la plataforma</text>
+      <text class="dato" x="668" y="112">${nPlatos} platos en ${nSocios} cartas</text>
+      <text class="sub" x="668" y="134">Tema y layout propios</text>
+      <text class="sub" x="668" y="150">Precios, stock, envío</text>
+      <text class="dato" x="668" y="172">🛵 Flota IZIFUD: ${conFlota}/${nSocios}</text>
+      <text class="sub" x="668" y="194">(o delivery propio)</text>
+      <text class="sub" x="668" y="210">Avanza estados del pedido</text>
+
+      <!-- RIDER -->
+      <rect class="nodo" x="345" y="330" width="230" height="150" rx="12"/>
+      <text class="tit" x="363" y="358">🛵 RIDER (${nRiders})</text>
+      <text class="dato" x="363" y="380">● En línea: ${enLinea}/${nRiders}</text>
+      <text class="sub" x="363" y="402">Asignación auto por carga</text>
+      <text class="sub" x="363" y="418">Cola sin asignar: ${sinAsignar}</text>
+      <text class="sub" x="363" y="434">Mapa de ruta 🏪→🏠</text>
+      <text class="sub" x="363" y="456">Activos + Historial</text>
+
+      <!-- ADMIN -->
+      <rect class="nodo" x="650" y="330" width="215" height="150" rx="12"/>
+      <text class="tit" x="668" y="358">🏢 ADMIN (vos)</text>
+      <text class="sub" x="668" y="380">Alta y gestión de socios</text>
+      <text class="sub" x="668" y="396">"Entrar como socio" (impersonate)</text>
+      <text class="sub" x="668" y="412">Alta y edición de riders</text>
+      <text class="dato" x="668" y="436">📊 Métricas de toda la red</text>
+      <text class="sub" x="668" y="458">Este diagrama vive acá 🙂</text>
+
+      <!-- FLECHAS -->
+      <line class="fl" x1="250" y1="120" x2="341" y2="120"/>
+      <text class="fl-lbl" x="266" y="112">crea</text>
+      <line class="fl" x1="575" y1="110" x2="646" y2="110"/>
+      <text class="fl-lbl" x="584" y="102">llega a</text>
+      <path class="fl" d="M 720 230 C 720 300, 640 330, 582 368"/>
+      <text class="fl-lbl" x="628" y="296">marca Preparando →</text>
+      <text class="fl-lbl" x="628" y="310">auto-asigna rider</text>
+      <path class="fl" d="M 345 410 C 190 410, 140 300, 143 216"/>
+      <text class="fl-lbl" x="170" y="390">entrega 🏠</text>
+      <line class="fl" x1="757" y1="330" x2="757" y2="236"/>
+      <text class="fl-lbl" x="766" y="288">gestiona</text>
+      <line class="fl" x1="650" y1="418" x2="581" y2="418"/>
+      <text class="fl-lbl" x="590" y="410">gestiona</text>
+      <path class="fl-soft" d="M 460 230 L 460 326"/>
+      <text class="fl-lbl" x="470" y="282">se asigna a</text>
+
+      <!-- STORAGE -->
+      <text class="tit" x="40" y="536" style="font-size:12px">💾 localStorage (demo sin backend)</text>
+      <rect class="stor" x="40" y="548" width="160" height="44" rx="8"/>
+      <text class="stor-t" x="52" y="566">izifud_app_v1</text>
+      <text class="sub" x="52" y="582">socios+pedidos+riders</text>
+      <rect class="stor" x="212" y="548" width="160" height="44" rx="8"/>
+      <text class="stor-t" x="224" y="566">izifud_cliente_data</text>
+      <text class="sub" x="224" y="582">perfil del cliente</text>
+      <rect class="stor" x="384" y="548" width="160" height="44" rx="8"/>
+      <text class="stor-t" x="396" y="566">izifud_mis_pedidos</text>
+      <text class="sub" x="396" y="582">refs de sus pedidos</text>
+      <rect class="stor" x="556" y="548" width="150" height="44" rx="8"/>
+      <text class="stor-t" x="568" y="566">izifud_dev_role</text>
+      <text class="sub" x="568" y="582">rol activo (dev)</text>
+      <rect class="stor" x="718" y="548" width="150" height="44" rx="8"/>
+      <text class="stor-t" x="730" y="566">izifud_dev_rider</text>
+      <text class="sub" x="730" y="582">rider activo (dev)</text>
+    </svg>
+    </div>
+    <p class="foot">Flujo feliz: Cliente crea el pedido → le llega al Socio → al marcar "Preparando" se auto-asigna a un Rider en línea → el Rider lo entrega. El Admin gestiona socios y riders, y mira las métricas de toda la red.</p>`;
+}
+
 const renderMap={
   original:renderOriginal,kg:renderKg,margen:renderMargen,
   sugeridos:renderSugeridos,envio:renderEnvio,
@@ -6654,7 +6941,7 @@ const renderMap={
   stock:renderStock,dashboard:renderDashboard,
   home:renderHome,socios:renderSocios,"plataforma-dash":renderPlataformaDash,
   entregas:renderEntregas,riders:renderRiders,"mis-pedidos":renderMisPedidos,
-  "rider-historial":renderRiderHistorial
+  "rider-historial":renderRiderHistorial,sistema:renderSistema
 };
 
 function renderTab(id){
