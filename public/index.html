@@ -216,6 +216,59 @@ body[data-role="rider"] .store-banner{display:none}
 .drb-btn.on{background:var(--surface);color:var(--ink);box-shadow:var(--shadow-sm)}
 .drb-note{color:var(--ink-faint);font-size:10px;margin-left:auto}
 @media(max-width:640px){.drb-note{display:none}}
+/* Selector de rider: visible solo en rol rider, al lado del switch de roles */
+.drb-rider-sel{display:none;height:26px;padding:0 8px;font-size:11px;font-weight:600;border:1px solid var(--border-strong);border-radius:7px;background:var(--surface);color:var(--ink)}
+body[data-role="rider"] .drb-rider-sel{display:block}
+/* Mapa de ruta por entrega */
+.ruta-map-wrap{display:none;height:190px;border-radius:8px;overflow:hidden;border:1px solid var(--border);margin-top:4px}
+.ruta-map-wrap.show{display:block}
+.ruta-pin-in{width:30px;height:30px;border-radius:50%;background:#fff;border:2px solid #18181b;display:flex;align-items:center;justify-content:center;font-size:15px;box-shadow:0 2px 6px rgba(0,0,0,.25)}
+.rh-nombre{font-size:14px;color:var(--ink);display:flex;align-items:center;gap:6px}
+/* Botón Mis pedidos (topbar, solo vista cliente) */
+.mis-pedidos-trigger{display:none;position:relative}
+body.vista-final .mis-pedidos-trigger{display:flex}
+.mp-badge{display:none;position:absolute;top:-5px;right:-5px;min-width:17px;height:17px;padding:0 4px;border-radius:9px;background:var(--danger);color:#fff;font-size:10px;font-weight:800;align-items:center;justify-content:center;line-height:1}
+.mp-badge.show{display:flex}
+/* Pantalla Mis pedidos (cliente) */
+.mp-head{display:flex;align-items:center;gap:10px;margin:2px 0 12px}
+.mp-head h2{font-size:18px;margin:0}
+.mp-volver{border:1px solid var(--border-strong);background:var(--surface);border-radius:8px;padding:6px 10px;font-size:12px;font-weight:600;color:var(--ink);cursor:pointer}
+.mp-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:10px}
+.mp-card-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.mp-rest{font-size:14px}
+.mp-meta{font-size:11px;color:var(--ink-faint)}
+.mp-total{margin-left:auto;font-weight:800;font-size:14px}
+.mp-msg{font-size:12.5px;color:var(--ink-soft);margin-top:2px}
+.mp-items{font-size:12px;color:var(--ink-soft);margin-top:8px;border-top:1px dashed var(--border);padding-top:8px}
+.mp-entrega{font-size:12px;color:var(--ink-faint);margin-top:4px}
+.mp-past{opacity:.85}
+/* Stepper de estado del pedido */
+.mp-steps{display:flex;margin:12px 0 8px}
+.mp-step{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;position:relative}
+.mp-step::before{content:"";position:absolute;top:8px;right:50%;width:100%;height:2px;background:var(--border-strong)}
+.mp-step:first-child::before{display:none}
+.mp-step.done::before,.mp-step.now::before{background:var(--ink)}
+.mp-dot{width:17px;height:17px;border-radius:50%;background:var(--surface);border:2px solid var(--border-strong);z-index:1;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:#fff;box-sizing:border-box}
+.mp-step.done .mp-dot{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+.mp-step.now .mp-dot{border-color:var(--ink);animation:mpPulse 1.8s ease-in-out infinite}
+.mp-lbl{font-size:9px;font-weight:700;color:var(--ink-faint);text-transform:uppercase;letter-spacing:.03em;text-align:center;line-height:1.2}
+.mp-step.done .mp-lbl,.mp-step.now .mp-lbl{color:var(--ink)}
+@keyframes mpPulse{0%,100%{box-shadow:0 0 0 0 rgba(0,0,0,.18)}50%{box-shadow:0 0 0 6px rgba(0,0,0,0)}}
+/* Modal pedido exitoso */
+.exito-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:10000;opacity:0;pointer-events:none;transition:opacity .2s}
+.exito-overlay.open{opacity:1;pointer-events:auto}
+.exito-modal{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%) scale(.94);z-index:10001;background:var(--bg);border:1px solid var(--border);border-radius:16px;padding:26px 22px;width:min(400px,calc(100vw - 32px));box-shadow:0 24px 70px rgba(0,0,0,.28);opacity:0;pointer-events:none;transition:opacity .22s,transform .22s;text-align:center}
+.exito-modal.open{opacity:1;pointer-events:auto;transform:translate(-50%,-50%) scale(1)}
+.exito-check{width:54px;height:54px;border-radius:50%;background:var(--ink);color:var(--bg);font-size:26px;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;animation:exitoPop .35s ease}
+@keyframes exitoPop{0%{transform:scale(.4);opacity:0}70%{transform:scale(1.12)}100%{transform:scale(1)}}
+.exito-modal h2{font-size:19px;margin:0 0 4px}
+.exito-sub{font-size:12.5px;color:var(--ink-soft);margin:0 0 14px}
+.exito-datos{border:1px solid var(--border);border-radius:10px;padding:10px 12px;margin-bottom:16px;text-align:left}
+.ed-row{display:flex;justify-content:space-between;font-size:12.5px;padding:3px 0}
+.ed-row span{color:var(--ink-faint)}
+.exito-acciones{display:flex;flex-direction:column;gap:8px}
+.exito-acciones button{width:100%;padding:10px;border-radius:9px;border:1px solid var(--border-strong);background:var(--surface);font-weight:600;font-size:13px;cursor:pointer;color:var(--ink)}
+.exito-acciones button.primary{background:var(--brand);border-color:var(--brand);color:#fff}
 /* Home del cliente: elegir restaurante */
 .home-hero{margin:6px 0 16px}
 .home-hero h2{font-size:22px;font-weight:700;letter-spacing:-0.02em;color:var(--ink);margin-bottom:4px}
@@ -1039,6 +1092,7 @@ select.cell-sel{height:26px;padding:0 6px;font-size:11px;border:1px solid var(--
     <button class="drb-btn" data-role="rider" onclick="setDevRole('rider')">Rider</button>
     <button class="drb-btn" data-role="admin" onclick="setDevRole('admin')">Admin</button>
   </div>
+  <select class="drb-rider-sel" id="drb-rider-sel" onchange="setDevRider(this.value)"></select>
   <span class="drb-note">modo desarrollo · sin login</span>
 </div>
 
@@ -1048,6 +1102,7 @@ select.cell-sel{height:26px;padding:0 6px;font-size:11px;border:1px solid var(--
     <p class="subtitle">Pedí online en tus restaurantes favoritos</p>
   </div>
   <div class="topbar-actions">
+    <button class="info-trigger mis-pedidos-trigger" id="btn-mis-pedidos" onclick="goToTab('mis-pedidos')" aria-label="Mis pedidos"><span class="ta-icon">📦</span><span class="ta-label">Mis pedidos</span><span class="mp-badge" id="mp-badge"></span></button>
     <button class="info-trigger" onclick="openInfo()" aria-label="Información"><span class="ta-icon">ℹ</span><span class="ta-label">Info</span></button>
   </div>
 </div>
@@ -1087,6 +1142,19 @@ select.cell-sel{height:26px;padding:0 6px;font-size:11px;border:1px solid var(--
   <div class="pe-foot">
     <button onclick="closeProductEditor()">Cancelar</button>
     <button class="primary" onclick="saveProductEdit()">Guardar cambios</button>
+  </div>
+</div>
+
+<!-- PEDIDO EXITOSO (confirmación post-checkout) -->
+<div class="exito-overlay" id="exito-overlay" onclick="closeExito()"></div>
+<div class="exito-modal" id="exito-modal" role="dialog" aria-modal="true">
+  <div class="exito-check">✓</div>
+  <h2>¡Pedido confirmado!</h2>
+  <p class="exito-sub" id="exito-sub"></p>
+  <div class="exito-datos" id="exito-datos"></div>
+  <div class="exito-acciones">
+    <button class="primary" onclick="verMiPedido()">📦 Seguir mi pedido</button>
+    <button onclick="closeExito()">Seguir mirando la carta</button>
   </div>
 </div>
 
@@ -1490,6 +1558,7 @@ const TABS=[
   {id:"home",label:"🏠 Restaurantes", group:"publico"},
   {id:"tienda",label:"🛒 Tienda", group:"publico", hidden:true},
   {id:"ubicacion",label:"📍 Mapa", group:"publico", hidden:true},
+  {id:"mis-pedidos",label:"📦 Mis pedidos", group:"publico", hidden:true},
   // GESTIÓN (socio: SU restaurante)
   {id:"pedidos",label:"🧾 Pedidos", group:"gestion"},
   {id:"dashboard",label:"🏪 Mi restaurante", group:"gestion"},
@@ -2235,6 +2304,7 @@ function renderPedidosList(){
           <div class="pedido-cliente-title">👤 Cliente · ${tipoEmoji} ${tipoLabel}</div>
           <div class="pedido-cliente-grid">
             ${tipo==="delivery"?`<div><span>📍 Dirección</span><strong>${p.cliente.direccion||"—"}</strong></div>`:""}
+            ${tipo==="delivery"&&p.riderId?`<div><span>🛵 Rider asignado</span><strong>${riderNombre(p.riderId)}</strong></div>`:""}
             <div><span>📞 Teléfono</span><strong>${p.cliente.telefono||"—"}</strong></div>
             ${p.cliente.correo?`<div><span>✉ Correo</span><strong>${p.cliente.correo}</strong></div>`:""}
             <div><span>💳 Forma de pago</span><strong>${(FORMA_PAGO_LABEL&&FORMA_PAGO_LABEL[p.cliente.formaDePago])||p.cliente.formaDePago||"—"}</strong></div>
@@ -2274,9 +2344,25 @@ function cambiarEstadoPedido(id,nuevoEstado){
   const p=pedidos.find(x=>x.id===id);
   if(!p)return;
   p.estado=nuevoEstado;
+  if(nuevoEstado==="preparando")asignarRiderAuto(p);
   saveToLocalStorage();
   renderPedidosSummary();
   renderPedidosList();
+  if(typeof refreshMisPedidosSiVisible==="function")refreshMisPedidosSiVisible();
+}
+
+// Al pasar a "Preparando", los pedidos delivery de locales con flota IZIFUD se
+// asignan al rider en línea con menos entregas activas. Si no hay nadie en
+// línea, quedan en la cola "Sin asignar" del panel de riders.
+function asignarRiderAuto(p){
+  if(p.tipoEntrega==="pickup"||p.riderId)return;
+  const t=tenants[currentTenantId];
+  if(getEntregaConfig(t).riderPlataforma===false)return;
+  const enLinea=riders.filter(r=>r.activo&&r.enLinea);
+  if(!enLinea.length)return;
+  const carga=id=>allPedidosCrossTenant().filter(x=>x.p.riderId===id&&(x.p.estado==="preparando"||x.p.estado==="en_camino")).length;
+  const elegido=enLinea.slice().sort((a,b)=>carga(a.id)-carga(b.id))[0];
+  p.riderId=elegido.id;
 }
 
 function cancelarPedido(id){
@@ -2949,13 +3035,13 @@ function submitCheckout(){
   pedidos.unshift(pedido);
   localStorage.setItem("izifud_cliente_data",JSON.stringify({direccion,telefono,correo,formaDePago}));
   saveToLocalStorage();
-  const entregaTxt=entregaMode==="delivery"?"Delivery":"Retiro en local";
-  alert(`✓ Pedido #${pedido.id} recibido\n\nProductos: ${items.length}\nTotal: ${fmt(total)}\nEntrega: ${entregaTxt}\nPago: ${FORMA_PAGO_LABEL[formaDePago]||formaDePago}\n\nGestionalo desde la tab 🧾 Pedidos.`);
+  registrarMiPedido(currentTenantId,pedido.id);
   cart={};
   updateCartBadge();
   if(typeof updateCartBar==="function")updateCartBar();
   renderStoreGrid();
   closeCart();
+  openExito(pedido);
   const pp=document.getElementById("panel-pedidos");
   if(pp&&pp.dataset.init){renderPedidosSummary();renderPedidosList();}
 }
@@ -4645,6 +4731,8 @@ function applyDevRole(){
   document.body.dataset.role=devRole;
   document.body.classList.toggle("vista-final",vistaFinal);
   document.querySelectorAll(".drb-btn").forEach(b=>b.classList.toggle("on",b.dataset.role===devRole));
+  updateDevRiderSelect();
+  if(typeof updateMisPedidosBadge==="function")updateMisPedidosBadge();
   renderGroupPills();
   // Cada rol aterriza en SU grupo: cliente→home, socio→pedidos, admin→socios, rider→entregas
   const defaults={cliente:"publico",socio:"gestion",admin:"plataforma",rider:"reparto"};
@@ -5965,21 +6053,25 @@ function renderPlataformaDash(){
       <div class="summary-card ok"><div class="lbl">Ventas (entregados)</div><div class="val">${fmt(totRevenue)||"$0"}</div></div>
       <div class="summary-card"><div class="lbl">Ticket promedio</div><div class="val">${ticket?fmt(ticket):"—"}</div></div>
     </div>
-    <div class="ow"><table style="min-width:760px">
+    <div class="ow"><table style="min-width:820px">
       <thead><tr>
-        <th>Socio</th><th>Estado</th><th>Platos</th><th>Pedidos</th><th>Entregados</th><th>Unidades</th><th>Ventas</th><th></th>
+        <th>Socio</th><th>Estado</th><th>Entrega</th><th>Platos</th><th>Pedidos</th><th>Entregados</th><th>Unidades</th><th>Ventas</th><th></th>
       </tr></thead>
       <tbody>
-        ${rows.map(r=>`<tr>
+        ${rows.map(r=>{
+          const ce=getEntregaConfig(r.t);
+          const entregaTxt=!ce.delivery?(ce.pickup?"🏪 Solo retiro":"—"):(ce.riderPlataforma!==false?"🛵 Flota IZIFUD":"🚚 Delivery propio");
+          return`<tr>
           <td>${r.t.icono||"🍽"} <strong>${r.t.nombre}</strong><span class="u">${r.t.zona||""}</span></td>
           <td><span class="badge ${r.disp?"ok":"warn"}">${r.disp?"Abierto":"Cerrado"}</span></td>
+          <td style="font-size:12px;white-space:nowrap">${entregaTxt}</td>
           <td>${r.activos}/${r.carta}</td>
           <td>${r.pedidos}</td>
           <td>${r.entregados}</td>
           <td>${r.unidades}</td>
           <td><strong>${fmt(r.revenue)||"$0"}</strong></td>
           <td><button class="edit-btn" onclick="adminGestionarSocio('${r.t.id}')">Entrar como socio →</button></td>
-        </tr>`).join("")}
+        </tr>`;}).join("")}
       </tbody>
     </table></div>
     ${(()=>{
@@ -6051,7 +6143,24 @@ function getDevRider(){
 
 function setDevRider(id){
   localStorage.setItem("izifud_dev_rider",id);
+  updateDevRiderSelect();
   renderEntregas();
+}
+
+// Selector de identidad del rider en la barra de roles (visible solo con rol Rider)
+function updateDevRiderSelect(){
+  const sel=document.getElementById("drb-rider-sel");
+  if(!sel)return;
+  const activos=riders.filter(r=>r.activo);
+  const yo=getDevRider();
+  sel.innerHTML=activos.length
+    ?activos.map(r=>`<option value="${r.id}" ${yo&&r.id===yo.id?"selected":""}>${(r.vehiculo||"🛵").split(" ")[0]} ${r.nombre}</option>`).join("")
+    :`<option value="">Sin riders activos</option>`;
+}
+
+function riderNombre(id){
+  const r=riders.find(x=>x.id===id);
+  return r?`${(r.vehiculo||"🛵").split(" ")[0]} ${r.nombre}`:"—";
 }
 
 function riderEntregasCount(riderId){
@@ -6060,8 +6169,8 @@ function riderEntregasCount(riderId){
 
 function renderEntregas(){
   const p=document.getElementById("panel-entregas");
+  destroyRutaMaps();
   const yo=getDevRider();
-  const activos=riders.filter(r=>r.activo);
   if(!yo){
     p.innerHTML=`<div class="pedido-empty"><strong>No hay riders activos</strong>El admin puede dar de alta riders en Plataforma → 🛵 Riders.</div>`;
     return;
@@ -6069,47 +6178,57 @@ function renderEntregas(){
   const todos=allPedidosCrossTenant();
   const esDelivery=x=>x.p.tipoEntrega!=="pickup";
   const restAcepta=x=>getEntregaConfig(x.tenant).riderPlataforma!==false;
-  const disponibles=todos.filter(x=>esDelivery(x)&&restAcepta(x)&&x.p.estado==="preparando"&&!x.p.riderId);
+  const misAsignadas=todos.filter(x=>x.p.estado==="preparando"&&x.p.riderId===yo.id);
   const misCurso=todos.filter(x=>x.p.estado==="en_camino"&&x.p.riderId===yo.id);
+  const sinAsignar=todos.filter(x=>esDelivery(x)&&restAcepta(x)&&x.p.estado==="preparando"&&!x.p.riderId);
   const misEntregadas=riderEntregasCount(yo.id);
-  const card=(x,accion)=>{
+  const card=(x,accion,badge)=>{
     const dir=(x.p.cliente&&x.p.cliente.direccion)||"Sin dirección";
+    const pid=x.p.id;
     return`<div class="entrega-card">
       <div class="entrega-top">
         <div class="entrega-rest">${x.tenant.icono||"🍽"} ${x.tenant.nombre}</div>
-        <span class="pedido-status ${x.p.estado}">${x.p.estado==="en_camino"?"En camino":"Listo p/ retirar"}</span>
+        ${badge}
         <div class="entrega-total">${fmt(x.p.total)}</div>
       </div>
       <div class="entrega-ruta">
-        <div class="er-row"><span>📦</span><div>#${x.p.id} · ${x.p.items.length} producto${x.p.items.length===1?"":"s"}</div></div>
+        <div class="er-row"><span>📦</span><div>#${pid} · ${x.p.items.length} producto${x.p.items.length===1?"":"s"}</div></div>
         <div class="er-row"><span>🏪</span><div>Retirar: ${x.tenant.direccion||"-"}</div></div>
         <div class="er-row"><span>🏠</span><div>Entregar: ${dir}${x.p.cliente&&x.p.cliente.telefono?" · 📞 "+x.p.cliente.telefono:""}</div></div>
       </div>
-      <div class="entrega-acciones">${accion}</div>
+      <div class="ruta-map-wrap" id="ruta-${pid}"></div>
+      <div class="entrega-acciones">
+        <button class="edit-btn" id="rbtn-${pid}" onclick="toggleRutaMapa('${x.tenant.id}','${pid}')">🗺 Ver mapa</button>
+        ${accion}
+      </div>
     </div>`;
   };
+  const bAsig=`<span class="pedido-status preparando">📋 Asignada</span>`;
+  const bCurso=`<span class="pedido-status en_camino">🛵 En camino</span>`;
+  const bLibre=`<span class="pedido-status pendiente">⏳ Sin asignar</span>`;
   p.innerHTML=`
     <div class="rider-head">
-      <select onchange="setDevRider(this.value)">
-        ${activos.map(r=>`<option value="${r.id}" ${r.id===yo.id?"selected":""}>${r.vehiculo.split(" ")[0]} ${r.nombre}</option>`).join("")}
-      </select>
+      <div class="rh-nombre">${(yo.vehiculo||"🛵").split(" ")[0]} <strong>${yo.nombre}</strong></div>
       <label class="entrega-toggle" style="background:transparent;border:none;padding:0">
         <span style="font-size:11px;font-weight:700;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.04em">${yo.enLinea?"En línea":"Fuera de línea"}</span>
         <input type="checkbox" ${yo.enLinea?"checked":""} onchange="riderToggleLinea('${yo.id}',this.checked)">
         <span class="et-switch"></span>
       </label>
       <div class="rh-stats">
+        <span>Asignadas <strong>${misAsignadas.length}</strong></span>
         <span>En curso <strong>${misCurso.length}</strong></span>
         <span>Entregadas <strong>${misEntregadas}</strong></span>
         <span>Turno <strong>${yo.turno||"-"}</strong></span>
       </div>
     </div>
-    ${!yo.enLinea?`<div class="store-blocked-banner"><strong>🌙 Estás fuera de línea</strong><span>Ponete en línea para tomar pedidos.</span></div>`:""}
-    <div class="rider-section-title">Mis entregas en curso (${misCurso.length})</div>
-    ${misCurso.length?misCurso.map(x=>card(x,`<button class="primary" onclick="riderEntregar('${x.tenant.id}','${x.p.id}')">✓ Entregado</button>`)).join(""):`<div class="pedido-empty"><strong>Nada en curso</strong>Tomá un pedido disponible para arrancar.</div>`}
-    <div class="rider-section-title">Disponibles para tomar (${disponibles.length})</div>
-    ${disponibles.length?disponibles.map(x=>card(x,yo.enLinea?`<button class="primary" onclick="riderTomar('${x.tenant.id}','${x.p.id}')">Tomar pedido</button>`:`<button disabled style="opacity:.5">Fuera de línea</button>`)).join(""):`<div class="pedido-empty"><strong>Sin pedidos disponibles</strong>Cuando un restaurante marque un pedido delivery como "Preparando", aparece acá.</div>`}
-    <p class="foot">Solo se listan pedidos delivery de restaurantes que usan la flota IZIFUD. Los locales con delivery propio gestionan sus envíos desde su panel.</p>`;
+    ${!yo.enLinea?`<div class="store-blocked-banner"><strong>🌙 Estás fuera de línea</strong><span>Los nuevos pedidos no se te asignan hasta que te pongas en línea.</span></div>`:""}
+    <div class="rider-section-title">📋 Asignadas a mí (${misAsignadas.length})</div>
+    ${misAsignadas.length?misAsignadas.map(x=>card(x,`<button class="primary" onclick="riderIniciar('${x.tenant.id}','${x.p.id}')">▶ Iniciar entrega</button>`,bAsig)).join(""):`<div class="pedido-empty"><strong>Nada asignado</strong>Cuando un local marque "Preparando" un pedido delivery, se te asigna automáticamente si estás en línea.</div>`}
+    <div class="rider-section-title">🛵 En camino (${misCurso.length})</div>
+    ${misCurso.length?misCurso.map(x=>card(x,`<button class="primary" onclick="riderEntregar('${x.tenant.id}','${x.p.id}')">✓ Entregado</button>`,bCurso)).join(""):`<div class="pedido-empty"><strong>Nada en camino</strong>Iniciá una entrega asignada para arrancar.</div>`}
+    <div class="rider-section-title">⏳ Sin asignar (${sinAsignar.length})</div>
+    ${sinAsignar.length?sinAsignar.map(x=>card(x,yo.enLinea?`<button class="primary" onclick="riderTomar('${x.tenant.id}','${x.p.id}')">Tomar pedido</button>`:`<button disabled style="opacity:.5">Fuera de línea</button>`,bLibre)).join(""):`<div class="pedido-empty"><strong>Cola vacía</strong>Acá caen los pedidos que se prepararon sin ningún rider en línea.</div>`}
+    <p class="foot">Los pedidos se asignan automáticamente al rider en línea con menos carga. Solo se listan pedidos delivery de locales que usan la flota IZIFUD; los que tienen delivery propio gestionan sus envíos desde su panel.</p>`;
 }
 
 function riderToggleLinea(id,v){
@@ -6126,36 +6245,111 @@ function riderTomar(tenantId,pedidoId){
   refreshPedidosSocioSiVisible();
 }
 
+function riderIniciar(tenantId,pedidoId){
+  mutarPedidoCrossTenant(tenantId,pedidoId,p=>{p.estado="en_camino";});
+  renderEntregas();
+  refreshPedidosSocioSiVisible();
+}
+
 function riderEntregar(tenantId,pedidoId){
   mutarPedidoCrossTenant(tenantId,pedidoId,p=>{p.estado="entregado";});
   renderEntregas();
   refreshPedidosSocioSiVisible();
 }
 
+// ── Mapa de ruta del rider (retiro 🏪 → entrega 🏠) ──
+let rutaMaps={};
+function destroyRutaMaps(){
+  Object.values(rutaMaps).forEach(m=>{try{m.remove();}catch(e){}});
+  rutaMaps={};
+}
+
+function toggleRutaMapa(tenantId,pedidoId){
+  const wrap=document.getElementById("ruta-"+pedidoId);
+  const btn=document.getElementById("rbtn-"+pedidoId);
+  if(!wrap)return;
+  const abierto=wrap.classList.toggle("show");
+  if(btn)btn.textContent=abierto?"Ocultar mapa":"🗺 Ver mapa";
+  if(!abierto){
+    if(rutaMaps[pedidoId]){try{rutaMaps[pedidoId].remove();}catch(e){}delete rutaMaps[pedidoId];}
+    wrap.innerHTML="";
+    return;
+  }
+  setTimeout(()=>buildRutaMapa(tenantId,pedidoId),50);
+}
+
+async function buildRutaMapa(tenantId,pedidoId){
+  if(typeof L==="undefined")return;
+  const wrap=document.getElementById("ruta-"+pedidoId);
+  const t=tenants[tenantId];
+  const x=allPedidosCrossTenant().find(e=>e.p.id===pedidoId);
+  if(!wrap||!t||!x||rutaMaps[pedidoId])return;
+  const centro=[t.lat!=null?t.lat:DEFAULT_CENTER.lat,t.lng!=null?t.lng:DEFAULT_CENTER.lng];
+  const m=L.map(wrap,{zoomControl:false,attributionControl:false,scrollWheelZoom:false}).setView(centro,13);
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19}).addTo(m);
+  rutaMaps[pedidoId]=m;
+  const pin=emoji=>L.divIcon({className:"ruta-pin",html:`<div class="ruta-pin-in">${emoji}</div>`,iconSize:[30,30],iconAnchor:[15,15]});
+  const pts=[];
+  if(t.lat!=null&&t.lng!=null){
+    L.marker([t.lat,t.lng],{icon:pin("🏪")}).addTo(m).bindPopup(`<b>${t.icono||"🍽"} ${t.nombre}</b><br>${t.direccion||""}`);
+    pts.push([t.lat,t.lng]);
+  }
+  let cli=x.p.cliente&&x.p.cliente.coords;
+  const dirCli=x.p.cliente&&x.p.cliente.direccion;
+  if(!cli&&dirCli){
+    // Pedidos sin pin del cliente: geocodificar la dirección y guardarla en el pedido
+    try{
+      const r=await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(dirCli+", Buenos Aires, Argentina")}&limit=1`);
+      const js=await r.json();
+      if(js&&js[0]){
+        cli={lat:parseFloat(js[0].lat),lng:parseFloat(js[0].lon)};
+        mutarPedidoCrossTenant(tenantId,pedidoId,pp=>{if(pp.cliente)pp.cliente.coords=cli;});
+      }
+    }catch(e){}
+  }
+  if(!rutaMaps[pedidoId])return;// se cerró mientras geocodificaba
+  if(cli&&cli.lat!=null){
+    L.marker([cli.lat,cli.lng],{icon:pin("🏠")}).addTo(m).bindPopup(`<b>Cliente</b><br>${dirCli||""}`);
+    pts.push([cli.lat,cli.lng]);
+    if(pts.length===2)L.polyline(pts,{color:"#18181b",weight:2,dashArray:"6 6",opacity:.7}).addTo(m);
+  }
+  if(pts.length>1)m.fitBounds(L.latLngBounds(pts).pad(0.3));
+  else if(pts.length===1)m.setView(pts[0],14);
+  setTimeout(()=>{try{m.invalidateSize();}catch(e){}},80);
+}
+
 function refreshPedidosSocioSiVisible(){
   const pp=document.getElementById("panel-pedidos");
   if(pp&&pp.dataset.init){renderPedidosSummary();renderPedidosList();}
+  refreshMisPedidosSiVisible();
 }
 
 // ─── RIDERS (gestión desde admin) ─────────────────────────
+let editingRiderId=null;
+
 function renderRiders(){
   const p=document.getElementById("panel-riders");
+  const ed=editingRiderId?riders.find(r=>r.id===editingRiderId):null;
+  const esc=s=>String(s||"").replace(/"/g,"&quot;");
   p.innerHTML=`
     <div class="rec-header">
       <h2>🛵 Riders de la flota</h2>
       <p>Alta manual y gestión de los repartidores de IZIFUD. Los restaurantes con delivery propio no usan esta flota.</p>
     </div>
-    <div class="tenant-form" style="margin-bottom:14px">
-      <h3>+ Nuevo rider</h3>
+    <div class="tenant-form" style="margin-bottom:14px${ed?";border-color:var(--brand)":""}">
+      <h3>${ed?`✎ Editando: ${ed.nombre}`:"+ Nuevo rider"}</h3>
       <div class="form-grid">
-        <div class="form-field" style="grid-column:span 2"><label>Nombre</label><input type="text" id="rid-nombre" placeholder="Nombre y apellido"></div>
-        <div class="form-field"><label>Teléfono</label><input type="text" id="rid-tel" placeholder="+54 11 ..."></div>
-        <div class="form-field"><label>Vehículo</label><select id="rid-veh"><option>🛵 Moto</option><option>🚲 Bici</option><option>🚗 Auto</option></select></div>
-        <div class="form-field"><label>Turno</label><input type="text" id="rid-turno" placeholder="Lun-Vie 19-24h"></div>
+        <div class="form-field" style="grid-column:span 2"><label>Nombre</label><input type="text" id="rid-nombre" placeholder="Nombre y apellido" value="${ed?esc(ed.nombre):""}"></div>
+        <div class="form-field"><label>Teléfono</label><input type="text" id="rid-tel" placeholder="+54 11 ..." value="${ed?esc(ed.tel):""}"></div>
+        <div class="form-field"><label>Vehículo</label><select id="rid-veh">${["🛵 Moto","🚲 Bici","🚗 Auto"].map(v=>`<option ${ed&&ed.vehiculo===v?"selected":""}>${v}</option>`).join("")}</select></div>
+        <div class="form-field"><label>Turno</label><input type="text" id="rid-turno" placeholder="Lun-Vie 19-24h" value="${ed?esc(ed.turno):""}"></div>
       </div>
-      <div class="form-actions"><button class="form-btn primary" onclick="crearRider()">Agregar rider</button></div>
+      <div class="form-actions">
+        <button class="form-btn primary" onclick="guardarRider()">${ed?"Guardar cambios":"Agregar rider"}</button>
+        ${ed?`<button class="form-btn" onclick="cancelarEdicionRider()">Cancelar</button>`:""}
+      </div>
     </div>
-    <div class="ow"><table style="min-width:720px">
+    <div class="ow"><table style="min-width:760px">
       <thead><tr><th>Rider</th><th>Vehículo</th><th>Turno</th><th>Estado</th><th>En línea</th><th>Entregas</th><th></th></tr></thead>
       <tbody>
         ${riders.map(r=>`<tr style="${r.activo?"":"opacity:.55"}">
@@ -6165,31 +6359,51 @@ function renderRiders(){
           <td><button class="edit-btn" onclick="riderToggleActivo('${r.id}')">${r.activo?"Activo · desactivar":"Inactivo · activar"}</button></td>
           <td><span class="badge ${r.enLinea?"ok":"neu"}">${r.enLinea?"● En línea":"○ Offline"}</span></td>
           <td><strong>${riderEntregasCount(r.id)}</strong></td>
-          <td><button class="edit-btn" style="color:var(--danger)" onclick="eliminarRider('${r.id}')">Eliminar</button></td>
+          <td style="white-space:nowrap">
+            <button class="edit-btn" onclick="editarRider('${r.id}')">✎ Editar</button>
+            <button class="edit-btn" style="color:var(--danger)" onclick="eliminarRider('${r.id}')">Eliminar</button>
+          </td>
         </tr>`).join("")}
       </tbody>
     </table></div>
-    <p class="foot">Los horarios son turnos declarados (texto libre por ahora). Más adelante: agenda de turnos por zona y asignación automática de pedidos.</p>`;
+    <p class="foot">Los horarios son turnos declarados (texto libre por ahora). Los pedidos se asignan automáticamente al rider en línea con menos carga; el resto queda en la cola "Sin asignar".</p>`;
 }
 
-function crearRider(){
+function editarRider(id){
+  editingRiderId=id;
+  renderRiders();
+  document.getElementById("rid-nombre")?.focus();
+}
+
+function cancelarEdicionRider(){
+  editingRiderId=null;
+  renderRiders();
+}
+
+function guardarRider(){
   const nombre=(document.getElementById("rid-nombre")?.value||"").trim();
   if(!nombre){alert("El nombre es obligatorio");return;}
-  riders.push({
-    id:"r_"+Date.now().toString(36),
+  const datos={
     nombre,
     tel:(document.getElementById("rid-tel")?.value||"").trim(),
     vehiculo:document.getElementById("rid-veh")?.value||"🛵 Moto",
-    turno:(document.getElementById("rid-turno")?.value||"").trim(),
-    activo:true,enLinea:false
-  });
+    turno:(document.getElementById("rid-turno")?.value||"").trim()
+  };
+  if(editingRiderId){
+    const r=riders.find(x=>x.id===editingRiderId);
+    if(r)Object.assign(r,datos);
+    editingRiderId=null;
+  }else{
+    riders.push({id:"r_"+Date.now().toString(36),...datos,activo:true,enLinea:false});
+  }
   saveToLocalStorage();
   renderRiders();
+  updateDevRiderSelect();
 }
 
 function riderToggleActivo(id){
   const r=riders.find(x=>x.id===id);
-  if(r){r.activo=!r.activo;saveToLocalStorage();renderRiders();}
+  if(r){r.activo=!r.activo;saveToLocalStorage();renderRiders();updateDevRiderSelect();}
 }
 
 function eliminarRider(id){
@@ -6197,8 +6411,151 @@ function eliminarRider(id){
   if(!r)return;
   if(!confirm(`¿Eliminar al rider "${r.nombre}"?`))return;
   riders=riders.filter(x=>x.id!==id);
+  if(editingRiderId===id)editingRiderId=null;
   saveToLocalStorage();
   renderRiders();
+  updateDevRiderSelect();
+}
+
+// ─── MIS PEDIDOS (cliente) + PEDIDO EXITOSO ─────────────────
+// Sin auth: los pedidos del cliente se recuerdan por dispositivo con
+// referencias {tenant, id} en localStorage (patrón guest-order-tracking).
+let misPedidosRefs=[];
+try{misPedidosRefs=JSON.parse(localStorage.getItem("izifud_mis_pedidos")||"[]")||[];}catch(e){misPedidosRefs=[];}
+
+function registrarMiPedido(tenantId,pedidoId){
+  misPedidosRefs.unshift({t:tenantId,id:pedidoId});
+  misPedidosRefs=misPedidosRefs.slice(0,30);
+  localStorage.setItem("izifud_mis_pedidos",JSON.stringify(misPedidosRefs));
+  updateMisPedidosBadge();
+}
+
+function misPedidos(){
+  const todos=allPedidosCrossTenant();
+  return misPedidosRefs
+    .map(ref=>todos.find(x=>x.tenant.id===ref.t&&x.p.id===ref.id))
+    .filter(Boolean);
+}
+
+function updateMisPedidosBadge(){
+  const b=document.getElementById("mp-badge");
+  if(!b)return;
+  const act=misPedidos().filter(x=>["pendiente","preparando","en_camino"].includes(x.p.estado)).length;
+  b.textContent=act>9?"9+":String(act||"");
+  b.classList.toggle("show",act>0);
+}
+
+function mpStepper(p){
+  const pickup=p.tipoEntrega==="pickup";
+  const steps=pickup
+    ?[["pendiente","Recibido"],["preparando","En preparación"],["entregado","Entregado"]]
+    :[["pendiente","Recibido"],["preparando","En preparación"],["en_camino","En camino"],["entregado","Entregado"]];
+  const idx=steps.findIndex(s=>s[0]===p.estado);
+  return`<div class="mp-steps">${steps.map((s,i)=>{
+    const done=i<idx||p.estado==="entregado";
+    const cls=done?"done":(i===idx?"now":"");
+    return`<div class="mp-step ${cls}"><div class="mp-dot">${done?"✓":""}</div><div class="mp-lbl">${s[1]}</div></div>`;
+  }).join("")}</div>`;
+}
+
+function renderMisPedidos(){
+  const el=document.getElementById("panel-mis-pedidos");
+  if(!el)return;
+  const lista=misPedidos();
+  updateMisPedidosBadge();
+  const head=`
+    <div class="mp-head">
+      <button class="mp-volver" onclick="goToTab('home')">← Restaurantes</button>
+      <h2>📦 Mis pedidos</h2>
+    </div>`;
+  if(!lista.length){
+    el.innerHTML=`${head}<div class="pedido-empty"><strong>Todavía no hiciste pedidos</strong>Elegí un restaurante, armá tu pedido y acá vas a poder seguir el estado.</div>`;
+    return;
+  }
+  const enCurso=lista.filter(x=>["pendiente","preparando","en_camino"].includes(x.p.estado));
+  const pasados=lista.filter(x=>!["pendiente","preparando","en_camino"].includes(x.p.estado));
+  const fmtFecha=iso=>{
+    const f=new Date(iso);
+    return f.toLocaleDateString("es-AR",{day:"2-digit",month:"short"})+" "+f.toLocaleTimeString("es-AR",{hour:"2-digit",minute:"2-digit"});
+  };
+  const resumenItems=p=>{
+    const vis=p.items.slice(0,3).map(i=>`${i.emoji} ${i.nombre} ×${i.qty}`).join(" · ");
+    const resto=p.items.length-3;
+    return vis+(resto>0?` · +${resto} más`:"");
+  };
+  const cardActivo=x=>{
+    const p=x.p,t=x.tenant;
+    const rider=p.riderId?riders.find(r=>r.id===p.riderId):null;
+    const pickup=p.tipoEntrega==="pickup";
+    const msg={
+      pendiente:`${t.nombre} está confirmando tu pedido.`,
+      preparando:pickup
+        ?"Tu pedido se está preparando. Cuando esté listo, pasá a retirarlo."
+        :(rider?`Tu pedido se está preparando. Lo va a llevar ${rider.nombre}.`:"Tu pedido se está preparando."),
+      en_camino:rider
+        ?`${(rider.vehiculo||"🛵").split(" ")[0]} ${rider.nombre} está yendo con tu pedido.`
+        :"Tu pedido está en camino.",
+    }[p.estado]||"";
+    return`<div class="mp-card">
+      <div class="mp-card-top">
+        <div class="mp-rest">${t.icono||"🍽"} <strong>${t.nombre}</strong></div>
+        <span class="mp-meta">#${p.id} · ${fmtFecha(p.fecha)}</span>
+        <span class="mp-total">${fmt(p.total)}</span>
+      </div>
+      ${mpStepper(p)}
+      ${msg?`<div class="mp-msg">${msg}</div>`:""}
+      <div class="mp-items">${resumenItems(p)}</div>
+      <div class="mp-entrega">${pickup?`🏪 Retiro en ${t.direccion||"el local"}`:`🛵 Delivery a ${(p.cliente&&p.cliente.direccion)||"tu dirección"}`}</div>
+    </div>`;
+  };
+  const cardPasado=x=>{
+    const p=x.p,t=x.tenant;
+    const lbl={entregado:"Entregado",cancelado:"Cancelado"}[p.estado]||p.estado;
+    return`<div class="mp-card mp-past">
+      <div class="mp-card-top">
+        <div class="mp-rest">${t.icono||"🍽"} <strong>${t.nombre}</strong></div>
+        <span class="mp-meta">${fmtFecha(p.fecha)} · ${p.items.length} ítem${p.items.length===1?"":"s"}</span>
+        <span class="pedido-status ${p.estado}">${lbl}</span>
+        <span class="mp-total">${fmt(p.total)}</span>
+      </div>
+    </div>`;
+  };
+  el.innerHTML=`${head}
+    ${enCurso.length?`<div class="rider-section-title">En curso (${enCurso.length})</div>${enCurso.map(cardActivo).join("")}`:""}
+    ${pasados.length?`<div class="rider-section-title">Historial (${pasados.length})</div>${pasados.map(cardPasado).join("")}`:""}
+    <p class="foot">El estado se actualiza solo a medida que el local y el rider avanzan. Más adelante: mapa con la ubicación del rider en vivo.</p>`;
+}
+
+function refreshMisPedidosSiVisible(){
+  updateMisPedidosBadge();
+  const el=document.getElementById("panel-mis-pedidos");
+  if(el&&el.classList.contains("on"))renderMisPedidos();
+}
+
+function openExito(pedido){
+  const t=tenants[currentTenantId];
+  const sub=document.getElementById("exito-sub");
+  if(sub)sub.textContent=pedido.tipoEntrega==="pickup"
+    ?`${t?t.nombre:"El local"} ya recibió tu pedido. Te avisamos cuando esté listo para retirar.`
+    :`${t?t.nombre:"El local"} ya recibió tu pedido y lo está confirmando.`;
+  const datos=document.getElementById("exito-datos");
+  if(datos)datos.innerHTML=`
+    <div class="ed-row"><span>Pedido</span><strong>#${pedido.id}</strong></div>
+    <div class="ed-row"><span>Total</span><strong>${fmt(pedido.total)}</strong></div>
+    <div class="ed-row"><span>Entrega</span><strong>${pedido.tipoEntrega==="pickup"?"🏪 Retiro en el local":"🛵 Delivery"}</strong></div>
+    <div class="ed-row"><span>Pago</span><strong>${FORMA_PAGO_LABEL[pedido.cliente.formaDePago]||pedido.cliente.formaDePago||"—"}</strong></div>`;
+  document.getElementById("exito-overlay").classList.add("open");
+  document.getElementById("exito-modal").classList.add("open");
+}
+
+function closeExito(){
+  document.getElementById("exito-overlay").classList.remove("open");
+  document.getElementById("exito-modal").classList.remove("open");
+}
+
+function verMiPedido(){
+  closeExito();
+  goToTab("mis-pedidos");
 }
 
 const renderMap={
@@ -6209,7 +6566,7 @@ const renderMap={
   tienda:renderTienda,recetas:renderRecetas,ubicacion:renderUbicacion,
   stock:renderStock,dashboard:renderDashboard,
   home:renderHome,socios:renderSocios,"plataforma-dash":renderPlataformaDash,
-  entregas:renderEntregas,riders:renderRiders
+  entregas:renderEntregas,riders:renderRiders,"mis-pedidos":renderMisPedidos
 };
 
 function renderTab(id){
@@ -6396,7 +6753,7 @@ function updateSiteFooter(){
         <h4>Tienda</h4>
         <a class="fl" onclick="goToTab('tienda')">Carta</a>
         <a class="fl" onclick="goToTab('ubicacion')">Locales</a>
-        <a class="fl" onclick="goToTab('pedidos')">Mis pedidos</a>
+        <a class="fl" onclick="goToTab('mis-pedidos')">Mis pedidos</a>
       </div>
       <div class="footer-col">
         <h4>Ayuda</h4>
