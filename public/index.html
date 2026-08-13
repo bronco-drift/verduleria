@@ -272,6 +272,15 @@ body.vista-final .mis-pedidos-trigger{display:flex}
 /* Perfil de usuario (topbar 👤, solo vista cliente) */
 .perfil-trigger{display:none}
 body.vista-final .perfil-trigger{display:flex}
+/* Selector de país (topbar, solo vista cliente) */
+.pais-trigger{display:none}
+body.vista-final .pais-trigger{display:flex}
+.pais-opt{display:flex;align-items:center;gap:12px;width:100%;padding:12px 14px;border:1px solid var(--border-strong);border-radius:11px;background:var(--surface);cursor:pointer;margin-bottom:8px;text-align:left}
+.pais-opt.on{border-color:var(--brand);box-shadow:0 0 0 1px var(--brand)}
+.pais-opt .po-flag{font-size:26px}
+.pais-opt .po-nombre{font-size:14px;font-weight:700;color:var(--ink)}
+.pais-opt .po-sub{display:block;font-size:11.5px;font-weight:400;color:var(--ink-faint)}
+.pais-opt .po-check{margin-left:auto;font-weight:800;color:var(--brand)}
 .perfil-sec{margin-bottom:18px}
 .perfil-sec h3{font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-faint);margin:0 0 8px}
 .perfil-sec .form-field{margin-bottom:8px}
@@ -1155,6 +1164,7 @@ select.cell-sel{height:26px;padding:0 6px;font-size:11px;border:1px solid var(--
     <p class="subtitle">Pedí online en tus restaurantes favoritos</p>
   </div>
   <div class="topbar-actions">
+    <button class="info-trigger pais-trigger" id="btn-pais" onclick="openPais()" aria-label="Elegir país"><span class="ta-icon" id="pais-flag">🇦🇷</span><span class="ta-label" id="pais-label">Argentina</span></button>
     <button class="info-trigger mis-pedidos-trigger" id="btn-mis-pedidos" onclick="goToTab('mis-pedidos')" aria-label="Mis pedidos"><span class="ta-icon">📦</span><span class="ta-label">Mis pedidos</span><span class="mp-badge" id="mp-badge"></span></button>
     <button class="info-trigger perfil-trigger" onclick="openPerfil()" aria-label="Mi cuenta"><span class="ta-icon">👤</span><span class="ta-label">Mi cuenta</span></button>
   </div>
@@ -1196,6 +1206,14 @@ select.cell-sel{height:26px;padding:0 6px;font-size:11px;border:1px solid var(--
     <button onclick="closeProductEditor()">Cancelar</button>
     <button class="primary" onclick="saveProductEdit()">Guardar cambios</button>
   </div>
+</div>
+
+<!-- SELECTOR DE PAÍS (capa arriba de los locales) -->
+<div class="exito-overlay" id="pais-overlay" onclick="closePais()"></div>
+<div class="exito-modal" id="pais-modal" role="dialog" aria-modal="true">
+  <h2 style="font-size:17px;margin-bottom:2px">🌎 ¿Dónde estás?</h2>
+  <p class="exito-sub" style="margin-bottom:12px">Los restaurantes y precios cambian según el país.</p>
+  <div id="pais-opts"></div>
 </div>
 
 <!-- PERFIL DE USUARIO (datos guardados + notificaciones) -->
@@ -1357,6 +1375,27 @@ const D=[
   {rest:"napoli",c:"Bebidas",n:"Agua con gas",u:"unidad",p:[],kg:null,costo:900,pVenta:2500},
   {rest:"napoli",c:"Postres",n:"Tiramisú",u:"porción",p:[],kg:null,costo:3200,pVenta:7200},
   {rest:"napoli",c:"Postres",n:"Cannoli x3",u:"unidad",p:[],kg:null,costo:2800,pVenta:6500},
+  // ── VENEZUELA · San Cristóbal (precios en USD) ──
+  {rest:"arepas",c:"Platos",n:"Arepa reina pepiada",u:"unidad",p:[],kg:null,costo:1.6,pVenta:3.5},
+  {rest:"arepas",c:"Platos",n:"Arepa pelúa",u:"unidad",p:[],kg:null,costo:1.4,pVenta:3},
+  {rest:"arepas",c:"Platos",n:"Arepa dominó",u:"unidad",p:[],kg:null,costo:1.2,pVenta:2.8},
+  {rest:"arepas",c:"Platos",n:"Pabellón criollo",u:"plato",p:[],kg:null,costo:3.2,pVenta:6.5},
+  {rest:"arepas",c:"Platos",n:"Empanadas andinas x3",u:"unidad",p:[],kg:null,costo:1.1,pVenta:2.5},
+  {rest:"arepas",c:"Combos",n:"Desayuno andino completo",u:"combo",p:[],kg:null,costo:2.6,pVenta:5.5},
+  {rest:"arepas",c:"Combos",n:"2 arepas + jugo",u:"combo",p:[],kg:null,costo:2.9,pVenta:6},
+  {rest:"arepas",c:"Bebidas",n:"Jugo natural",u:"vaso",p:[],kg:null,costo:0.7,pVenta:1.8},
+  {rest:"arepas",c:"Bebidas",n:"Malta",u:"unidad",p:[],kg:null,costo:0.6,pVenta:1.5},
+  {rest:"arepas",c:"Bebidas",n:"Café marrón",u:"taza",p:[],kg:null,costo:0.35,pVenta:1},
+  {rest:"arepas",c:"Postres",n:"Quesillo",u:"porción",p:[],kg:null,costo:0.9,pVenta:2},
+  {rest:"arepas",c:"Postres",n:"Torta tres leches",u:"porción",p:[],kg:null,costo:1.1,pVenta:2.5},
+  {rest:"marquesina",c:"Platos",n:"Pizza margarita",u:"unidad",p:[],kg:null,costo:3.4,pVenta:7},
+  {rest:"marquesina",c:"Platos",n:"Pizza pepperoni",u:"unidad",p:[],kg:null,costo:4.2,pVenta:8.5},
+  {rest:"marquesina",c:"Platos",n:"Pizza tachirense",u:"unidad",p:[],kg:null,costo:4.5,pVenta:9},
+  {rest:"marquesina",c:"Platos",n:"Lasaña de carne",u:"porción",p:[],kg:null,costo:3.1,pVenta:6.5},
+  {rest:"marquesina",c:"Combos",n:"Pizza + refresco 2L",u:"combo",p:[],kg:null,costo:5.2,pVenta:10.5},
+  {rest:"marquesina",c:"Bebidas",n:"Refresco 2L",u:"unidad",p:[],kg:null,costo:1.1,pVenta:2.2},
+  {rest:"marquesina",c:"Bebidas",n:"Cerveza Polar",u:"unidad",p:[],kg:null,costo:0.7,pVenta:1.5},
+  {rest:"marquesina",c:"Postres",n:"Brownie con helado",u:"porción",p:[],kg:null,costo:1,pVenta:2.2},
 ];
 
 // La carta del restaurante activo (los items sin rest son compartidos)
@@ -1449,9 +1488,10 @@ let pedidosOpen = new Set();
 let riders=[];
 function initRiders(){
   riders=[
-    {id:"r1",nombre:"Lucas Benítez",tel:"+54 11 6111-2233",vehiculo:"🛵 Moto",turno:"Lun-Vie 19-24h",activo:true,enLinea:true},
-    {id:"r2",nombre:"Camila Torres",tel:"+54 11 6222-3344",vehiculo:"🚲 Bici",turno:"Sáb-Dom 12-24h",activo:true,enLinea:true},
-    {id:"r3",nombre:"Nico Paredes",tel:"+54 11 6333-4455",vehiculo:"🛵 Moto",turno:"Vie-Dom 20-01h",activo:false,enLinea:false},
+    {id:"r1",nombre:"Lucas Benítez",tel:"+54 11 6111-2233",vehiculo:"🛵 Moto",turno:"Lun-Vie 19-24h",activo:true,enLinea:true,pais:"AR"},
+    {id:"r2",nombre:"Camila Torres",tel:"+54 11 6222-3344",vehiculo:"🚲 Bici",turno:"Sáb-Dom 12-24h",activo:true,enLinea:true,pais:"AR"},
+    {id:"r3",nombre:"Nico Paredes",tel:"+54 11 6333-4455",vehiculo:"🛵 Moto",turno:"Vie-Dom 20-01h",activo:false,enLinea:false,pais:"AR"},
+    {id:"r4",nombre:"Jesús Contreras",tel:"+58 416 555-1122",vehiculo:"🛵 Moto",turno:"Lun-Sáb 11-22h",activo:true,enLinea:true,pais:"VE"},
   ];
 }
 
@@ -1587,7 +1627,33 @@ const FOTOS_HISTORICAS=new Set([
 ]);
 
 // ─── HELPERS ─────────────────────────────────────────────
-function fmt(v){return v!=null?"$"+Math.round(v).toLocaleString("es-AR"):null}
+// ── PAÍSES (capa arriba de los locales; cada tenant tiene pais + moneda) ──
+const PAISES={
+  AR:{flag:"🇦🇷",nombre:"Argentina",ciudad:"Buenos Aires",center:{lat:-34.6037,lng:-58.3816},zoom:12,moneda:"ARS",monedaLabel:"$ pesos"},
+  VE:{flag:"🇻🇪",nombre:"Venezuela",ciudad:"San Cristóbal",center:{lat:7.7669,lng:-72.2250},zoom:13,moneda:"USD",monedaLabel:"US$ dólares"}
+};
+let paisActivo=localStorage.getItem("izifud_pais")||"AR";
+if(!PAISES[paisActivo])paisActivo="AR";
+
+function monedaDe(t){return (t&&t.moneda)||"ARS";}
+
+// Sufijo de geocoding según el país del local (o el país activo si no hay local)
+function sufijoGeoPais(t){
+  const p=PAISES[(t&&t.pais)||paisActivo]||PAISES.AR;
+  return `${p.ciudad}, ${p.nombre}`;
+}
+
+// fmt: usa la moneda del tenant activo salvo que se pase una explícita
+// (vistas cross-tenant como rider/admin/mis pedidos pasan la del local del pedido)
+function fmt(v,moneda){
+  if(v==null)return null;
+  const m=moneda||monedaDe(typeof tenants!=="undefined"&&tenants[currentTenantId]);
+  if(m==="USD"){
+    const n=Math.round(v*100)/100;
+    return "US$ "+n.toLocaleString("en-US",{minimumFractionDigits:n%1?2:0,maximumFractionDigits:2});
+  }
+  return "$"+Math.round(v).toLocaleString("es-AR");
+}
 function pct(v){return v!=null?Math.round(v)+"%":null}
 function margen(costo,venta){
   if(!costo||!venta||venta<=0)return null;
@@ -2438,7 +2504,8 @@ function asignarRiderAuto(p){
   if(p.tipoEntrega==="pickup"||p.riderId)return;
   const t=tenants[currentTenantId];
   if(getEntregaConfig(t).riderPlataforma===false)return;
-  const enLinea=riders.filter(r=>r.activo&&r.enLinea);
+  // Solo riders del mismo país que el local
+  const enLinea=riders.filter(r=>r.activo&&r.enLinea&&(r.pais||"AR")===((t&&t.pais)||"AR"));
   if(!enLinea.length)return;
   const carga=id=>allPedidosCrossTenant().filter(x=>x.p.riderId===id&&(x.p.estado==="preparando"||x.p.estado==="en_camino")).length;
   const elegido=enLinea.slice().sort((a,b)=>carga(a.id)-carga(b.id))[0];
@@ -2473,9 +2540,18 @@ const EMOJIS={
   "Agua saborizada":"🥤","Mochi x2":"🍡","Helado de té verde":"🍨",
   // Napoli Pizza
   "Muzzarella":"🍕","Napolitana":"🍕","Fugazzeta rellena":"🍕","Calabresa":"🍕",
-  "Porción de fainá":"🫓","Pizza + fainá + bebida":"🍕","2 muzzarellas promo":"🍕",
+  "Porción de fainá":"🧆","Pizza + fainá + bebida":"🍕","2 muzzarellas promo":"🍕",
   "Cerveza artesanal pinta":"🍺","Coca-Cola 1.5L":"🥤","Agua con gas":"💧",
-  "Tiramisú":"🍰","Cannoli x3":"🥐"
+  "Tiramisú":"🍰","Cannoli x3":"🥐",
+  // Arepas El Táchira (VE)
+  "Arepa reina pepiada":"🥙","Arepa pelúa":"🥙","Arepa dominó":"🥙",
+  "Pabellón criollo":"🍛","Empanadas andinas x3":"🥟","Desayuno andino completo":"🍳",
+  "2 arepas + jugo":"🥙","Jugo natural":"🧃","Malta":"🍾","Café marrón":"☕",
+  "Quesillo":"🍮","Torta tres leches":"🍰",
+  // Pizza La Marquesina (VE)
+  "Pizza margarita":"🍕","Pizza pepperoni":"🍕","Pizza tachirense":"🍕",
+  "Lasaña de carne":"🍝","Pizza + refresco 2L":"🍕","Refresco 2L":"🥤",
+  "Cerveza Polar":"🍺","Brownie con helado":"🍨"
 };
 
 // Popularidad base (platos estrella por restaurante). Los no listados valen 0.
@@ -2489,7 +2565,13 @@ const POPULARIDAD_BASE={
   "Gyozas de cerdo x6":72,"Niguiri de salmón x5":65,"Cerveza Sapporo":52,
   // Napoli
   "Muzzarella":100,"Napolitana":88,"Fugazzeta rellena":78,"Pizza + fainá + bebida":74,
-  "Porción de fainá":68,"Calabresa":62,"Cerveza artesanal pinta":54,"Tiramisú":50
+  "Porción de fainá":68,"Calabresa":62,"Cerveza artesanal pinta":54,"Tiramisú":50,
+  // Arepas El Táchira (VE)
+  "Arepa reina pepiada":100,"Pabellón criollo":90,"Desayuno andino completo":82,
+  "Arepa pelúa":76,"Empanadas andinas x3":70,"Quesillo":60,"Café marrón":55,
+  // Pizza La Marquesina (VE)
+  "Pizza tachirense":100,"Pizza pepperoni":85,"Pizza + refresco 2L":78,
+  "Pizza margarita":72,"Lasaña de carne":64,"Cerveza Polar":52
 };
 
 function ventasPorProducto(){
@@ -2959,7 +3041,8 @@ async function geocodeCartAddress(){
   const q=(inp?.value||"").trim();
   if(!q){inp?.classList.add("invalid");return;}
   inp?.classList.remove("invalid");
-  const query=q.toLowerCase().includes("argentina")?q:`${q}, Buenos Aires, Argentina`;
+  const sufC=sufijoGeoPais(tenants[currentTenantId]);
+  const query=q.toLowerCase().includes(sufC.split(", ")[1].toLowerCase())?q:`${q}, ${sufC}`;
   try{
     const r=await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`);
     const data=await r.json();
@@ -3179,6 +3262,56 @@ function confirmarPedidoFinal(){
   openExito(pedido);
   const pp=document.getElementById("panel-pedidos");
   if(pp&&pp.dataset.init){renderPedidosSummary();renderPedidosList();}
+}
+
+// ── SELECTOR DE PAÍS ──
+function openPais(){
+  const opts=document.getElementById("pais-opts");
+  opts.innerHTML=Object.entries(PAISES).map(([k,p])=>`
+    <button class="pais-opt ${k===paisActivo?"on":""}" onclick="setPais('${k}')">
+      <span class="po-flag">${p.flag}</span>
+      <span><span class="po-nombre">${p.nombre}</span><span class="po-sub">${p.ciudad} · precios en ${p.monedaLabel}</span></span>
+      ${k===paisActivo?`<span class="po-check">✓</span>`:""}
+    </button>`).join("");
+  document.getElementById("pais-overlay").classList.add("open");
+  document.getElementById("pais-modal").classList.add("open");
+}
+
+function closePais(){
+  document.getElementById("pais-overlay").classList.remove("open");
+  document.getElementById("pais-modal").classList.remove("open");
+}
+
+function updatePaisTrigger(){
+  const p=PAISES[paisActivo];
+  const f=document.getElementById("pais-flag");
+  const l=document.getElementById("pais-label");
+  if(f)f.textContent=p.flag;
+  if(l)l.textContent=p.nombre;
+}
+
+function setPais(k){
+  if(!PAISES[k]){closePais();return;}
+  const cambio=k!==paisActivo;
+  paisActivo=k;
+  localStorage.setItem("izifud_pais",k);
+  updatePaisTrigger();
+  closePais();
+  if(!cambio)return;
+  // Si el local activo es de otro país, pasar al primero del país elegido
+  const t=tenants[currentTenantId];
+  if(((t&&t.pais)||"AR")!==k){
+    const lista=Object.values(tenants).filter(x=>(x.pais||"AR")===k);
+    const destino=lista.find(x=>x.activo!==false)||lista[0];
+    if(destino)switchTenant(destino.id);
+  }
+  // Mapa: recentrar en la ciudad del país
+  if(typeof mapInstance!=="undefined"&&mapInstance){
+    rebuildMapMarkers();
+    if(typeof renderTiendaList==="function")renderTiendaList();
+    mapInstance.setView([PAISES[k].center.lat,PAISES[k].center.lng],PAISES[k].zoom);
+  }
+  goToTab("home");
 }
 
 // ── PERFIL DE USUARIO (👤 Mi cuenta) ──
@@ -3712,7 +3845,7 @@ const COMPETENCIA=[];
 
 // TIENDAS combina mis verdulerías (tenants con coords) + competencia
 function getAllTiendas(){
-  const mias=Object.values(tenants||{}).filter(t=>t.lat!=null&&t.lng!=null).map(t=>({
+  const mias=Object.values(tenants||{}).filter(t=>t.lat!=null&&t.lng!=null&&(t.pais||"AR")===paisActivo).map(t=>({
     id:"tenant_"+t.id,
     nombre:t.nombre,
     color:"#2a5f7a",// petróleo: marca propia (no verde)
@@ -3856,7 +3989,8 @@ function initMap(){
     document.getElementById("map-container").innerHTML=`<div style="padding:2rem;text-align:center;color:var(--ink-soft)">No se pudo cargar el mapa. Verificá tu conexión a internet.</div>`;
     return;
   }
-  mapInstance=L.map("map-container").setView([DEFAULT_CENTER.lat,DEFAULT_CENTER.lng],11);
+  const centroPais=(PAISES[paisActivo]||PAISES.AR).center;
+  mapInstance=L.map("map-container").setView([centroPais.lat,centroPais.lng],(PAISES[paisActivo]||PAISES.AR).zoom||11);
   applyMapStyle(currentMapStyle);
   buildMapStylePicker();
 
@@ -4079,8 +4213,9 @@ async function buscarDireccion(){
   const input=document.getElementById("ubi-addr");
   const q=input.value.trim();
   if(!q){alert("Ingresá una dirección");return;}
-  // Append Argentina if not specified
-  const query=q.toLowerCase().includes("argentina")?q:`${q}, Buenos Aires, Argentina`;
+  // Completar con la ciudad/país activos si no se especificó
+  const sufU=sufijoGeoPais(null);
+  const query=q.toLowerCase().includes(sufU.split(", ")[1].toLowerCase())?q:`${q}, ${sufU}`;
   try{
     const r=await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`);
     const data=await r.json();
@@ -4849,6 +4984,7 @@ function initTenants(){
     style:{theme:"lumina",layout:"lista-compacta",mostrarFotos:false,mostrarCombos:false},
     entregaConfig:{delivery:true,pickup:true},
     activo:true,
+    pais:"AR",moneda:"ARS",
     data:snapshotCurrentState(),
   };
   tenants["sakura"]={
@@ -4860,6 +4996,7 @@ function initTenants(){
     style:{theme:"lumina",layout:"grilla",mostrarFotos:false,mostrarCombos:false},
     entregaConfig:{delivery:true,pickup:false},
     activo:true,
+    pais:"AR",moneda:"ARS",
     data:snapshotCurrentState(),
   };
   tenants["napoli"]={
@@ -4871,8 +5008,42 @@ function initTenants(){
     style:{theme:"lumina",layout:"menu-categoria",mostrarFotos:false,mostrarCombos:false},
     entregaConfig:{delivery:true,pickup:true},
     activo:true,
+    pais:"AR",moneda:"ARS",
     data:snapshotCurrentState(),
   };
+  // ── VENEZUELA · San Cristóbal (precios en USD) ──
+  tenants["arepas"]={
+    id:"arepas",nombre:"Arepas El Táchira",icono:"🥙",
+    zona:"Centro",direccion:"Carrera 9 con Calle 10, San Cristóbal",
+    tel:"+58 276 341-2200",diasEnvio:"Lun-Dom 7-22h",
+    lat:7.7669, lng:-72.2250,
+    creada:"2026-04-02",
+    style:{theme:"lumina",layout:"lista-compacta",mostrarFotos:false,mostrarCombos:false},
+    entregaConfig:{delivery:true,pickup:true},
+    activo:true,
+    pais:"VE",moneda:"USD",
+    data:snapshotCurrentState(),
+  };
+  tenants["marquesina"]={
+    id:"marquesina",nombre:"Pizza La Marquesina",icono:"🍕",
+    zona:"Barrio Obrero",direccion:"Calle 14 #7-25, Barrio Obrero, San Cristóbal",
+    tel:"+58 276 356-8811",diasEnvio:"Mar-Dom 17-23h",
+    lat:7.7590, lng:-72.2215,
+    creada:"2026-05-20",
+    style:{theme:"lumina",layout:"grilla",mostrarFotos:false,mostrarCombos:false},
+    entregaConfig:{delivery:true,pickup:true},
+    activo:true,
+    pais:"VE",moneda:"USD",
+    data:snapshotCurrentState(),
+  };
+  // Zonas de envío propias de San Cristóbal (en USD; el snapshot traía las de CABA)
+  const zonasSC=[
+    {nombre:"Centro",costoFijo:1,costoPorKm:0,freeMin:12,tiempoMin:20,tiempoMax:40},
+    {nombre:"Barrio Obrero / La Concordia",costoFijo:1.5,costoPorKm:0,freeMin:15,tiempoMin:30,tiempoMax:55},
+    {nombre:"Pueblo Nuevo / Pirineos",costoFijo:2,costoPorKm:0,freeMin:20,tiempoMin:40,tiempoMax:70},
+  ];
+  tenants["arepas"].data.zonas=JSON.parse(JSON.stringify(zonasSC));
+  tenants["marquesina"].data.zonas=JSON.parse(JSON.stringify(zonasSC));
 }
 
 // Pedidos de demo: en un dispositivo nuevo cada rol arranca con material para
@@ -4906,6 +5077,14 @@ function initDemoPedidos(){
   tenants["napoli"].data.pedidos=[
     mk({id:"ORD-DEMO-N1",haceMin:14,estado:"preparando",items:[["Muzzarella",1],["Porción de fainá",2],["Coca-Cola 1.5L",1]],dir:"Av. Rivadavia 4980, CABA",coords:{lat:-34.6172,lng:-58.4355},tel:"+54 11 6333-9006"}),
     mk({id:"ORD-DEMO-N2",haceMin:60*50,estado:"entregado",rider:"r2",items:[["2 muzzarellas promo",1],["Tiramisú",1]],dir:"Yerbal 2300, CABA",coords:{lat:-34.6205,lng:-58.4462},tel:"+54 11 6333-9007"}),
+  ];
+  // Venezuela · San Cristóbal
+  tenants["arepas"].data.pedidos=[
+    mk({id:"ORD-DEMO-V1",haceMin:11,estado:"pendiente",items:[["Arepa reina pepiada",2],["Jugo natural",2]],dir:"Calle 5 con Carrera 20, Pueblo Nuevo, San Cristóbal",coords:{lat:7.7735,lng:-72.2312},tel:"+58 414 700-1101"}),
+    mk({id:"ORD-DEMO-V2",haceMin:60*28,estado:"entregado",rider:"r4",items:[["Pabellón criollo",1],["Malta",1],["Quesillo",1]],dir:"Carrera 19, La Concordia, San Cristóbal",coords:{lat:7.7528,lng:-72.2286},tel:"+58 424 700-1102"}),
+  ];
+  tenants["marquesina"].data.pedidos=[
+    mk({id:"ORD-DEMO-V3",haceMin:19,estado:"preparando",rider:"r4",items:[["Pizza tachirense",1],["Refresco 2L",1]],dir:"Av. Carabobo, Barrio Obrero, San Cristóbal",coords:{lat:7.7612,lng:-72.2198},tel:"+58 416 700-1103"}),
   ];
 }
 
@@ -4973,6 +5152,7 @@ function applyDevRole(){
   document.querySelectorAll(".drb-btn").forEach(b=>b.classList.toggle("on",b.dataset.role===devRole));
   updateDevRiderSelect();
   if(typeof updateMisPedidosBadge==="function")updateMisPedidosBadge();
+  if(typeof updatePaisTrigger==="function")updatePaisTrigger();
   renderGroupPills();
   // Cada rol aterriza en SU grupo: cliente→home, socio→pedidos, admin→socios, rider→entregas
   const defaults={cliente:"publico",socio:"gestion",admin:"plataforma",rider:"reparto"};
@@ -5556,6 +5736,10 @@ function renderTenantForm(){
           <label>Zona</label>
           <input type="text" id="tf-zona" value="${e.zona||""}" placeholder="CABA / GBA Norte...">
         </div>
+        <div class="form-field">
+          <label>País</label>
+          <select id="tf-pais">${Object.entries(PAISES).map(([k,p])=>`<option value="${k}" ${(e.pais||"AR")===k?"selected":""}>${p.flag} ${p.nombre} — ${p.ciudad} (${p.monedaLabel})</option>`).join("")}</select>
+        </div>
         <div class="form-field" style="grid-column:span 2">
           <label>Dirección</label>
           <div style="display:flex;gap:6px">
@@ -5605,7 +5789,8 @@ async function geocodeAddress(){
   if(!addr){alert("Ingresá una dirección primero");return;}
   const status=document.getElementById("geocode-status");
   if(status)status.innerHTML='<span style="color:var(--ink-soft)">⏳ Buscando...</span>';
-  const query=addr.toLowerCase().includes("argentina")?addr:`${addr}, ${zona?zona+", ":""}Buenos Aires, Argentina`;
+  const pf=PAISES[document.getElementById("tf-pais")?.value||"AR"]||PAISES.AR;
+  const query=addr.toLowerCase().includes(pf.nombre.toLowerCase())?addr:`${addr}, ${zona?zona+", ":""}${pf.ciudad}, ${pf.nombre}`;
   try{
     const r=await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`);
     const data=await r.json();
@@ -5627,6 +5812,7 @@ function saveTenant(){
   if(!nombre){alert("El nombre es obligatorio");return;}
   const latVal=document.getElementById("tf-lat").value;
   const lngVal=document.getElementById("tf-lng").value;
+  const paisSel=document.getElementById("tf-pais")?.value||"AR";
   const data={
     icono:document.getElementById("tf-icono").value.trim()||"🥬",
     nombre,
@@ -5636,6 +5822,8 @@ function saveTenant(){
     diasEnvio:document.getElementById("tf-dias").value.trim(),
     lat:latVal?parseFloat(latVal):null,
     lng:lngVal?parseFloat(lngVal):null,
+    pais:paisSel,
+    moneda:(PAISES[paisSel]||PAISES.AR).moneda,
   };
   if(editingTenant.isNew){
     const id="tenant_"+Date.now();
@@ -6008,7 +6196,8 @@ async function geocodeMyAddress(){
   if(!addr){alert("Ingresá una dirección primero");return;}
   const status=document.getElementById("mv-geo-status");
   if(status)status.innerHTML='<span style="color:var(--ink-soft)">⏳ Buscando...</span>';
-  const query=addr.toLowerCase().includes("argentina")?addr:`${addr}, ${zona?zona+", ":""}Buenos Aires, Argentina`;
+  const sufM=sufijoGeoPais(tenants[currentTenantId]);
+  const query=addr.toLowerCase().includes(sufM.split(", ")[1].toLowerCase())?addr:`${addr}, ${zona?zona+", ":""}${sufM}`;
   try{
     const r=await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`);
     const data=await r.json();
@@ -6209,7 +6398,7 @@ function renderHome(){
     p.innerHTML=`
       <div class="home-hero">
         <h2>¿Qué querés comer hoy?</h2>
-        <p>Elegí un restaurante para ver su carta y pedir online.</p>
+        <p id="home-sub">Elegí un restaurante para ver su carta y pedir online.</p>
       </div>
       <div class="top">
         <input type="text" id="home-search" placeholder="Buscar restaurante o zona..." oninput="homeSearch=this.value.toLowerCase();renderHomeList()">
@@ -6224,7 +6413,9 @@ function renderHome(){
 function renderHomeList(){
   const el=document.getElementById("home-list");
   if(!el)return;
-  const socios=Object.values(tenants).filter(t=>
+  const sub=document.getElementById("home-sub");
+  if(sub)sub.textContent=`Restaurantes en ${PAISES[paisActivo].flag} ${PAISES[paisActivo].ciudad} — elegí uno y pedí online.`;
+  const socios=Object.values(tenants).filter(t=>(t.pais||"AR")===paisActivo).filter(t=>
     !homeSearch||t.nombre.toLowerCase().includes(homeSearch)||(t.zona||"").toLowerCase().includes(homeSearch));
   if(!socios.length){
     el.innerHTML=`<div class="pedido-empty"><strong>Sin resultados</strong>Probá con otro nombre o zona.</div>`;
@@ -6276,10 +6467,17 @@ function renderPlataformaDash(){
     const unidades=peds.reduce((a,x)=>a+(x.items||[]).reduce((s,i)=>s+i.qty,0),0);
     return{t,carta:carta.length,activos,pedidos:peds.length,entregados:entregados.length,revenue,unidades,disp:isLocalDisponible(t)};
   });
-  const totRevenue=rows.reduce((a,r)=>a+r.revenue,0);
   const totPedidos=rows.reduce((a,r)=>a+r.pedidos,0);
   const totEntregados=rows.reduce((a,r)=>a+r.entregados,0);
-  const ticket=totEntregados?Math.round(totRevenue/totEntregados):0;
+  // Ventas y ticket por moneda (AR$ y US$ no se suman entre sí)
+  const porMoneda={},entPorMoneda={};
+  rows.forEach(r=>{
+    const m=monedaDe(r.t);
+    porMoneda[m]=(porMoneda[m]||0)+r.revenue;
+    entPorMoneda[m]=(entPorMoneda[m]||0)+r.entregados;
+  });
+  const ventasTxt=Object.entries(porMoneda).filter(([,v])=>v>0).map(([m,v])=>fmt(v,m)).join(" + ")||"$0";
+  const ticketTxt=Object.entries(porMoneda).filter(([m,v])=>v>0&&entPorMoneda[m]).map(([m,v])=>fmt(v/entPorMoneda[m],m)).join(" · ")||"—";
   p.innerHTML=`
     <div class="rec-header">
       <h2>📊 Plataforma IZIFUD</h2>
@@ -6290,8 +6488,8 @@ function renderPlataformaDash(){
       <div class="summary-card ok"><div class="lbl">Abiertos</div><div class="val">${rows.filter(r=>r.disp).length}</div></div>
       <div class="summary-card"><div class="lbl">Platos publicados</div><div class="val">${rows.reduce((a,r)=>a+r.carta,0)}</div></div>
       <div class="summary-card"><div class="lbl">Pedidos</div><div class="val">${totPedidos}</div></div>
-      <div class="summary-card ok"><div class="lbl">Ventas (entregados)</div><div class="val">${fmt(totRevenue)||"$0"}</div></div>
-      <div class="summary-card"><div class="lbl">Ticket promedio</div><div class="val">${ticket?fmt(ticket):"—"}</div></div>
+      <div class="summary-card ok"><div class="lbl">Ventas (entregados)</div><div class="val">${ventasTxt}</div></div>
+      <div class="summary-card"><div class="lbl">Ticket promedio</div><div class="val">${ticketTxt}</div></div>
     </div>
     <div class="ow"><table style="min-width:820px">
       <thead><tr>
@@ -6302,14 +6500,14 @@ function renderPlataformaDash(){
           const ce=getEntregaConfig(r.t);
           const entregaTxt=!ce.delivery?(ce.pickup?"🏪 Solo retiro":"—"):(ce.riderPlataforma!==false?"🛵 Flota IZIFUD":"🚚 Delivery propio");
           return`<tr>
-          <td>${r.t.icono||"🍽"} <strong>${r.t.nombre}</strong><span class="u">${r.t.zona||""}</span></td>
+          <td>${(PAISES[r.t.pais||"AR"]||PAISES.AR).flag} ${r.t.icono||"🍽"} <strong>${r.t.nombre}</strong><span class="u">${r.t.zona||""}</span></td>
           <td><span class="badge ${r.disp?"ok":"warn"}">${r.disp?"Abierto":"Cerrado"}</span></td>
           <td style="font-size:12px;white-space:nowrap">${entregaTxt}</td>
           <td>${r.activos}/${r.carta}</td>
           <td>${r.pedidos}</td>
           <td>${r.entregados}</td>
           <td>${r.unidades}</td>
-          <td><strong>${fmt(r.revenue)||"$0"}</strong></td>
+          <td><strong>${fmt(r.revenue,monedaDe(r.t))||"$0"}</strong></td>
           <td><button class="edit-btn" onclick="adminGestionarSocio('${r.t.id}')">Entrar como socio →</button></td>
         </tr>`;}).join("")}
       </tbody>
@@ -6319,9 +6517,9 @@ function renderPlataformaDash(){
       const maxRev=Math.max(...rows.map(r=>r.revenue),1);
       const ventasBars=rows.filter(r=>r.revenue>0).sort((a,b)=>b.revenue-a.revenue).map(r=>`
         <div class="bar-row">
-          <div class="bar-name">${r.t.icono||"🍽"} ${r.t.nombre}</div>
+          <div class="bar-name">${(PAISES[r.t.pais||"AR"]||PAISES.AR).flag} ${r.t.icono||"🍽"} ${r.t.nombre}</div>
           <div class="bar-track"><div class="bar-fill" style="width:${(r.revenue/maxRev)*100}%;background:var(--brand)"></div></div>
-          <div class="bar-val">${fmt(r.revenue)}</div>
+          <div class="bar-val">${fmt(r.revenue,monedaDe(r.t))}</div>
         </div>`).join("");
       const unidadesPorPlato={};
       allPedidosCrossTenant().forEach(x=>{
@@ -6396,7 +6594,7 @@ function updateDevRiderSelect(){
   const activos=riders.filter(r=>r.activo);
   const yo=getDevRider();
   sel.innerHTML=activos.length
-    ?activos.map(r=>`<option value="${r.id}" ${yo&&r.id===yo.id?"selected":""}>${(r.vehiculo||"🛵").split(" ")[0]} ${r.nombre}</option>`).join("")
+    ?activos.map(r=>`<option value="${r.id}" ${yo&&r.id===yo.id?"selected":""}>${(PAISES[r.pais||"AR"]||PAISES.AR).flag} ${(r.vehiculo||"🛵").split(" ")[0]} ${r.nombre}</option>`).join("")
     :`<option value="">Sin riders activos</option>`;
 }
 
@@ -6417,7 +6615,9 @@ function renderEntregas(){
     p.innerHTML=`<div class="pedido-empty"><strong>No hay riders activos</strong>El admin puede dar de alta riders en Plataforma → 🛵 Riders.</div>`;
     return;
   }
-  const todos=allPedidosCrossTenant();
+  // El rider solo ve pedidos de locales de SU país
+  const miPais=yo.pais||"AR";
+  const todos=allPedidosCrossTenant().filter(x=>(x.tenant.pais||"AR")===miPais);
   const esDelivery=x=>x.p.tipoEntrega!=="pickup";
   const restAcepta=x=>getEntregaConfig(x.tenant).riderPlataforma!==false;
   const misAsignadas=todos.filter(x=>x.p.estado==="preparando"&&x.p.riderId===yo.id);
@@ -6431,7 +6631,7 @@ function renderEntregas(){
       <div class="entrega-top">
         <div class="entrega-rest">${x.tenant.icono||"🍽"} ${x.tenant.nombre}</div>
         ${badge}
-        <div class="entrega-total">${fmt(x.p.total)}</div>
+        <div class="entrega-total">${fmt(x.p.total,monedaDe(x.tenant))}</div>
       </div>
       <div class="entrega-ruta">
         <div class="er-row"><span>📦</span><div>#${pid} · ${x.p.items.length} producto${x.p.items.length===1?"":"s"}</div></div>
@@ -6450,7 +6650,7 @@ function renderEntregas(){
   const bLibre=`<span class="pedido-status pendiente">⏳ Sin asignar</span>`;
   p.innerHTML=`
     <div class="rider-head">
-      <div class="rh-nombre">${(yo.vehiculo||"🛵").split(" ")[0]} <strong>${yo.nombre}</strong></div>
+      <div class="rh-nombre">${(PAISES[yo.pais||"AR"]||PAISES.AR).flag} ${(yo.vehiculo||"🛵").split(" ")[0]} <strong>${yo.nombre}</strong></div>
       <label class="entrega-toggle" style="background:transparent;border:none;padding:0">
         <span style="font-size:11px;font-weight:700;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.04em">${yo.enLinea?"En línea":"Fuera de línea"}</span>
         <input type="checkbox" ${yo.enLinea?"checked":""} onchange="riderToggleLinea('${yo.id}',this.checked)">
@@ -6559,7 +6759,7 @@ async function buildRutaMapa(tenantId,pedidoId){
   if(!cli&&dirCli){
     // Pedidos sin pin del cliente: geocodificar la dirección y guardarla en el pedido
     try{
-      const r=await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(dirCli+", Buenos Aires, Argentina")}&limit=1`);
+      const r=await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(dirCli+", "+sufijoGeoPais(t))}&limit=1`);
       const js=await r.json();
       if(js&&js[0]){
         cli={lat:parseFloat(js[0].lat),lng:parseFloat(js[0].lon)};
@@ -6594,11 +6794,13 @@ function renderRiderHistorial(){
     return;
   }
   const done=allPedidosCrossTenant()
+    .filter(x=>(x.tenant.pais||"AR")===(yo.pais||"AR"))
     .filter(x=>x.p.estado==="entregado"&&x.p.riderId===yo.id)
     .sort((a,b)=>new Date(b.p.fecha)-new Date(a.p.fecha));
   const hoyStr=new Date().toDateString();
   const deHoy=done.filter(x=>new Date(x.p.fecha).toDateString()===hoyStr).length;
   const valor=done.reduce((a,x)=>a+x.p.total,0);
+  const monRider=done.length?monedaDe(done[0].tenant):(PAISES[yo.pais||"AR"]||PAISES.AR).moneda;
   const fmtFecha=iso=>{
     const f=new Date(iso);
     return f.toLocaleDateString("es-AR",{day:"2-digit",month:"short"})+" "+f.toLocaleTimeString("es-AR",{hour:"2-digit",minute:"2-digit"});
@@ -6609,7 +6811,7 @@ function renderRiderHistorial(){
       <div class="rh-stats">
         <span>Entregas <strong>${done.length}</strong></span>
         <span>Hoy <strong>${deHoy}</strong></span>
-        <span>Valor entregado <strong>${fmt(valor)||"$0"}</strong></span>
+        <span>Valor entregado <strong>${fmt(valor,monRider)||"$0"}</strong></span>
       </div>
     </div>
     ${done.length?done.map(x=>`
@@ -6617,7 +6819,7 @@ function renderRiderHistorial(){
         <div class="mp-card-top">
           <div class="mp-rest">${x.tenant.icono||"🍽"} <strong>${x.tenant.nombre}</strong></div>
           <span class="mp-meta">#${x.p.id} · ${fmtFecha(x.p.fecha)}</span>
-          <span class="mp-total">${fmt(x.p.total)}</span>
+          <span class="mp-total">${fmt(x.p.total,monedaDe(x.tenant))}</span>
         </div>
         <div class="mp-entrega">🏠 ${(x.p.cliente&&x.p.cliente.direccion)||"Sin dirección"}</div>
       </div>`).join(""):`<div class="pedido-empty"><strong>Todavía no entregaste pedidos</strong>Cuando marques entregas como completadas, quedan acá.</div>`}
@@ -6643,17 +6845,19 @@ function renderRiders(){
         <div class="form-field"><label>Teléfono</label><input type="text" id="rid-tel" placeholder="+54 11 ..." value="${ed?esc(ed.tel):""}"></div>
         <div class="form-field"><label>Vehículo</label><select id="rid-veh">${["🛵 Moto","🚲 Bici","🚗 Auto"].map(v=>`<option ${ed&&ed.vehiculo===v?"selected":""}>${v}</option>`).join("")}</select></div>
         <div class="form-field"><label>Turno</label><input type="text" id="rid-turno" placeholder="Lun-Vie 19-24h" value="${ed?esc(ed.turno):""}"></div>
+        <div class="form-field"><label>País</label><select id="rid-pais">${Object.entries(PAISES).map(([k,p])=>`<option value="${k}" ${(ed?ed.pais||"AR":"AR")===k?"selected":""}>${p.flag} ${p.nombre} (${p.ciudad})</option>`).join("")}</select></div>
       </div>
       <div class="form-actions">
         <button class="form-btn primary" onclick="guardarRider()">${ed?"Guardar cambios":"Agregar rider"}</button>
         ${ed?`<button class="form-btn" onclick="cancelarEdicionRider()">Cancelar</button>`:""}
       </div>
     </div>
-    <div class="ow"><table style="min-width:760px">
-      <thead><tr><th>Rider</th><th>Vehículo</th><th>Turno</th><th>Estado</th><th>En línea</th><th>Entregas</th><th></th></tr></thead>
+    <div class="ow"><table style="min-width:800px">
+      <thead><tr><th>Rider</th><th>País</th><th>Vehículo</th><th>Turno</th><th>Estado</th><th>En línea</th><th>Entregas</th><th></th></tr></thead>
       <tbody>
         ${riders.map(r=>`<tr style="${r.activo?"":"opacity:.55"}">
           <td><strong>${r.nombre}</strong><span class="u">${r.tel||""}</span></td>
+          <td>${(PAISES[r.pais||"AR"]||PAISES.AR).flag} ${(PAISES[r.pais||"AR"]||PAISES.AR).ciudad}</td>
           <td>${r.vehiculo}</td>
           <td>${r.turno||"-"}</td>
           <td><button class="edit-btn" onclick="riderToggleActivo('${r.id}')">${r.activo?"Activo · desactivar":"Inactivo · activar"}</button></td>
@@ -6687,7 +6891,8 @@ function guardarRider(){
     nombre,
     tel:(document.getElementById("rid-tel")?.value||"").trim(),
     vehiculo:document.getElementById("rid-veh")?.value||"🛵 Moto",
-    turno:(document.getElementById("rid-turno")?.value||"").trim()
+    turno:(document.getElementById("rid-turno")?.value||"").trim(),
+    pais:document.getElementById("rid-pais")?.value||"AR"
   };
   if(editingRiderId){
     const r=riders.find(x=>x.id===editingRiderId);
@@ -6802,7 +7007,7 @@ function renderMisPedidos(){
       <div class="mp-card-top">
         <div class="mp-rest">${t.icono||"🍽"} <strong>${t.nombre}</strong></div>
         <span class="mp-meta">#${p.id} · ${fmtFecha(p.fecha)}</span>
-        <span class="mp-total">${fmt(p.total)}</span>
+        <span class="mp-total">${fmt(p.total,monedaDe(t))}</span>
       </div>
       ${mpStepper(p)}
       ${msg?`<div class="mp-msg">${msg}</div>`:""}
@@ -6819,7 +7024,7 @@ function renderMisPedidos(){
         <div class="mp-rest">${t.icono||"🍽"} <strong>${t.nombre}</strong></div>
         <span class="mp-meta">${fmtFecha(p.fecha)} · ${p.items.length} producto${p.items.length===1?"":"s"}</span>
         <span class="pedido-status ${p.estado}">${lbl}</span>
-        <span class="mp-total">${fmt(p.total)}</span>
+        <span class="mp-total">${fmt(p.total,monedaDe(t))}</span>
         ${p.estado==="entregado"?`<button class="edit-btn" onclick="repetirPedido('${t.id}','${p.id}')">↻ Repetir</button>`:""}
       </div>
     </div>`;
