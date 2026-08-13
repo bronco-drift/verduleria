@@ -245,6 +245,8 @@ body.vista-final .mis-pedidos-trigger{display:flex}
 .mp-msg{font-size:12.5px;color:var(--ink-soft);margin-top:2px}
 .mp-items{font-size:12px;color:var(--ink-soft);margin-top:8px;border-top:1px dashed var(--border);padding-top:8px}
 .mp-entrega{font-size:12px;color:var(--ink-faint);margin-top:4px}
+.mp-pago{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12px;color:var(--ink-soft);margin-top:6px}
+.mp-acciones{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
 .mp-past{opacity:.85}
 /* Stepper de estado del pedido */
 .mp-steps{display:flex;margin:12px 0 8px}
@@ -284,6 +286,47 @@ body.vista-final .perfil-trigger{display:flex}
 .pf-toggle .pf-t-sub{display:block;font-size:11px;font-weight:400;color:var(--ink-faint)}
 .pf-guardar{width:100%;padding:11px;border-radius:9px;border:1px solid var(--brand);background:var(--brand);color:var(--on-brand);font-weight:700;font-size:13px;cursor:pointer}
 .pf-ayuda{display:block;text-align:center;margin-top:12px;font-size:12px;color:var(--ink-faint);cursor:pointer;text-decoration:underline}
+/* Bloques de pago en el checkout */
+.pago-conv{background:var(--brand-tint);border:1px solid var(--border);border-radius:9px;padding:9px 12px;font-size:13px;color:var(--ink);margin-bottom:8px}
+.pago-conv span{color:var(--ink-faint);font-size:11.5px}
+.pago-datos{background:var(--surface-2);border:1px solid var(--border);border-radius:9px;padding:10px 12px;margin-bottom:8px}
+.pago-datos .pd-tit{font-size:12px;font-weight:700;color:var(--ink);margin-bottom:6px}
+.pago-datos .pd-row{display:flex;justify-content:space-between;gap:10px;font-size:12px;padding:2px 0}
+.pago-datos .pd-row span{color:var(--ink-faint)}
+.pago-datos .pd-vacio{font-size:11.5px;color:var(--ink-faint);line-height:1.4}
+.pago-datos .pd-ref-lbl{display:block;font-size:11px;font-weight:600;color:var(--ink-soft);margin:8px 0 3px}
+.pago-datos input{width:100%;height:34px;padding:0 10px;font-size:13px;border:1px solid var(--border-strong);border-radius:7px;background:var(--surface);color:var(--ink)}
+.er-cobro{background:var(--warn-bg);border-radius:7px;padding:6px 8px;margin-top:2px}
+/* Comprobante */
+.cmp-tipo{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);margin-top:8px}
+.cmp-legal{margin-top:14px;padding-top:10px;border-top:1px dashed var(--border-strong);font-size:10.5px;color:var(--ink-faint);text-align:center;line-height:1.4}
+@media print{
+  body>*{display:none!important}
+  body{padding:0!important;background:#fff!important}
+  #comprobante-modal{display:block!important;position:static!important;transform:none!important;opacity:1!important;
+    box-shadow:none!important;border:none!important;max-height:none!important;overflow:visible!important;width:100%!important;padding:0!important}
+  .cmp-acciones{display:none!important}
+}
+/* Caja de pago dentro del pedido (socio) */
+.pago-box{margin-top:10px;padding-top:10px;border-top:1px dashed var(--border)}
+.pago-box-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:13px}
+.pago-box-head strong{margin-left:auto}
+.pago-box-ref{font-size:12px;color:var(--ink-soft);margin-top:6px}
+.pago-box-acciones{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+.pago-box-acciones button{height:32px;padding:0 12px;font-size:12px;font-weight:600;border-radius:7px;border:1px solid var(--border-strong);background:var(--surface);color:var(--ink);cursor:pointer}
+.pago-box-acciones button.primary{background:var(--brand);border-color:var(--brand);color:var(--on-brand)}
+.pago-box-acciones button.danger{color:var(--danger);border-color:var(--danger)}
+/* Config de cobros del socio */
+.cobros-datos{margin-top:12px;padding-top:12px;border-top:1px dashed var(--border-strong)}
+.cobros-datos .cd-tit{font-size:12px;font-weight:700;color:var(--ink);margin-bottom:8px}
+.cobros-datos .cd-hint{display:block;font-size:10.5px;color:var(--ink-faint);margin-top:3px}
+/* Estado del pago (socio, rider, cliente) */
+.pago-estado{display:inline-flex;align-items:center;gap:5px;font-size:10.5px;font-weight:700;padding:3px 9px;border-radius:999px;white-space:nowrap}
+.pago-estado.pendiente{background:var(--warn-bg);color:var(--warn-fg)}
+.pago-estado.verificado{background:var(--success-bg);color:var(--success-fg)}
+.pago-estado.rechazado{background:var(--danger-bg);color:var(--danger-fg)}
+.pago-estado.contra_entrega{background:var(--surface-2);color:var(--ink-soft)}
+.pago-estado.cobrado{background:var(--success-bg);color:var(--success-fg)}
 /* Resumen tipo ticket */
 .resumen-modal{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%) scale(.94);z-index:10001;background:var(--bg);border:1px solid var(--border);border-radius:16px;padding:20px 18px;width:min(430px,calc(100vw - 32px));max-height:min(86dvh,720px);overflow-y:auto;box-shadow:0 24px 70px rgba(0,0,0,.28);opacity:0;pointer-events:none;transition:opacity .22s,transform .22s}
 .resumen-modal.open{opacity:1;pointer-events:auto;transform:translate(-50%,-50%) scale(1)}
@@ -1207,6 +1250,17 @@ select.cell-sel{height:26px;padding:0 6px;font-size:11px;border:1px solid var(--
   </div>
 </div>
 
+<!-- COMPROBANTE DE PEDIDO (no fiscal) -->
+<div class="exito-overlay" id="comprobante-overlay" onclick="closeComprobante()"></div>
+<div class="resumen-modal" id="comprobante-modal" role="dialog" aria-modal="true">
+  <div id="comprobante-body"></div>
+  <div class="exito-acciones cmp-acciones" style="margin-top:14px">
+    <button class="primary" onclick="compartirComprobante()">📤 Compartir</button>
+    <button onclick="imprimirComprobante()">🖨 Imprimir / PDF</button>
+    <button onclick="closeComprobante()">Cerrar</button>
+  </div>
+</div>
+
 <!-- PERFIL DE USUARIO (datos guardados + notificaciones) -->
 <div class="info-overlay" id="perfil-overlay" onclick="closePerfil()"></div>
 <div class="info-drawer" id="perfil-drawer">
@@ -1301,14 +1355,15 @@ select.cell-sel{height:26px;padding:0 6px;font-size:11px;border:1px solid var(--
       </div>
       <div class="checkout-field">
         <label>Forma de pago <span class="req">*</span></label>
-        <select id="co-pago">
+        <select id="co-pago" onchange="onPagoChange()">
           <option value="">Elegí cómo pagar...</option>
-          <option value="efectivo">💵 Efectivo al recibir</option>
-          <option value="mercadopago">💳 Mercado Pago</option>
-          <option value="transferencia">🏦 Transferencia</option>
-          <option value="tarjeta">💳 Tarjeta al recibir</option>
         </select>
       </div>
+      <div class="checkout-field" id="co-moneda-wrap" style="display:none">
+        <label>¿Con qué pagás?</label>
+        <select id="co-moneda" onchange="onPagoChange()"></select>
+      </div>
+      <div id="co-pago-datos"></div>
       <div class="checkout-error" id="co-error"></div>
     </div>
   </div>
@@ -1628,6 +1683,103 @@ if(!PAISES[paisActivo])paisActivo="AR";
 
 function monedaDe(t){return (t&&t.moneda)||"ARS";}
 
+// ── MONEDAS Y COBROS ──────────────────────────────────────
+// El precio SIEMPRE vive en la moneda del local (ARS o USD). Las demás monedas
+// existen solo al momento de pagar: se convierten con la tasa del socio y la
+// tasa queda CONGELADA en el pedido, así el comprobante nunca se contradice.
+const MONEDAS={
+  ARS:{nombre:"Pesos argentinos",corto:"$"},
+  USD:{nombre:"Dólares",corto:"US$"},
+  VES:{nombre:"Bolívares",corto:"Bs"},
+  COP:{nombre:"Pesos colombianos",corto:"COP"},
+};
+
+// Sin pasarela de pago: todo se verifica a mano (socio o rider).
+const METODOS_PAGO={
+  AR:{
+    efectivo:{label:"💵 Efectivo al recibir",monedas:["ARS"],ref:false},
+    mercadopago:{label:"💳 Mercado Pago",monedas:["ARS"],ref:true},
+    transferencia:{label:"🏦 Transferencia",monedas:["ARS"],ref:true},
+  },
+  VE:{
+    efectivo:{label:"💵 Efectivo al recibir",monedas:["USD","COP","VES"],ref:false},
+    pagomovil:{label:"📲 Pago Móvil",monedas:["VES"],ref:true},
+    transferencia:{label:"🏦 Transferencia bancaria",monedas:["VES"],ref:true},
+  }
+};
+
+function metodosDePais(pais){return METODOS_PAGO[pais||"AR"]||METODOS_PAGO.AR;}
+
+// Datos de cobro de los locales demo (los usan el seed y la migración)
+const COBROS_DEMO={
+  tito:{metodos:{efectivo:true,mercadopago:true,transferencia:true},datos:{telefono:"+54 11 4832-1001",cedula:"dontito.parrilla",banco:"Mercado Pago"},tasas:{}},
+  arepas:{metodos:{efectivo:true,pagomovil:true,transferencia:false},datos:{telefono:"0414-3712200",cedula:"V-14582310",banco:"Banesco"},tasas:{VES:40,COP:4000}},
+  marquesina:{metodos:{efectivo:true,pagomovil:true,transferencia:true},datos:{telefono:"0426-5568811",cedula:"J-30556881-4",banco:"Banco de Venezuela"},tasas:{VES:40,COP:4050}},
+};
+
+function getCobros(t){
+  const pais=(t&&t.pais)||"AR";
+  const def=pais==="VE"
+    ?{metodos:{efectivo:true,pagomovil:true,transferencia:false},datos:{telefono:"",cedula:"",banco:""},tasas:{VES:40,COP:4000}}
+    :{metodos:{efectivo:true,mercadopago:true,transferencia:true},datos:{telefono:"",cedula:"",banco:""},tasas:{}};
+  const c=(t&&t.cobros)||{};
+  return{
+    metodos:{...def.metodos,...(c.metodos||{})},
+    datos:{...def.datos,...(c.datos||{})},
+    tasas:{...def.tasas,...(c.tasas||{})}
+  };
+}
+
+// Devuelve {monto,tasa} en la moneda de pago. tasa=1 si es la misma moneda.
+function convertirAPago(montoBase,monedaBase,monedaPago,tasas){
+  if(!monedaPago||monedaPago===monedaBase)return{monto:montoBase,tasa:1};
+  const tasa=parseFloat((tasas||{})[monedaPago])||0;
+  return tasa>0?{monto:montoBase*tasa,tasa}:{monto:null,tasa:0};
+}
+
+function labelMetodo(pais,metodo){
+  const m=metodosDePais(pais)[metodo];
+  return m?m.label:(FORMA_PAGO_LABEL[metodo]||metodo||"—");
+}
+
+// Texto listo para mostrar: "US$ 9.80 · Bs 392,00 (tasa 40)"
+function textoPago(p,tenant){
+  if(!p||!p.pago)return null;
+  const base=fmt(p.total,monedaDe(tenant));
+  if(!p.pago.moneda||p.pago.moneda===monedaDe(tenant)||!p.pago.monto)return base;
+  return `${base} · ${fmt(p.pago.monto,p.pago.moneda)}`;
+}
+
+const PAGO_ESTADO_LABEL={
+  pendiente:"⏳ Sin verificar",
+  verificado:"✓ Pago verificado",
+  rechazado:"✗ Pago rechazado",
+  contra_entrega:"💵 Paga al recibir",
+  cobrado:"✓ Cobrado"
+};
+
+function pagoDe(p){
+  // Pedidos viejos (sin objeto pago) se muestran como pago contra entrega
+  return p.pago||{metodo:(p.cliente&&p.cliente.formaDePago)||"",moneda:null,tasa:1,monto:p.total,referencia:"",estado:"contra_entrega"};
+}
+
+function setPagoEstado(tenantId,pedidoId,estado){
+  mutarPedidoCrossTenant(tenantId,pedidoId,p=>{p.pago=pagoDe(p);p.pago.estado=estado;});
+  refreshPedidosSocioSiVisible();
+  const pe=document.getElementById("panel-entregas");
+  if(pe&&pe.classList.contains("on"))renderEntregas();
+}
+
+function cargarReferencia(tenantId,pedidoId){
+  const ref=prompt("Número de referencia de la operación:");
+  if(ref==null)return;
+  const limpio=limpiarTxt(ref);
+  if(!limpio)return;
+  mutarPedidoCrossTenant(tenantId,pedidoId,p=>{p.pago=pagoDe(p);p.pago.referencia=limpio;p.pago.estado="pendiente";});
+  renderMisPedidos();
+  refreshPedidosSocioSiVisible();
+}
+
 // Sufijo de geocoding según el país del local (o el país activo si no hay local)
 function sufijoGeoPais(t){
   const p=PAISES[(t&&t.pais)||paisActivo]||PAISES.AR;
@@ -1643,6 +1795,11 @@ function fmt(v,moneda){
     const n=Math.round(v*100)/100;
     return "US$ "+n.toLocaleString("en-US",{minimumFractionDigits:n%1?2:0,maximumFractionDigits:2});
   }
+  if(m==="VES"){
+    const n=Math.round(v*100)/100;
+    return "Bs "+n.toLocaleString("es-VE",{minimumFractionDigits:n%1?2:0,maximumFractionDigits:2});
+  }
+  if(m==="COP")return "COP "+Math.round(v).toLocaleString("es-CO");
   return "$"+Math.round(v).toLocaleString("es-AR");
 }
 function pct(v){return v!=null?Math.round(v)+"%":null}
@@ -1694,7 +1851,7 @@ const TABS=[
   {id:"dashboard",label:"🏪 Mi restaurante", group:"gestion"},
   {id:"stock",label:"📦 Carta y precios", group:"gestion"},
   {id:"margen",label:"💰 Margen bruto", group:"gestion"},
-  {id:"envio",label:"🚚 Costo de envío", group:"gestion"},
+  {id:"envio",label:"💳 Cobros y envío", group:"gestion"},
   // PLATAFORMA (admin B2B: socios, riders y métricas — sin carta propia)
   {id:"socios",label:"🤝 Socios", group:"plataforma"},
   {id:"plataforma-dash",label:"📊 Estadísticas", group:"plataforma"},
@@ -2149,6 +2306,7 @@ function renderEnvio(){
   if(!p.dataset.init){
     p.innerHTML=`
       <div id="entrega-config-host"></div>
+      <div id="cobros-config-host" style="margin-top:1rem"></div>
       <h3 style="font-size:13px;font-weight:700;margin:1.25rem 0 .5rem;color:var(--ink)">Zonas de entrega</h3>
       <p style="margin-bottom:1rem;font-size:12px;color:var(--ink-soft)">Configurá cada zona. El sistema calcula el punto de break-even para ofrecer envío gratis.</p>
       <div class="zona-grid" id="zona-grid"></div>
@@ -2166,6 +2324,7 @@ function renderEnvio(){
   }
   const host=document.getElementById("entrega-config-host");
   if(host)host.innerHTML=renderEntregaConfigHTML(tenants[currentTenantId]);
+  refrescarCobrosHost();
   renderZonas();
   renderSimulador();
 }
@@ -2443,8 +2602,25 @@ function renderPedidosList(){
             ${tipo==="delivery"&&p.riderId?`<div><span>🛵 Rider asignado</span><strong>${riderNombre(p.riderId)}</strong></div>`:""}
             <div><span>📞 Teléfono</span><strong>${p.cliente.telefono||"—"}</strong></div>
             ${p.cliente.correo?`<div><span>✉ Correo</span><strong>${p.cliente.correo}</strong></div>`:""}
-            <div><span>💳 Forma de pago</span><strong>${(FORMA_PAGO_LABEL&&FORMA_PAGO_LABEL[p.cliente.formaDePago])||p.cliente.formaDePago||"—"}</strong></div>
+            <div><span>💳 Forma de pago</span><strong>${labelMetodo(tenants[currentTenantId]&&tenants[currentTenantId].pais,p.cliente.formaDePago)}</strong></div>
           </div>
+          ${(()=>{
+            const pg=pagoDe(p);
+            const t=tenants[currentTenantId];
+            const conv=pg.tasa&&pg.tasa!==1&&pg.monto!=null;
+            return`<div class="pago-box">
+              <div class="pago-box-head">
+                <span class="pago-estado ${pg.estado}">${PAGO_ESTADO_LABEL[pg.estado]||pg.estado}</span>
+                <strong>${conv?`${fmt(pg.monto,pg.moneda)} <span style="font-weight:400;color:var(--ink-faint);font-size:11px">(${fmt(p.total,monedaDe(t))} · tasa ${fmt(pg.tasa,pg.moneda)})</span>`:fmt(p.total,monedaDe(t))}</strong>
+              </div>
+              ${pg.referencia?`<div class="pago-box-ref">Referencia: <strong>${pg.referencia}</strong></div>`:(pg.estado==="pendiente"?`<div class="pago-box-ref" style="color:var(--ink-faint)">El cliente todavía no cargó la referencia.</div>`:"")}
+              ${pg.estado==="pendiente"?`<div class="pago-box-acciones">
+                <button class="primary" onclick="setPagoEstado('${currentTenantId}','${p.id}','verificado')">✓ Verificar pago</button>
+                <button class="danger" onclick="setPagoEstado('${currentTenantId}','${p.id}','rechazado')">✗ Rechazar</button>
+              </div>`:""}
+              ${pg.estado==="rechazado"?`<div class="pago-box-acciones"><button onclick="setPagoEstado('${currentTenantId}','${p.id}','pendiente')">↺ Volver a revisar</button></div>`:""}
+            </div>`;
+          })()}
         </div>`:""}
         <div class="pedido-items">
           ${p.items.map(i=>`<div class="pedido-item-row">
@@ -2463,6 +2639,7 @@ function renderPedidosList(){
           ${p.estado==="pendiente"?`<button class="primary" onclick="cambiarEstadoPedido('${p.id}','preparando')">▶ Marcar preparando</button>`:""}
           ${(p.estado==="preparando"||p.estado==="en_camino")&&!enManosRider?`<button class="primary" onclick="cambiarEstadoPedido('${p.id}','entregado')">✓ Marcar entregado</button>`:""}
           ${enManosRider?`<span style="font-size:12px;color:var(--ink-faint);align-self:center">🛵 En manos de ${riderNombre(p.riderId)} — lo cierra el rider</span>`:""}
+          <button onclick="abrirComprobante('${currentTenantId}','${p.id}')">🧾 Comprobante</button>
           ${p.estado!=="cancelado"&&p.estado!=="entregado"?`<button class="danger" onclick="cancelarPedido('${p.id}')">✕ Cancelar</button>`:""}
           ${p.estado==="entregado"||p.estado==="cancelado"?`<button onclick="eliminarPedido('${p.id}')">🗑 Eliminar</button>`:""}
         </div>
@@ -2482,6 +2659,10 @@ function cambiarEstadoPedido(id,nuevoEstado){
   if(!p)return;
   p.estado=nuevoEstado;
   if(nuevoEstado==="preparando")asignarRiderAuto(p);
+  if(nuevoEstado==="entregado"){
+    p.pago=pagoDe(p);
+    if(p.pago.estado==="contra_entrega")p.pago.estado="cobrado";
+  }
   saveToLocalStorage();
   renderPedidosSummary();
   renderPedidosList();
@@ -2878,6 +3059,7 @@ let cartMiniMapVisible=false;
 
 function openCart(){
   populateCartZonas();
+  renderPagoOpciones();// antes del prefill: el select se arma según el local
   prefillCheckoutForm();
   const cfg=getEntregaConfig(tenants[currentTenantId]);
   if(cfg.delivery||cfg.pickup){
@@ -2896,6 +3078,83 @@ function closeCart(){
   if(err)err.classList.remove("show");
 }
 
+// Llena el select de pago con lo que ACEPTA este local (según su país)
+function renderPagoOpciones(){
+  const sel=document.getElementById("co-pago");
+  if(!sel)return;
+  const t=tenants[currentTenantId];
+  const cobros=getCobros(t);
+  const disponibles=Object.entries(metodosDePais(t&&t.pais)).filter(([k])=>cobros.metodos[k]);
+  const prev=sel.value;
+  sel.innerHTML=`<option value="">Elegí cómo pagar...</option>`+
+    disponibles.map(([k,m])=>`<option value="${k}">${m.label}</option>`).join("");
+  if(prev&&disponibles.some(([k])=>k===prev))sel.value=prev;
+  onPagoChange();
+}
+
+// Muestra/oculta el selector de moneda, los datos del local y el monto convertido
+function onPagoChange(){
+  const t=tenants[currentTenantId];
+  const cobros=getCobros(t);
+  const metodo=document.getElementById("co-pago")?.value||"";
+  const def=metodosDePais(t&&t.pais)[metodo];
+  const wrap=document.getElementById("co-moneda-wrap");
+  const selMon=document.getElementById("co-moneda");
+  const datos=document.getElementById("co-pago-datos");
+  if(!datos)return;
+  if(!def){
+    if(wrap)wrap.style.display="none";
+    datos.innerHTML="";
+    return;
+  }
+  const monedaLocal=monedaDe(t);
+  // Monedas que se pueden usar: las del método, salvo que falte la tasa
+  const opciones=def.monedas.filter(m=>m===monedaLocal||(parseFloat(cobros.tasas[m])||0)>0);
+  const usables=opciones.length?opciones:[monedaLocal];
+  if(wrap){
+    if(usables.length>1){
+      wrap.style.display="";
+      const prev=selMon.value;
+      selMon.innerHTML=usables.map(m=>`<option value="${m}">${MONEDAS[m].corto} · ${MONEDAS[m].nombre}</option>`).join("");
+      if(prev&&usables.includes(prev))selMon.value=prev;
+    } else {
+      wrap.style.display="none";
+      selMon.innerHTML=`<option value="${usables[0]}">${MONEDAS[usables[0]].corto}</option>`;
+    }
+  }
+  const monedaPago=selMon?selMon.value||usables[0]:usables[0];
+  const total=totalCarritoActual();
+  const conv=convertirAPago(total,monedaLocal,monedaPago,cobros.tasas);
+  let html="";
+  if(conv.tasa!==1&&conv.monto!=null){
+    html+=`<div class="pago-conv">Pagás <strong>${fmt(conv.monto,monedaPago)}</strong> <span>(tasa ${fmt(conv.tasa,monedaPago)} por ${MONEDAS[monedaLocal].corto} 1)</span></div>`;
+  }
+  if(def.ref){
+    const d=cobros.datos;
+    const tieneDatos=d.telefono||d.cedula||d.banco;
+    html+=`<div class="pago-datos">
+      <div class="pd-tit">${metodo==="pagomovil"?"📲 Pagá a estos datos":"🏦 Datos para transferir"}</div>
+      ${tieneDatos?`
+        ${d.telefono?`<div class="pd-row"><span>Teléfono</span><strong>${d.telefono}</strong></div>`:""}
+        ${d.cedula?`<div class="pd-row"><span>Cédula / RIF</span><strong>${d.cedula}</strong></div>`:""}
+        ${d.banco?`<div class="pd-row"><span>Banco</span><strong>${d.banco}</strong></div>`:""}
+      `:`<div class="pd-vacio">El local todavía no cargó sus datos. Coordinalo por teléfono al confirmar.</div>`}
+      <label class="pd-ref-lbl">Número de referencia <span class="opt">(podés cargarlo después)</span></label>
+      <input type="text" id="co-referencia" placeholder="Últimos dígitos de la operación">
+    </div>`;
+  }
+  datos.innerHTML=html;
+}
+
+function totalCarritoActual(){
+  const subtotal=Object.entries(cart).reduce((acc,[n,q])=>acc+(pVentas[n]||0)*q,0);
+  if(entregaMode!=="delivery")return subtotal;
+  const selEl=document.getElementById("cart-zona-sel");
+  const zi=selEl?parseInt(selEl.value)||0:0;
+  const z=zonas[zi]||zonas[0]||{freeMin:0,costoFijo:0};
+  return subtotal+(subtotal>=z.freeMin?0:z.costoFijo);
+}
+
 function prefillCheckoutForm(){
   const saved=JSON.parse(localStorage.getItem("izifud_cliente_data")||"{}");
   const set=(id,v)=>{const e=document.getElementById(id);if(e&&!e.value)e.value=v||"";};
@@ -2904,7 +3163,12 @@ function prefillCheckoutForm(){
   set("co-direccion",dirSaved);
   set("co-telefono",saved.telefono);
   set("co-correo",saved.correo);
-  set("co-pago",saved.formaDePago);
+  // El método guardado solo aplica si este local lo acepta
+  const selPago=document.getElementById("co-pago");
+  if(selPago&&!selPago.value&&saved.formaDePago&&[...selPago.options].some(o=>o.value===saved.formaDePago)){
+    selPago.value=saved.formaDePago;
+    onPagoChange();
+  }
 }
 
 function getEntregaConfig(t){
@@ -3116,10 +3380,12 @@ function renderCartFoot(){
   }
 }
 
+// Etiquetas globales (fallback). Lo que ve el cliente sale de METODOS_PAGO según el país.
 const FORMA_PAGO_LABEL={
   efectivo:"💵 Efectivo al recibir",
   mercadopago:"💳 Mercado Pago",
   transferencia:"🏦 Transferencia",
+  pagomovil:"📲 Pago Móvil",
   tarjeta:"💳 Tarjeta al recibir"
 };
 
@@ -3183,6 +3449,23 @@ function submitCheckout(){
     total,
     tipoEntrega:entregaMode,
     cliente:{nombre:getClienteData().nombre||"",direccion,telefono,correo,formaDePago,coords:entregaMode==="delivery"&&userLocation?{lat:userLocation.lat,lng:userLocation.lng}:null},
+    pago:(()=>{
+      const t=tenants[currentTenantId];
+      const cobros=getCobros(t);
+      const monedaLocal=monedaDe(t);
+      const def=metodosDePais(t&&t.pais)[formaDePago];
+      const monedaPago=document.getElementById("co-moneda")?.value||monedaLocal;
+      const conv=convertirAPago(total,monedaLocal,monedaPago,cobros.tasas);
+      return{
+        metodo:formaDePago,
+        moneda:conv.monto!=null?monedaPago:monedaLocal,
+        tasa:conv.monto!=null?conv.tasa:1,// congelada: sobrevive a cambios de tasa
+        monto:conv.monto!=null?conv.monto:total,
+        referencia:def&&def.ref?limpiarTxt(document.getElementById("co-referencia")?.value):"",
+        // efectivo se cobra al entregar; el resto espera verificación del socio
+        estado:def&&def.ref?"pendiente":"contra_entrega"
+      };
+    })(),
     estado:"pendiente"
   };
   // Paso intermedio: resumen tipo ticket para revisar antes de confirmar
@@ -3214,13 +3497,15 @@ function openResumen(p){
       ?`<div class="tkt-row"><span class="tkt-n">Retiro en el local</span><strong style="color:var(--success-fg)">Sin cargo</strong></div>`
       :`<div class="tkt-row"><span class="tkt-n">Envío ${p.envioGratis?"(gratis)":""} · ${p.zona}</span><strong>${p.envioGratis?"$0":fmt(p.costoEnvio)}</strong></div>`}
     <div class="tkt-sep"></div>
-    <div class="tkt-total"><span>Total</span><span>${fmt(p.total)}</span></div>
+    <div class="tkt-total"><span>Total</span><span>${fmt(p.total,monedaDe(t))}</span></div>
+    ${p.pago&&p.pago.tasa!==1&&p.pago.monto!=null?`<div class="tkt-row" style="justify-content:flex-end;font-weight:700"><span>Pagás ${fmt(p.pago.monto,p.pago.moneda)} <span style="font-weight:400;color:var(--ink-faint)">(tasa ${fmt(p.pago.tasa,p.pago.moneda)})</span></span></div>`:""}
     <div class="tkt-datos">
       ${p.cliente.nombre?`<div class="td-row"><span>Nombre</span><strong>${p.cliente.nombre}</strong></div>`:""}
       <div class="td-row"><span>Entrega</span><strong>${pickup?`🏪 Retiro en ${(t&&t.direccion)||"el local"}`:`🛵 ${p.cliente.direccion}`}</strong></div>
       <div class="td-row"><span>Teléfono</span><strong>${p.cliente.telefono}</strong></div>
       ${p.cliente.correo?`<div class="td-row"><span>Correo</span><strong>${p.cliente.correo}</strong></div>`:""}
-      <div class="td-row"><span>Pago</span><strong>${FORMA_PAGO_LABEL[p.cliente.formaDePago]||p.cliente.formaDePago}</strong></div>
+      <div class="td-row"><span>Pago</span><strong>${labelMetodo(t&&t.pais,p.cliente.formaDePago)}</strong></div>
+      ${p.pago&&p.pago.referencia?`<div class="td-row"><span>Referencia</span><strong>${p.pago.referencia}</strong></div>`:""}
     </div>`;
   document.getElementById("resumen-overlay").classList.add("open");
   document.getElementById("resumen-modal").classList.add("open");
@@ -3286,6 +3571,96 @@ function setPais(k){
   if(devRole==="cliente")goToTab("home");
   else renderTabsForGroup();
   if(typeof updateGlobalHeader==="function")updateGlobalHeader();
+}
+
+// ── COMPROBANTE DE PEDIDO (no fiscal) ──
+let comprobanteActual=null;
+
+function abrirComprobante(tenantId,pedidoId){
+  const x=allPedidosCrossTenant().find(e=>e.tenant.id===tenantId&&e.p.id===pedidoId);
+  if(!x)return;
+  comprobanteActual=x;
+  const p=x.p,t=x.tenant,pg=pagoDe(p);
+  const mon=monedaDe(t);
+  const f=new Date(p.fecha);
+  const fechaStr=f.toLocaleDateString("es-AR",{day:"2-digit",month:"2-digit",year:"numeric"})+" · "+f.toLocaleTimeString("es-AR",{hour:"2-digit",minute:"2-digit"});
+  const pickup=p.tipoEntrega==="pickup";
+  const conv=pg.tasa&&pg.tasa!==1&&pg.monto!=null;
+  document.getElementById("comprobante-body").innerHTML=`
+    <div class="tkt-head">
+      <div style="font-size:26px">${t.icono||"🍽"}</div>
+      <div class="tkt-rest">${t.nombre}</div>
+      <div class="tkt-sub">${t.direccion||""}${t.tel?" · "+t.tel:""}</div>
+      <div class="cmp-tipo">Comprobante de pedido</div>
+      <div class="tkt-sub">#${p.id} · ${fechaStr}</div>
+    </div>
+    <div class="tkt-items">
+      ${p.items.map(i=>`<div class="tkt-row"><span class="tkt-n">${i.emoji} ${i.nombre}</span><span class="tkt-q">×${i.qty}</span><strong>${fmt(i.subtotal,mon)}</strong></div>`).join("")}
+    </div>
+    <div class="tkt-sep"></div>
+    <div class="tkt-row"><span class="tkt-n">Subtotal</span><strong>${fmt(p.subtotal,mon)}</strong></div>
+    ${pickup
+      ?`<div class="tkt-row"><span class="tkt-n">Retiro en el local</span><strong>Sin cargo</strong></div>`
+      :`<div class="tkt-row"><span class="tkt-n">Envío${p.envioGratis?" (gratis)":""}${p.zona?" · "+p.zona:""}</span><strong>${p.envioGratis?fmt(0,mon):fmt(p.costoEnvio,mon)}</strong></div>`}
+    <div class="tkt-sep"></div>
+    <div class="tkt-total"><span>Total</span><span>${fmt(p.total,mon)}</span></div>
+    ${conv?`<div class="tkt-row" style="justify-content:flex-end"><span>Pagado en ${MONEDAS[pg.moneda].nombre.toLowerCase()}: <strong>${fmt(pg.monto,pg.moneda)}</strong> (tasa ${fmt(pg.tasa,pg.moneda)})</span></div>`:""}
+    <div class="tkt-datos">
+      ${p.cliente&&p.cliente.nombre?`<div class="td-row"><span>Cliente</span><strong>${p.cliente.nombre}</strong></div>`:""}
+      ${p.cliente&&p.cliente.telefono?`<div class="td-row"><span>Teléfono</span><strong>${p.cliente.telefono}</strong></div>`:""}
+      <div class="td-row"><span>Entrega</span><strong>${pickup?`Retiro en ${t.direccion||"el local"}`:`Delivery a ${(p.cliente&&p.cliente.direccion)||"-"}`}</strong></div>
+      <div class="td-row"><span>Pago</span><strong>${labelMetodo(t.pais,pg.metodo)}</strong></div>
+      ${pg.referencia?`<div class="td-row"><span>Referencia</span><strong>${pg.referencia}</strong></div>`:""}
+      <div class="td-row"><span>Estado</span><strong>${PAGO_ESTADO_LABEL[pg.estado]||pg.estado}</strong></div>
+    </div>
+    <div class="cmp-legal">Comprobante de pedido — no válido como factura fiscal.</div>`;
+  document.getElementById("comprobante-overlay").classList.add("open");
+  document.getElementById("comprobante-modal").classList.add("open");
+}
+
+function closeComprobante(){
+  document.getElementById("comprobante-overlay").classList.remove("open");
+  document.getElementById("comprobante-modal").classList.remove("open");
+}
+
+function imprimirComprobante(){window.print();}
+
+function comprobanteTexto(){
+  if(!comprobanteActual)return "";
+  const p=comprobanteActual.p,t=comprobanteActual.tenant,pg=pagoDe(p),mon=monedaDe(t);
+  const f=new Date(p.fecha);
+  const L=[];
+  L.push(`${t.icono||""} ${t.nombre}`.trim());
+  if(t.direccion)L.push(t.direccion);
+  L.push("");
+  L.push(`Comprobante de pedido #${p.id}`);
+  L.push(f.toLocaleDateString("es-AR")+" "+f.toLocaleTimeString("es-AR",{hour:"2-digit",minute:"2-digit"}));
+  L.push("");
+  p.items.forEach(i=>L.push(`${i.qty}x ${i.nombre} — ${fmt(i.subtotal,mon)}`));
+  L.push("");
+  L.push(`Subtotal: ${fmt(p.subtotal,mon)}`);
+  if(p.tipoEntrega!=="pickup")L.push(`Envío: ${p.envioGratis?fmt(0,mon):fmt(p.costoEnvio,mon)}`);
+  L.push(`TOTAL: ${fmt(p.total,mon)}`);
+  if(pg.tasa&&pg.tasa!==1&&pg.monto!=null)L.push(`Pagado: ${fmt(pg.monto,pg.moneda)} (tasa ${fmt(pg.tasa,pg.moneda)})`);
+  L.push(`Pago: ${labelMetodo(t.pais,pg.metodo)}${pg.referencia?" · Ref "+pg.referencia:""}`);
+  L.push(PAGO_ESTADO_LABEL[pg.estado]||pg.estado);
+  L.push("");
+  L.push("Comprobante de pedido — no válido como factura fiscal.");
+  return L.join("\n");
+}
+
+async function compartirComprobante(){
+  const txt=comprobanteTexto();
+  if(!txt)return;
+  if(navigator.share){
+    try{await navigator.share({title:"Comprobante de pedido",text:txt});return;}catch(e){if(e&&e.name==="AbortError")return;}
+  }
+  try{
+    await navigator.clipboard.writeText(txt);
+    alert("Comprobante copiado. Pegalo donde quieras mandarlo.");
+  }catch(e){
+    alert(txt);
+  }
 }
 
 // ── PERFIL DE USUARIO (👤 Mi cuenta) ──
@@ -5013,6 +5388,7 @@ function initTenants(){
     entregaConfig:{delivery:true,pickup:true},
     activo:true,
     pais:"AR",moneda:"ARS",
+    cobros:JSON.parse(JSON.stringify(COBROS_DEMO.tito)),
     data:snapshotCurrentState(),
   };
   tenants["sakura"]={
@@ -5056,6 +5432,7 @@ function seedVenezuela(){
     entregaConfig:{delivery:true,pickup:true},
     activo:true,
     pais:"VE",moneda:"USD",
+    cobros:JSON.parse(JSON.stringify(COBROS_DEMO.arepas)),
     data:snapshotCurrentState(),
   };
   tenants["marquesina"]={
@@ -5068,6 +5445,7 @@ function seedVenezuela(){
     entregaConfig:{delivery:true,pickup:true},
     activo:true,
     pais:"VE",moneda:"USD",
+    cobros:JSON.parse(JSON.stringify(COBROS_DEMO.marquesina)),
     data:snapshotCurrentState(),
   };
   // Zonas de envío propias de San Cristóbal (en USD; el snapshot traía las de CABA)
@@ -5079,12 +5457,16 @@ function seedVenezuela(){
   tenants["arepas"].data.zonas=JSON.parse(JSON.stringify(zonasSC));
   tenants["marquesina"].data.zonas=JSON.parse(JSON.stringify(zonasSC));
   // Pedidos demo de San Cristóbal (el snapshot pudo traer pedidos del tenant activo: se pisan)
+  // Cada pedido demo estrena un medio de pago distinto para ver el flujo completo
   tenants["arepas"].data.pedidos=[
-    mkPedidoDemo({id:"ORD-DEMO-V1",haceMin:11,estado:"pendiente",items:[["Arepa reina pepiada",2],["Jugo natural",2]],dir:"Calle 5 con Carrera 20, Pueblo Nuevo, San Cristóbal",coords:{lat:7.7735,lng:-72.2312},tel:"+58 414 700-1101"}),
-    mkPedidoDemo({id:"ORD-DEMO-V2",haceMin:60*28,estado:"entregado",rider:"r4",items:[["Pabellón criollo",1],["Malta",1],["Quesillo",1]],dir:"Carrera 19, La Concordia, San Cristóbal",coords:{lat:7.7528,lng:-72.2286},tel:"+58 424 700-1102"}),
+    mkPedidoDemo({id:"ORD-DEMO-V1",haceMin:11,estado:"pendiente",items:[["Arepa reina pepiada",2],["Jugo natural",2]],dir:"Calle 5 con Carrera 20, Pueblo Nuevo, San Cristóbal",coords:{lat:7.7735,lng:-72.2312},tel:"+58 414 700-1101",zona:"Pueblo Nuevo / Pirineos",
+      pago:{metodo:"pagomovil",moneda:"VES",tasa:40,referencia:"0056871",estado:"pendiente"}}),
+    mkPedidoDemo({id:"ORD-DEMO-V2",haceMin:60*28,estado:"entregado",rider:"r4",items:[["Pabellón criollo",1],["Malta",1],["Quesillo",1]],dir:"Carrera 19, La Concordia, San Cristóbal",coords:{lat:7.7528,lng:-72.2286},tel:"+58 424 700-1102",zona:"Barrio Obrero / La Concordia",
+      pago:{metodo:"efectivo",moneda:"COP",tasa:4000,estado:"cobrado"}}),
   ];
   tenants["marquesina"].data.pedidos=[
-    mkPedidoDemo({id:"ORD-DEMO-V3",haceMin:19,estado:"preparando",rider:"r4",items:[["Pizza tachirense",1],["Refresco 2L",1]],dir:"Av. Carabobo, Barrio Obrero, San Cristóbal",coords:{lat:7.7612,lng:-72.2198},tel:"+58 416 700-1103"}),
+    mkPedidoDemo({id:"ORD-DEMO-V3",haceMin:19,estado:"preparando",rider:"r4",items:[["Pizza tachirense",1],["Refresco 2L",1]],dir:"Av. Carabobo, Barrio Obrero, San Cristóbal",coords:{lat:7.7612,lng:-72.2198},tel:"+58 416 700-1103",zona:"Barrio Obrero / La Concordia",
+      pago:{metodo:"efectivo",moneda:"USD",tasa:1,estado:"contra_entrega"}}),
   ];
 }
 
@@ -5096,11 +5478,22 @@ function mkPedidoDemo(o){
   const precio=n=>{const d=D.find(x=>x.n===n);return d?d.pVenta:0;};
   const items=o.items.map(([n,q])=>({nombre:n,qty:q,precioUnit:precio(n),subtotal:precio(n)*q,unidad:(D.find(x=>x.n===n)||{}).u||"",emoji:EMOJIS[n]||"🍽"}));
   const subtotal=items.reduce((a,i)=>a+i.subtotal,0);
+  const pg=o.pago||{};
+  const metodo=pg.metodo||"efectivo";
+  const tasa=pg.tasa||1;
   return{
     id:o.id,fecha:new Date(Date.now()-o.haceMin*60000).toISOString(),
     items,subtotal,zona:o.zona||"CABA",costoEnvio:0,envioGratis:true,total:subtotal,
     tipoEntrega:"delivery",
-    cliente:{direccion:o.dir,telefono:o.tel,correo:"",formaDePago:"efectivo",coords:o.coords||null},
+    cliente:{direccion:o.dir,telefono:o.tel,correo:"",formaDePago:metodo,coords:o.coords||null},
+    pago:{
+      metodo,
+      moneda:pg.moneda||null,
+      tasa,
+      monto:Math.round(subtotal*tasa*100)/100,
+      referencia:pg.referencia||"",
+      estado:pg.estado||(o.estado==="entregado"?"cobrado":"contra_entrega")
+    },
     estado:o.estado,
     ...(o.rider?{riderId:o.rider}:{})
   };
@@ -5134,6 +5527,25 @@ function migrarSeedsNuevos(){
     if(!t.pais){t.pais="AR";t.moneda=t.moneda||"ARS";cambio=true;}
   });
   riders.forEach(r=>{if(!r.pais){r.pais="AR";cambio=true;}});
+  // Cobros: los locales guardados antes de esta capa no tienen config
+  Object.values(tenants).forEach(t=>{
+    if(!t.cobros){
+      t.cobros=COBROS_DEMO[t.id]?JSON.parse(JSON.stringify(COBROS_DEMO[t.id])):getCobros(t);
+      cambio=true;
+    }
+  });
+  // Pedidos viejos: sin objeto pago quedan como "paga al recibir"
+  Object.values(tenants).forEach(t=>{
+    const lista=(t.data&&t.data.pedidos)||[];
+    lista.forEach(p=>{
+      if(!p.pago){
+        p.pago={metodo:(p.cliente&&p.cliente.formaDePago)||"efectivo",moneda:null,tasa:1,monto:p.total,referencia:"",
+          estado:p.estado==="entregado"?"cobrado":"contra_entrega"};
+        cambio=true;
+      }
+    });
+  });
+  if(cambio&&tenants[currentTenantId]&&tenants[currentTenantId].data)pedidos=JSON.parse(JSON.stringify(tenants[currentTenantId].data.pedidos||pedidos));
   if(!tenants["arepas"]||!tenants["marquesina"]){
     seedVenezuela();
     cambio=true;
@@ -5497,6 +5909,91 @@ function renderTenantDetail(){
         Las opciones de entrega se configuran en la tab <strong>🚚 Costo de envío</strong>.
       </p>
     </div>`;
+}
+
+// ── COBROS DEL SOCIO (métodos, datos y tasas) ──
+function renderCobrosConfigHTML(t){
+  const pais=(t&&t.pais)||"AR";
+  const cobros=getCobros(t);
+  const monedaLocal=monedaDe(t);
+  const defs=metodosDePais(pais);
+  const esc=s=>String(s||"").replace(/"/g,"&quot;");
+  const necesitaDatos=Object.entries(defs).some(([k,m])=>cobros.metodos[k]&&m.ref);
+  // Monedas de pago distintas a la del local (necesitan tasa)
+  const otras=[...new Set(Object.values(defs).flatMap(m=>m.monedas))].filter(m=>m!==monedaLocal);
+  return `
+    <div class="entrega-config">
+      <div class="entrega-config-title">💳 Cómo cobrás</div>
+      <p class="entrega-config-desc">Elegí qué medios aceptás. No hay pasarela de pago: los pagos por transferencia los verificás vos con el número de referencia, y el efectivo lo cobra quien entrega.</p>
+      <div class="entrega-config-rows">
+        ${Object.entries(defs).map(([k,m])=>`<label class="entrega-toggle">
+          <div class="et-info">
+            <strong>${m.label}</strong>
+            <span>${m.ref?"El cliente carga la referencia y vos la verificás":"Se cobra al entregar el pedido"}</span>
+          </div>
+          <input type="checkbox" ${cobros.metodos[k]?"checked":""} onchange="setCobroMetodo('${k}',this.checked)">
+          <span class="et-switch"></span>
+        </label>`).join("")}
+      </div>
+      ${necesitaDatos?`
+      <div class="cobros-datos">
+        <div class="cd-tit">Datos que ve el cliente para pagarte</div>
+        <div class="form-grid">
+          <div class="form-field"><label>Teléfono ${pais==="VE"?"(Pago Móvil)":""}</label><input type="text" value="${esc(cobros.datos.telefono)}" placeholder="${pais==="VE"?"0414-1234567":"+54 11 ..."}" onchange="setCobroDato('telefono',this.value)"></div>
+          <div class="form-field"><label>${pais==="VE"?"Cédula / RIF":"CUIT / Alias"}</label><input type="text" value="${esc(cobros.datos.cedula)}" placeholder="${pais==="VE"?"V-12345678":"alias.mp"}" onchange="setCobroDato('cedula',this.value)"></div>
+          <div class="form-field"><label>Banco</label><input type="text" value="${esc(cobros.datos.banco)}" placeholder="${pais==="VE"?"Banesco":"Banco / billetera"}" onchange="setCobroDato('banco',this.value)"></div>
+        </div>
+      </div>`:""}
+      ${otras.length?`
+      <div class="cobros-datos">
+        <div class="cd-tit">Tasa de cambio</div>
+        <p class="entrega-config-desc" style="margin-bottom:8px">Tu carta está en ${MONEDAS[monedaLocal].nombre.toLowerCase()}. Poné cuánto vale 1 ${MONEDAS[monedaLocal].corto} en cada moneda que aceptás. La tasa queda guardada en cada pedido, así un cambio de hoy no altera los pedidos de ayer.</p>
+        <div class="form-grid">
+          ${otras.map(m=>`<div class="form-field">
+            <label>${MONEDAS[m].corto} · ${MONEDAS[m].nombre}</label>
+            <input type="number" step="0.01" min="0" value="${cobros.tasas[m]||""}" placeholder="0 = no acepto" onchange="setCobroTasa('${m}',this.value)">
+            <span class="cd-hint">${(parseFloat(cobros.tasas[m])||0)>0?`${MONEDAS[monedaLocal].corto} 1 = ${fmt(parseFloat(cobros.tasas[m]),m)}`:"Sin tasa: no aparece como opción"}</span>
+          </div>`).join("")}
+        </div>
+      </div>`:""}
+    </div>`;
+}
+
+function refrescarCobrosHost(){
+  const host=document.getElementById("cobros-config-host");
+  if(host)host.innerHTML=renderCobrosConfigHTML(tenants[currentTenantId]);
+}
+
+function ensureCobros(){
+  const t=tenants[currentTenantId];
+  if(!t)return null;
+  if(!t.cobros)t.cobros=getCobros(t);
+  return t;
+}
+
+function setCobroMetodo(k,on){
+  const t=ensureCobros();
+  if(!t)return;
+  t.cobros.metodos={...t.cobros.metodos,[k]:!!on};
+  saveToLocalStorage();
+  refrescarCobrosHost();
+  if(document.getElementById("cart-drawer")?.classList.contains("open"))renderPagoOpciones();
+}
+
+function setCobroDato(campo,valor){
+  const t=ensureCobros();
+  if(!t)return;
+  t.cobros.datos={...t.cobros.datos,[campo]:limpiarTxt(valor)};
+  saveToLocalStorage();
+}
+
+function setCobroTasa(moneda,valor){
+  const t=ensureCobros();
+  if(!t)return;
+  t.cobros.tasas={...t.cobros.tasas,[moneda]:parseFloat(valor)||0};
+  saveToLocalStorage();
+  refrescarCobrosHost();
+  if(document.getElementById("cart-drawer")?.classList.contains("open"))onPagoChange();
 }
 
 function renderEntregaConfigHTML(t){
@@ -6711,6 +7208,14 @@ function renderEntregas(){
         <div class="er-row"><span>📦</span><div>#${pid} · ${x.p.items.length} producto${x.p.items.length===1?"":"s"}</div></div>
         <div class="er-row"><span>🏪</span><div>Retirar: ${x.tenant.direccion||"-"}</div></div>
         <div class="er-row"><span>🏠</span><div>Entregar: ${dir}${x.p.cliente&&x.p.cliente.telefono?" · 📞 "+x.p.cliente.telefono:""}</div></div>
+        ${(()=>{
+          const pg=pagoDe(x.p);
+          const monto=pg.monto!=null&&pg.tasa!==1?fmt(pg.monto,pg.moneda):fmt(x.p.total,monedaDe(x.tenant));
+          if(pg.estado==="contra_entrega")return`<div class="er-row er-cobro"><span>💵</span><div><strong>Cobrar ${monto}</strong> en efectivo${pg.tasa!==1?` (${fmt(x.p.total,monedaDe(x.tenant))} a tasa ${fmt(pg.tasa,pg.moneda)})`:""}</div></div>`;
+          if(pg.estado==="verificado")return`<div class="er-row"><span>✅</span><div>Ya pagó por ${labelMetodo(x.tenant.pais,pg.metodo).replace(/^..\s/,"")} — no cobres nada</div></div>`;
+          if(pg.estado==="cobrado")return`<div class="er-row"><span>✅</span><div>Cobrado ${monto}</div></div>`;
+          return`<div class="er-row er-cobro"><span>⚠️</span><div><strong>Pago sin verificar</strong> — confirmá con el local antes de entregar</div></div>`;
+        })()}
       </div>
       <div class="ruta-map-wrap" id="ruta-${pid}"></div>
       <div class="entrega-acciones">
@@ -6778,7 +7283,12 @@ function riderIniciar(tenantId,pedidoId){
 }
 
 function riderEntregar(tenantId,pedidoId){
-  mutarPedidoCrossTenant(tenantId,pedidoId,p=>{p.estado="entregado";});
+  mutarPedidoCrossTenant(tenantId,pedidoId,p=>{
+    p.estado="entregado";
+    // El efectivo se cobra en la puerta: al entregar queda saldado
+    p.pago=pagoDe(p);
+    if(p.pago.estado==="contra_entrega")p.pago.estado="cobrado";
+  });
   renderEntregas();
   refreshPedidosSocioSiVisible();
 }
@@ -7087,7 +7597,19 @@ function renderMisPedidos(){
       ${msg?`<div class="mp-msg">${msg}</div>`:""}
       <div class="mp-items">${resumenItems(p)}</div>
       <div class="mp-entrega">${pickup?`🏪 Retiro en ${t.direccion||"el local"}`:`🛵 Delivery a ${(p.cliente&&p.cliente.direccion)||"tu dirección"}`}</div>
-      ${p.estado==="pendiente"?`<div style="margin-top:8px"><button class="edit-btn" style="color:var(--danger)" onclick="clienteCancelarPedido('${t.id}','${p.id}')">✕ Cancelar pedido</button></div>`:""}
+      ${(()=>{
+        const pg=pagoDe(p);
+        const conv=pg.tasa&&pg.tasa!==1&&pg.monto!=null;
+        return`<div class="mp-pago">
+          <span class="pago-estado ${pg.estado}">${PAGO_ESTADO_LABEL[pg.estado]||pg.estado}</span>
+          <span>${labelMetodo(t.pais,pg.metodo)}${conv?" · "+fmt(pg.monto,pg.moneda):""}</span>
+        </div>`;
+      })()}
+      <div class="mp-acciones">
+        ${(()=>{const pg=pagoDe(p);return pg.estado==="pendiente"&&!pg.referencia?`<button class="edit-btn" onclick="cargarReferencia('${t.id}','${p.id}')">📲 Cargar referencia</button>`:"";})()}
+        <button class="edit-btn" onclick="abrirComprobante('${t.id}','${p.id}')">🧾 Comprobante</button>
+        ${p.estado==="pendiente"?`<button class="edit-btn" style="color:var(--danger)" onclick="clienteCancelarPedido('${t.id}','${p.id}')">✕ Cancelar pedido</button>`:""}
+      </div>
     </div>`;
   };
   const cardPasado=x=>{
@@ -7099,6 +7621,7 @@ function renderMisPedidos(){
         <span class="mp-meta">${fmtFecha(p.fecha)} · ${p.items.length} producto${p.items.length===1?"":"s"}</span>
         <span class="pedido-status ${p.estado}">${lbl}</span>
         <span class="mp-total">${fmt(p.total,monedaDe(t))}</span>
+        <button class="edit-btn" onclick="abrirComprobante('${t.id}','${p.id}')">🧾</button>
         ${p.estado==="entregado"?`<button class="edit-btn" onclick="repetirPedido('${t.id}','${p.id}')">↻ Repetir</button>`:""}
       </div>
     </div>`;
