@@ -1570,7 +1570,8 @@ const TABS=[
   {id:"plataforma-dash",label:"📊 Estadísticas", group:"plataforma"},
   {id:"riders",label:"🛵 Riders", group:"plataforma"},
   // REPARTO (rider de plataforma)
-  {id:"entregas",label:"🛵 Entregas", group:"reparto"},
+  {id:"entregas",label:"🛵 Pedidos activos", group:"reparto"},
+  {id:"rider-historial",label:"🕓 Historial", group:"reparto"},
 ];
 
 // Cada rol ve SOLO su grupo (el switch de rol es la única navegación cruzada)
@@ -4674,6 +4675,40 @@ function initTenants(){
   };
 }
 
+// Pedidos de demo: en un dispositivo nuevo cada rol arranca con material para
+// probar (socio: pendiente para avanzar; rider: asignada + en camino + cola;
+// admin: entregados que alimentan las estadísticas). Solo corre en el primer boot.
+function initDemoPedidos(){
+  const precio=n=>{const d=D.find(x=>x.n===n);return d?d.pVenta:0;};
+  const mk=o=>{
+    const items=o.items.map(([n,q])=>({nombre:n,qty:q,precioUnit:precio(n),subtotal:precio(n)*q,unidad:(D.find(x=>x.n===n)||{}).u||"",emoji:EMOJIS[n]||"🍽"}));
+    const subtotal=items.reduce((a,i)=>a+i.subtotal,0);
+    return{
+      id:o.id,fecha:new Date(Date.now()-o.haceMin*60000).toISOString(),
+      items,subtotal,zona:o.zona||"CABA",costoEnvio:0,envioGratis:true,total:subtotal,
+      tipoEntrega:"delivery",
+      cliente:{direccion:o.dir,telefono:o.tel,correo:"",formaDePago:"efectivo",coords:o.coords||null},
+      estado:o.estado,
+      ...(o.rider?{riderId:o.rider}:{})
+    };
+  };
+  // Tito es el tenant activo al boot: sus pedidos van al estado runtime y se re-snapshotea
+  pedidos=[
+    mk({id:"ORD-DEMO-T1",haceMin:9,estado:"pendiente",items:[["Asado de tira",1],["Provoleta",1]],dir:"Gorriti 4890, CABA",coords:{lat:-34.5893,lng:-58.4287},tel:"+54 11 6111-9001"}),
+    mk({id:"ORD-DEMO-T2",haceMin:24,estado:"preparando",rider:"r1",items:[["Parrillada para 2",1],["Flan casero",2]],dir:"Av. Santa Fe 3200, CABA",coords:{lat:-34.5948,lng:-58.4098},tel:"+54 11 6111-9002"}),
+    mk({id:"ORD-DEMO-T3",haceMin:60*26,estado:"entregado",rider:"r1",items:[["Choripán + bebida",2]],dir:"Honduras 5300, CABA",coords:{lat:-34.5872,lng:-58.4330},tel:"+54 11 6111-9003"}),
+  ];
+  tenants["tito"].data=snapshotCurrentState();
+  tenants["sakura"].data.pedidos=[
+    mk({id:"ORD-DEMO-S1",haceMin:6,estado:"en_camino",rider:"r1",items:[["Combo 30 piezas",1],["Gyozas de cerdo x6",1]],dir:"Juramento 1550, CABA",coords:{lat:-34.5611,lng:-58.4522},tel:"+54 11 6222-9004"}),
+    mk({id:"ORD-DEMO-S2",haceMin:60*30,estado:"entregado",rider:"r2",items:[["Roll Philadelphia x8",2]],dir:"Av. Cabildo 1900, CABA",coords:{lat:-34.5680,lng:-58.4505},tel:"+54 11 6222-9005"}),
+  ];
+  tenants["napoli"].data.pedidos=[
+    mk({id:"ORD-DEMO-N1",haceMin:14,estado:"preparando",items:[["Muzzarella",1],["Porción de fainá",2],["Coca-Cola 1.5L",1]],dir:"Av. Rivadavia 4980, CABA",coords:{lat:-34.6172,lng:-58.4355},tel:"+54 11 6333-9006"}),
+    mk({id:"ORD-DEMO-N2",haceMin:60*50,estado:"entregado",rider:"r2",items:[["2 muzzarellas promo",1],["Tiramisú",1]],dir:"Yerbal 2300, CABA",coords:{lat:-34.6205,lng:-58.4462},tel:"+54 11 6333-9007"}),
+  ];
+}
+
 function switchTenant(id){
   if(id===currentTenantId)return;
   // Save current state before switching
@@ -6145,6 +6180,8 @@ function setDevRider(id){
   localStorage.setItem("izifud_dev_rider",id);
   updateDevRiderSelect();
   renderEntregas();
+  const ph=document.getElementById("panel-rider-historial");
+  if(ph&&ph.classList.contains("on"))renderRiderHistorial();
 }
 
 // Selector de identidad del rider en la barra de roles (visible solo con rol Rider)
@@ -6228,7 +6265,17 @@ function renderEntregas(){
     ${misCurso.length?misCurso.map(x=>card(x,`<button class="primary" onclick="riderEntregar('${x.tenant.id}','${x.p.id}')">✓ Entregado</button>`,bCurso)).join(""):`<div class="pedido-empty"><strong>Nada en camino</strong>Iniciá una entrega asignada para arrancar.</div>`}
     <div class="rider-section-title">⏳ Sin asignar (${sinAsignar.length})</div>
     ${sinAsignar.length?sinAsignar.map(x=>card(x,yo.enLinea?`<button class="primary" onclick="riderTomar('${x.tenant.id}','${x.p.id}')">Tomar pedido</button>`:`<button disabled style="opacity:.5">Fuera de línea</button>`,bLibre)).join(""):`<div class="pedido-empty"><strong>Cola vacía</strong>Acá caen los pedidos que se prepararon sin ningún rider en línea.</div>`}
-    <p class="foot">Los pedidos se asignan automáticamente al rider en línea con menos carga. Solo se listan pedidos delivery de locales que usan la flota IZIFUD; los que tienen delivery propio gestionan sus envíos desde su panel.</p>`;
+    <p class="foot">Los pedidos se asignan automáticamente al rider en línea con menos carga. Solo se listan pedidos delivery de locales que usan la flota IZIFUD; los que tienen delivery propio gestionan sus envíos desde su panel. Tus entregas terminadas están en 🕓 Historial.</p>`;
+  // Las entregas propias (asignadas + en camino) abren su mapa de una, estilo app de rider
+  [...misAsignadas,...misCurso].forEach(x=>{
+    const wrap=document.getElementById("ruta-"+x.p.id);
+    const btn=document.getElementById("rbtn-"+x.p.id);
+    if(wrap&&!wrap.classList.contains("show")){
+      wrap.classList.add("show");
+      if(btn)btn.textContent="Ocultar mapa";
+      setTimeout(()=>buildRutaMapa(x.tenant.id,x.p.id),60);
+    }
+  });
 }
 
 function riderToggleLinea(id,v){
@@ -6322,6 +6369,46 @@ function refreshPedidosSocioSiVisible(){
   const pp=document.getElementById("panel-pedidos");
   if(pp&&pp.dataset.init){renderPedidosSummary();renderPedidosList();}
   refreshMisPedidosSiVisible();
+}
+
+// ── TAB: HISTORIAL DEL RIDER ──
+function renderRiderHistorial(){
+  const p=document.getElementById("panel-rider-historial");
+  if(!p)return;
+  const yo=getDevRider();
+  if(!yo){
+    p.innerHTML=`<div class="pedido-empty"><strong>No hay riders activos</strong>El admin puede dar de alta riders en Plataforma → 🛵 Riders.</div>`;
+    return;
+  }
+  const done=allPedidosCrossTenant()
+    .filter(x=>x.p.estado==="entregado"&&x.p.riderId===yo.id)
+    .sort((a,b)=>new Date(b.p.fecha)-new Date(a.p.fecha));
+  const hoyStr=new Date().toDateString();
+  const deHoy=done.filter(x=>new Date(x.p.fecha).toDateString()===hoyStr).length;
+  const valor=done.reduce((a,x)=>a+x.p.total,0);
+  const fmtFecha=iso=>{
+    const f=new Date(iso);
+    return f.toLocaleDateString("es-AR",{day:"2-digit",month:"short"})+" "+f.toLocaleTimeString("es-AR",{hour:"2-digit",minute:"2-digit"});
+  };
+  p.innerHTML=`
+    <div class="rider-head">
+      <div class="rh-nombre">${(yo.vehiculo||"🛵").split(" ")[0]} <strong>${yo.nombre}</strong></div>
+      <div class="rh-stats">
+        <span>Entregas <strong>${done.length}</strong></span>
+        <span>Hoy <strong>${deHoy}</strong></span>
+        <span>Valor entregado <strong>${fmt(valor)||"$0"}</strong></span>
+      </div>
+    </div>
+    ${done.length?done.map(x=>`
+      <div class="mp-card mp-past">
+        <div class="mp-card-top">
+          <div class="mp-rest">${x.tenant.icono||"🍽"} <strong>${x.tenant.nombre}</strong></div>
+          <span class="mp-meta">#${x.p.id} · ${fmtFecha(x.p.fecha)}</span>
+          <span class="mp-total">${fmt(x.p.total)}</span>
+        </div>
+        <div class="mp-entrega">🏠 ${(x.p.cliente&&x.p.cliente.direccion)||"Sin dirección"}</div>
+      </div>`).join(""):`<div class="pedido-empty"><strong>Todavía no entregaste pedidos</strong>Cuando marques entregas como completadas, quedan acá.</div>`}
+    <p class="foot">Historial de entregas completadas por este rider en todos los locales de la plataforma.</p>`;
 }
 
 // ─── RIDERS (gestión desde admin) ─────────────────────────
@@ -6566,7 +6653,8 @@ const renderMap={
   tienda:renderTienda,recetas:renderRecetas,ubicacion:renderUbicacion,
   stock:renderStock,dashboard:renderDashboard,
   home:renderHome,socios:renderSocios,"plataforma-dash":renderPlataformaDash,
-  entregas:renderEntregas,riders:renderRiders,"mis-pedidos":renderMisPedidos
+  entregas:renderEntregas,riders:renderRiders,"mis-pedidos":renderMisPedidos,
+  "rider-historial":renderRiderHistorial
 };
 
 function renderTab(id){
@@ -6578,6 +6666,7 @@ const loaded=loadFromLocalStorage();
 if(!loaded){
   initTenants();
   initRiders();
+  initDemoPedidos();
   saveToLocalStorage();
 }
 updateGlobalHeader();
