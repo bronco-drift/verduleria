@@ -8,8 +8,8 @@
   "display": "standalone",
   "display_override": ["window-controls-overlay", "standalone", "browser"],
   "orientation": "portrait",
-  "background_color": "#f5f0e6",
-  "theme_color": "#2e5f7a",
+  "background_color": "#FAFAFA",
+  "theme_color": "#FAFAFA",
   "lang": "es-AR",
   "dir": "ltr",
   "categories": ["shopping", "food", "lifestyle"],
@@ -29,16 +29,16 @@
   ],
   "shortcuts": [
     {
-      "name": "Ver tienda",
-      "short_name": "Tienda",
-      "description": "Catálogo de frutas y verduras",
+      "name": "Restaurantes",
+      "short_name": "Restaurantes",
+      "description": "Elegí un restaurante y armá tu pedido",
       "url": "/",
       "icons": [{ "src": "/icon-512.svg", "sizes": "any", "type": "image/svg+xml" }]
     },
     {
       "name": "Mis pedidos",
       "short_name": "Pedidos",
-      "description": "Ver el estado de mis pedidos",
+      "description": "Seguí el estado de tus pedidos",
       "url": "/",
       "icons": [{ "src": "/icon-512.svg", "sizes": "any", "type": "image/svg+xml" }]
     }

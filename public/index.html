@@ -13,8 +13,8 @@
 
 <!-- PWA -->
 <link rel="manifest" href="/manifest.webmanifest">
-<meta name="theme-color" content="#2e5f7a" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#0f1419" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#FAFAFA" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0A0A0A" media="(prefers-color-scheme: dark)">
 <meta name="color-scheme" content="light dark">
 <meta name="application-name" content="IZIFUD">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -34,16 +34,16 @@
 <meta property="og:site_name" content="IZIFUD">
 <meta property="og:title" content="IZIFUD — Pedí online en tus restaurantes favoritos">
 <meta property="og:description" content="Mirá la carta, elegí delivery o retiro en el local y pagá como quieras.">
-<meta property="og:url" content="https://verduras.ar/">
-<meta property="og:image" content="https://verduras.ar/icon-512.svg">
-<meta property="og:image:alt" content="Logo de verduras.ar">
+<meta property="og:url" content="https://verduleria-git-comida-bronco-s-projects.vercel.app/">
+<meta property="og:image" content="https://verduleria-git-comida-bronco-s-projects.vercel.app/icon-512.svg">
+<meta property="og:image:alt" content="Logo de IZIFUD">
 <meta property="og:locale" content="es_AR">
 
 <!-- Twitter Card -->
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="IZIFUD — Pedidos online de restaurantes">
 <meta name="twitter:description" content="Mirá la carta, elegí delivery o retiro, pagá como quieras.">
-<meta name="twitter:image" content="https://verduras.ar/icon-512.svg">
+<meta name="twitter:image" content="https://verduleria-git-comida-bronco-s-projects.vercel.app/icon-512.svg">
 
 <!-- Hint a buscadores: SPA -->
 <meta name="fragment" content="!">
@@ -251,7 +251,7 @@ body.vista-final .mis-pedidos-trigger{display:flex}
 .mp-dot{width:17px;height:17px;border-radius:50%;background:var(--surface);border:2px solid var(--border-strong);z-index:1;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:#fff;box-sizing:border-box}
 .mp-step.done .mp-dot{background:var(--ink);border-color:var(--ink);color:var(--bg)}
 .mp-step.now .mp-dot{border-color:var(--ink);animation:mpPulse 1.8s ease-in-out infinite}
-.mp-lbl{font-size:9px;font-weight:700;color:var(--ink-faint);text-transform:uppercase;letter-spacing:.03em;text-align:center;line-height:1.2}
+.mp-lbl{font-size:10px;font-weight:700;color:var(--ink-faint);text-transform:uppercase;letter-spacing:.03em;text-align:center;line-height:1.2}
 .mp-step.done .mp-lbl,.mp-step.now .mp-lbl{color:var(--ink)}
 @keyframes mpPulse{0%,100%{box-shadow:0 0 0 0 rgba(0,0,0,.18)}50%{box-shadow:0 0 0 6px rgba(0,0,0,0)}}
 /* Modal pedido exitoso */
@@ -401,7 +401,12 @@ body.vista-final .volver-locales{display:inline-flex}
 .admin-close{width:32px;height:32px;border:none;background:rgba(255,255,255,.15);color:#fff;font-size:16px;cursor:pointer;border-radius:7px;display:flex;align-items:center;justify-content:center}
 .admin-close:hover{background:rgba(255,255,255,.25)}
 .admin-drawer-body{flex:1;overflow-y:auto;padding:18px}
-.tabs{display:flex;gap:0;margin-bottom:1.5rem;border-bottom:2px solid var(--border);overflow-x:auto}
+.tabs{display:flex;gap:0;margin-bottom:1.5rem;border-bottom:2px solid var(--border);overflow-x:auto;scrollbar-width:thin;scrollbar-color:var(--border-strong) transparent}
+/* Scrollbars finos en todos los contenedores con scroll horizontal (adiós scrollbar gordo de Windows) */
+.tabs::-webkit-scrollbar,.sys-wrap::-webkit-scrollbar,.ow::-webkit-scrollbar{height:6px}
+.tabs::-webkit-scrollbar-thumb,.sys-wrap::-webkit-scrollbar-thumb,.ow::-webkit-scrollbar-thumb{background:var(--border-strong);border-radius:3px}
+.tabs::-webkit-scrollbar-track,.sys-wrap::-webkit-scrollbar-track,.ow::-webkit-scrollbar-track{background:transparent}
+.sys-wrap,.ow{scrollbar-width:thin;scrollbar-color:var(--border-strong) transparent}
 .tab{padding:8px 16px;font-size:12px;font-weight:500;color:var(--ink-soft);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;white-space:nowrap;transition:all .15s}
 .tab.on{color:var(--ink);border-bottom-color:var(--brand)}
 .tab:hover{color:var(--ink)}
@@ -1080,7 +1085,7 @@ html[data-theme="lumina"] .prod-dot{display:inline-block}
 .mes.on{background:var(--brand);color:#fff;border-color:var(--brand)}
 .mes.off{background:var(--surface-2);color:var(--ink-soft);border-color:var(--border)}
 .mes.off:hover{background:var(--border)}
-.edit-btn{font-size:11px;padding:3px 9px;border-radius:5px;border:1px solid var(--border-strong);background:transparent;color:var(--ink-soft);cursor:pointer}
+.edit-btn{font-size:11px;padding:7px 10px;min-height:32px;border-radius:6px;border:1px solid var(--border-strong);background:transparent;color:var(--ink-soft);cursor:pointer}
 .edit-btn:hover{background:var(--surface-2)}
 
 /* Proveedor */
@@ -1300,7 +1305,7 @@ select.cell-sel{height:26px;padding:0 6px;font-size:11px;border:1px solid var(--
   </div>
   <div class="cart-foot">
     <div class="cart-total"><span>Total a pagar</span><span id="cart-total-val">$0</span></div>
-    <button class="checkout-btn" onclick="submitCheckout()">Confirmar pedido ↗</button>
+    <button class="checkout-btn" onclick="submitCheckout()">Revisar pedido ↗</button>
   </div>
 </div>
 
@@ -2356,6 +2361,9 @@ function renderPedidosList(){
     const tipo=p.tipoEntrega||"delivery";
     const tipoEmoji=tipo==="pickup"?"🏪":"🛵";
     const tipoLabel=tipo==="pickup"?"Retiro":"Delivery";
+    // Si un rider vivo lo lleva, el cierre es del rider (evita doble dueño del estado)
+    const riderVivo=p.riderId&&riders.some(r=>r.id===p.riderId);
+    const enManosRider=p.estado==="en_camino"&&riderVivo;
     return`<div class="pedido-card ${isOpen?"open":""}">
       <div class="pedido-head" onclick="togglePedido('${p.id}')">
         <div class="pedido-meta">
@@ -2396,7 +2404,8 @@ function renderPedidosList(){
         </div>
         <div class="pedido-actions">
           ${p.estado==="pendiente"?`<button class="primary" onclick="cambiarEstadoPedido('${p.id}','preparando')">▶ Marcar preparando</button>`:""}
-          ${p.estado==="preparando"||p.estado==="en_camino"?`<button class="primary" onclick="cambiarEstadoPedido('${p.id}','entregado')">✓ Marcar entregado</button>`:""}
+          ${(p.estado==="preparando"||p.estado==="en_camino")&&!enManosRider?`<button class="primary" onclick="cambiarEstadoPedido('${p.id}','entregado')">✓ Marcar entregado</button>`:""}
+          ${enManosRider?`<span style="font-size:12px;color:var(--ink-faint);align-self:center">🛵 En manos de ${riderNombre(p.riderId)} — lo cierra el rider</span>`:""}
           ${p.estado!=="cancelado"&&p.estado!=="entregado"?`<button class="danger" onclick="cancelarPedido('${p.id}')">✕ Cancelar</button>`:""}
           ${p.estado==="entregado"||p.estado==="cancelado"?`<button onclick="eliminarPedido('${p.id}')">🗑 Eliminar</button>`:""}
         </div>
@@ -2912,7 +2921,8 @@ function initCartMiniMap(){
   if(!el)return;
   const center=userLocation?[userLocation.lat,userLocation.lng]:[-34.6037,-58.3816];
   cartMiniMap=L.map(el,{zoomControl:false,attributionControl:false}).setView(center,userLocation?14:11);
-  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19}).addTo(cartMiniMap);
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:"© OpenStreetMap"}).addTo(cartMiniMap);
+  L.control.attribution({prefix:false}).addTo(cartMiniMap);
   L.control.zoom({position:"topright"}).addTo(cartMiniMap);
   cartMiniMap.on("click",e=>{
     setCartLocation(e.latlng.lat,e.latlng.lng,"Punto seleccionado en el mapa");
@@ -3048,10 +3058,10 @@ function submitCheckout(){
     alert("Este local no está aceptando pedidos en este momento.");
     return;
   }
-  const telefono=(document.getElementById("co-telefono")?.value||"").trim();
-  const correo=(document.getElementById("co-correo")?.value||"").trim();
+  const telefono=limpiarTxt(document.getElementById("co-telefono")?.value);
+  const correo=limpiarTxt(document.getElementById("co-correo")?.value);
   const formaDePago=document.getElementById("co-pago")?.value||"";
-  const direccion=entregaMode==="delivery"?(document.getElementById("co-direccion")?.value||"").trim():"";
+  const direccion=entregaMode==="delivery"?limpiarTxt(document.getElementById("co-direccion")?.value):"";
   const errors=[];
   const markInvalid=(id,bad)=>{
     const el=document.getElementById(id);
@@ -3176,6 +3186,10 @@ function getClienteData(){
   try{return JSON.parse(localStorage.getItem("izifud_cliente_data")||"{}")||{};}catch(e){return{};}
 }
 
+// Sanitizado mínimo de inputs de usuario (los datos se renderizan con innerHTML
+// en las vistas de socio/rider/ticket; con backend real esto pasa a escape al render)
+function limpiarTxt(s){return String(s||"").replace(/[<>]/g,"").trim();}
+
 function openPerfil(){
   const d=getClienteData();
   const notif=d.notif||{estado:true,ofertas:false};
@@ -3216,7 +3230,7 @@ function closePerfil(){
 }
 
 function savePerfil(){
-  const g=id=>(document.getElementById(id)?.value||"").trim();
+  const g=id=>limpiarTxt(document.getElementById(id)?.value);
   const data={...getClienteData(),
     nombre:g("pf-nombre"),telefono:g("pf-telefono"),correo:g("pf-correo"),
     direccion:g("pf-direccion"),formaDePago:document.getElementById("pf-pago")?.value||"",
@@ -3228,7 +3242,9 @@ function savePerfil(){
   const cp=document.getElementById("co-pago");
   if(cp&&data.formaDePago)cp.value=data.formaDePago;
   prefillCheckoutForm();
-  closePerfil();
+  const btn=document.querySelector(".pf-guardar");
+  if(btn){btn.textContent="Guardado ✓";btn.disabled=true;}
+  setTimeout(closePerfil,650);
 }
 
 // Alias legacy por compatibilidad si algo viejo lo llama
@@ -4893,18 +4909,23 @@ function initDemoPedidos(){
   ];
 }
 
+// Carrito por restaurante: cambiar de local no te borra lo que ya armaste en otro
+let cartsPorTenant={};
+
 function switchTenant(id){
   if(id===currentTenantId)return;
   // Save current state before switching
   tenants[currentTenantId].data=snapshotCurrentState();
+  cartsPorTenant[currentTenantId]=cart;
   // Load new tenant
   const t=tenants[id];
   if(!t){alert("Restaurante no encontrado");return;}
   loadTenantState(t);
   currentTenantId=id;
   applyTenantStyle(t);
-  // Reset transient UI state
-  cart={};
+  // Reset transient UI state (el carrito se restaura por local)
+  cart=cartsPorTenant[id]||{};
+  if(typeof updateCartBadge==="function")updateCartBadge();
   storeQtys={};
   D.forEach(r=>{storeQtys[r.n]=1;});
   // Re-render everything visible EXCEPT ubicacion (we keep its map alive)
@@ -5316,7 +5337,7 @@ function updateCheckoutGate(){
   const t=tenants[currentTenantId];
   if(isLocalDisponible(t)){
     btn.disabled=false;
-    btn.textContent="Confirmar pedido ↗";
+    btn.textContent="Revisar pedido ↗";
     btn.style.background="";
     btn.style.cursor="";
   } else {
@@ -6444,9 +6465,9 @@ function renderEntregas(){
     </div>
     ${!yo.enLinea?`<div class="store-blocked-banner"><strong>🌙 Estás fuera de línea</strong><span>Los nuevos pedidos no se te asignan hasta que te pongas en línea.</span></div>`:""}
     <div class="rider-section-title">📋 Asignadas a mí (${misAsignadas.length})</div>
-    ${misAsignadas.length?misAsignadas.map(x=>card(x,`<button class="primary" onclick="riderIniciar('${x.tenant.id}','${x.p.id}')">▶ Iniciar entrega</button>`,bAsig)).join(""):`<div class="pedido-empty"><strong>Nada asignado</strong>Cuando un local marque "Preparando" un pedido delivery, se te asigna automáticamente si estás en línea.</div>`}
+    ${misAsignadas.length?misAsignadas.map(x=>card(x,`<button class="edit-btn" onclick="riderSoltar('${x.tenant.id}','${x.p.id}')">Soltar</button><button class="primary" onclick="riderIniciar('${x.tenant.id}','${x.p.id}')">▶ Iniciar entrega</button>`,bAsig)).join(""):`<div class="pedido-empty"><strong>Nada asignado</strong>Cuando un local marque "Preparando" un pedido delivery, se te asigna automáticamente si estás en línea.</div>`}
     <div class="rider-section-title">🛵 En camino (${misCurso.length})</div>
-    ${misCurso.length?misCurso.map(x=>card(x,`<button class="primary" onclick="riderEntregar('${x.tenant.id}','${x.p.id}')">✓ Entregado</button>`,bCurso)).join(""):`<div class="pedido-empty"><strong>Nada en camino</strong>Iniciá una entrega asignada para arrancar.</div>`}
+    ${misCurso.length?misCurso.map(x=>card(x,`<button class="edit-btn" onclick="riderSoltar('${x.tenant.id}','${x.p.id}')">Soltar</button><button class="primary" onclick="riderEntregar('${x.tenant.id}','${x.p.id}')">✓ Entregado</button>`,bCurso)).join(""):`<div class="pedido-empty"><strong>Nada en camino</strong>Iniciá una entrega asignada para arrancar.</div>`}
     <div class="rider-section-title">⏳ Sin asignar (${sinAsignar.length})</div>
     ${sinAsignar.length?sinAsignar.map(x=>card(x,yo.enLinea?`<button class="primary" onclick="riderTomar('${x.tenant.id}','${x.p.id}')">Tomar pedido</button>`:`<button disabled style="opacity:.5">Fuera de línea</button>`,bLibre)).join(""):`<div class="pedido-empty"><strong>Cola vacía</strong>Acá caen los pedidos que se prepararon sin ningún rider en línea.</div>`}
     <p class="foot">Los pedidos se asignan automáticamente al rider en línea con menos carga. Solo se listan pedidos delivery de locales que usan la flota IZIFUD; los que tienen delivery propio gestionan sus envíos desde su panel. Tus entregas terminadas están en 🕓 Historial.</p>`;
@@ -6488,6 +6509,13 @@ function riderEntregar(tenantId,pedidoId){
   refreshPedidosSocioSiVisible();
 }
 
+function riderSoltar(tenantId,pedidoId){
+  if(!confirm("¿Soltar este pedido? Vuelve a la cola para que lo tome otro rider."))return;
+  mutarPedidoCrossTenant(tenantId,pedidoId,p=>{p.riderId=null;if(p.estado==="en_camino")p.estado="preparando";});
+  renderEntregas();
+  refreshPedidosSocioSiVisible();
+}
+
 // ── Mapa de ruta del rider (retiro 🏪 → entrega 🏠) ──
 let rutaMaps={};
 function destroyRutaMaps(){
@@ -6517,7 +6545,8 @@ async function buildRutaMapa(tenantId,pedidoId){
   if(!wrap||!t||!x||rutaMaps[pedidoId])return;
   const centro=[t.lat!=null?t.lat:DEFAULT_CENTER.lat,t.lng!=null?t.lng:DEFAULT_CENTER.lng];
   const m=L.map(wrap,{zoomControl:false,attributionControl:false,scrollWheelZoom:false}).setView(centro,13);
-  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19}).addTo(m);
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:"© OpenStreetMap"}).addTo(m);
+  L.control.attribution({prefix:false}).addTo(m);
   rutaMaps[pedidoId]=m;
   const pin=emoji=>L.divIcon({className:"ruta-pin",html:`<div class="ruta-pin-in">${emoji}</div>`,iconSize:[30,30],iconAnchor:[15,15]});
   const pts=[];
@@ -6680,6 +6709,8 @@ function riderToggleActivo(id){
 function eliminarRider(id){
   const r=riders.find(x=>x.id===id);
   if(!r)return;
+  const activas=allPedidosCrossTenant().filter(x=>x.p.riderId===id&&(x.p.estado==="preparando"||x.p.estado==="en_camino")).length;
+  if(activas){alert(`${r.nombre} tiene ${activas} entrega${activas===1?"":"s"} en curso. Esperá a que termine o que las suelte antes de eliminarlo.`);return;}
   if(!confirm(`¿Eliminar al rider "${r.nombre}"?`))return;
   riders=riders.filter(x=>x.id!==id);
   if(editingRiderId===id)editingRiderId=null;
@@ -6777,6 +6808,7 @@ function renderMisPedidos(){
       ${msg?`<div class="mp-msg">${msg}</div>`:""}
       <div class="mp-items">${resumenItems(p)}</div>
       <div class="mp-entrega">${pickup?`🏪 Retiro en ${t.direccion||"el local"}`:`🛵 Delivery a ${(p.cliente&&p.cliente.direccion)||"tu dirección"}`}</div>
+      ${p.estado==="pendiente"?`<div style="margin-top:8px"><button class="edit-btn" style="color:var(--danger)" onclick="clienteCancelarPedido('${t.id}','${p.id}')">✕ Cancelar pedido</button></div>`:""}
     </div>`;
   };
   const cardPasado=x=>{
@@ -6785,9 +6817,10 @@ function renderMisPedidos(){
     return`<div class="mp-card mp-past">
       <div class="mp-card-top">
         <div class="mp-rest">${t.icono||"🍽"} <strong>${t.nombre}</strong></div>
-        <span class="mp-meta">${fmtFecha(p.fecha)} · ${p.items.length} ítem${p.items.length===1?"":"s"}</span>
+        <span class="mp-meta">${fmtFecha(p.fecha)} · ${p.items.length} producto${p.items.length===1?"":"s"}</span>
         <span class="pedido-status ${p.estado}">${lbl}</span>
         <span class="mp-total">${fmt(p.total)}</span>
+        ${p.estado==="entregado"?`<button class="edit-btn" onclick="repetirPedido('${t.id}','${p.id}')">↻ Repetir</button>`:""}
       </div>
     </div>`;
   };
@@ -6795,6 +6828,29 @@ function renderMisPedidos(){
     ${enCurso.length?`<div class="rider-section-title">En curso (${enCurso.length})</div>${enCurso.map(cardActivo).join("")}`:""}
     ${pasados.length?`<div class="rider-section-title">Historial (${pasados.length})</div>${pasados.map(cardPasado).join("")}`:""}
     <p class="foot">El estado se actualiza solo a medida que el local y el rider avanzan. Más adelante: mapa con la ubicación del rider en vivo.</p>`;
+}
+
+function clienteCancelarPedido(tenantId,pedidoId){
+  if(!confirm("¿Cancelar este pedido?"))return;
+  // Solo mientras el local no lo aceptó (pendiente); después lo maneja el local
+  mutarPedidoCrossTenant(tenantId,pedidoId,p=>{if(p.estado==="pendiente")p.estado="cancelado";});
+  renderMisPedidos();
+  refreshPedidosSocioSiVisible();
+}
+
+function repetirPedido(tenantId,pedidoId){
+  const x=allPedidosCrossTenant().find(e=>e.tenant.id===tenantId&&e.p.id===pedidoId);
+  if(!x)return;
+  if(tenantId!==currentTenantId)switchTenant(tenantId);
+  cart={};
+  x.p.items.forEach(i=>{
+    const d=D.find(r=>r.n===i.nombre&&r.rest===tenantId);
+    if(d)cart[i.nombre]=i.qty;// solo lo que sigue en la carta
+  });
+  updateCartBadge();
+  if(typeof updateCartBar==="function")updateCartBar();
+  goToTab("tienda");
+  setTimeout(openCart,180);
 }
 
 function refreshMisPedidosSiVisible(){
